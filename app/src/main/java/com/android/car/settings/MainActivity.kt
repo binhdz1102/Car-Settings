@@ -4,45 +4,33 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.activity.viewModels
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.car.settings.ui.HvacTemperatureScreen
+import com.android.car.settings.ui.HvacViewModel
 import com.android.car.settings.ui.theme.CarSettingTheme
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: HvacViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
-            CarSettingTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CarSettingScreen(modifier = Modifier.padding(innerPadding))
-                }
+            CarSettingTheme(dynamicColor = false) {
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                HvacTemperatureScreen(
+                    uiState = uiState,
+                    onDecreaseDriverTemperature = viewModel::decreaseDriverTemperature,
+                    onIncreaseDriverTemperature = viewModel::increaseDriverTemperature,
+                    onDecreasePassengerTemperature = viewModel::decreasePassengerTemperature,
+                    onIncreasePassengerTemperature = viewModel::increasePassengerTemperature,
+                    onRetry = viewModel::connect,
+                )
             }
         }
-    }
-}
-
-@Composable
-fun CarSettingScreen(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Text(text = "CarSetting")
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    CarSettingTheme {
-        CarSettingScreen()
     }
 }

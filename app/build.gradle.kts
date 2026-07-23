@@ -22,6 +22,7 @@ val platformKeystoreProperties =
 
 android {
     namespace = "com.android.car.settings"
+    useLibrary("android.car")
 
     defaultConfig {
         applicationId = "com.android.car.settings"
