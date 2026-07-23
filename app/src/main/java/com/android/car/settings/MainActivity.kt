@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
 fun CarSettingScreen(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(text = "CarSetting")
     }
