@@ -43,4 +43,19 @@ sealed class RealCarPropertyResult<out T> {
             is Success -> value
             is Failure -> throw error
         }
+
+    inline fun <R> map(transform: (T) -> R): RealCarPropertyResult<R> =
+        when (this) {
+            is Success -> Success(transform(value), source)
+            is Failure -> this
+        }
+
+    inline fun <R> fold(
+        onSuccess: (value: T, source: RealCarPropertyValueSource) -> R,
+        onFailure: (error: RealCarPropertyException, staleValue: RealCarPropertyValue?) -> R,
+    ): R =
+        when (this) {
+            is Success -> onSuccess(value, source)
+            is Failure -> onFailure(error, staleValue)
+        }
 }

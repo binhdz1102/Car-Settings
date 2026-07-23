@@ -12,6 +12,8 @@ import android.car.hardware.property.PropertyNotAvailableAndRetryException
 import android.car.hardware.property.PropertyNotAvailableException
 import android.car.hardware.property.Subscription
 import android.content.Context
+import android.os.CancellationSignal
+import android.os.SystemClock
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -20,7 +22,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,16 +34,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.resume
 
 /**
  * Singleton wrapper làm việc trực tiếp với `CarPropertyManager` trong môi trường xe thật.
@@ -72,12 +83,14 @@ class RealCarPropertyManager
         private val scope = CoroutineScope(job + carDispatcher)
         private val callbackExecutor = callbackDispatcher.asExecutor()
         private val connectionMutex = Mutex()
+        private val subscriptionMutex = Mutex()
 
         private val callbacksByKey = ConcurrentHashMap<PropertyKey, CopyOnWriteArrayList<CallbackRegistration>>()
         private val callbackKeysByProperty = ConcurrentHashMap<Int, MutableSet<PropertyKey>>()
         private val cache = ConcurrentHashMap<PropertyKey, RealCarPropertyValue>()
         private val subscribedRates = ConcurrentHashMap<Int, Float>()
         private val subscribedAreas = ConcurrentHashMap<Int, Set<Int>>()
+        private val propertyConfigCache = ConcurrentHashMap<Int, CarPropertyConfig<*>>()
 
         private val _connectionState = MutableStateFlow(RealCarConnectionState.DISCONNECTED)
         val connectionState: StateFlow<RealCarConnectionState> = _connectionState.asStateFlow()
@@ -358,6 +371,133 @@ class RealCarPropertyManager
                 value.asIntArray()
             }
 
+        suspend fun tryGetLongProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+        ): RealCarPropertyResult<Long> =
+            readTypedProperty(Long::class.javaObjectType, propertyId, areaId) { value ->
+                value.asLong()
+            }
+
+        suspend fun trySetLongProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+            value: Long,
+        ): RealCarPropertyResult<Unit> = writePropertySafely(Long::class.javaObjectType, propertyId, areaId, value)
+
+        suspend fun tryGetFloatArrayProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+        ): RealCarPropertyResult<FloatArray> =
+            readTypedProperty(FloatArray::class.java, propertyId, areaId) { value ->
+                value.asFloatArray()
+            }
+
+        suspend fun trySetFloatArrayProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+            value: FloatArray,
+        ): RealCarPropertyResult<Unit> =
+            writePropertySafely(
+                FloatArray::class.java,
+                propertyId,
+                areaId,
+                value.copyOf(),
+            )
+
+        suspend fun tryGetLongArrayProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+        ): RealCarPropertyResult<LongArray> =
+            readTypedProperty(LongArray::class.java, propertyId, areaId) { value ->
+                value.asLongArray()
+            }
+
+        suspend fun trySetLongArrayProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+            value: LongArray,
+        ): RealCarPropertyResult<Unit> =
+            writePropertySafely(
+                LongArray::class.java,
+                propertyId,
+                areaId,
+                value.copyOf(),
+            )
+
+        suspend fun tryGetByteArrayProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+        ): RealCarPropertyResult<ByteArray> =
+            readTypedProperty(ByteArray::class.java, propertyId, areaId) { value ->
+                value.asByteArray()
+            }
+
+        suspend fun trySetByteArrayProperty(
+            propertyId: Int,
+            areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
+            value: ByteArray,
+        ): RealCarPropertyResult<Unit> =
+            writePropertySafely(
+                ByteArray::class.java,
+                propertyId,
+                areaId,
+                value.copyOf(),
+            )
+
+        /**
+         * API typed khuyến nghị cho code mới / Recommended type-safe API for new code.
+         */
+        suspend fun <T : Any> read(property: RealCarProperty<T>): RealCarPropertyResult<T> =
+            tryGetProperty(
+                valueClass = property.valueClass,
+                propertyId = property.propertyId,
+                areaId = property.areaId,
+            )
+
+        /**
+         * Ghi có xác nhận VHAL theo mặc định.
+         *
+         * Writes with VHAL confirmation by default. Set [waitForPropertyUpdate] to false only
+         * for explicitly fire-and-forget operations.
+         */
+        suspend fun <T : Any> write(
+            property: RealCarProperty<T>,
+            value: T,
+            waitForPropertyUpdate: Boolean = true,
+            timeoutMillis: Long = RealCarBatchOptions.DEFAULT_TIMEOUT_MILLIS,
+        ): RealCarPropertyResult<Unit> {
+            val batch =
+                trySetProperties(
+                    requests =
+                        listOf(
+                            property.writeRequest(
+                                value = value,
+                                waitForPropertyUpdate = waitForPropertyUpdate,
+                            ),
+                        ),
+                    options = RealCarBatchOptions(timeoutMillis = timeoutMillis),
+                )
+            return batch.items.single().result
+        }
+
+        /**
+         * Observe typed value; lỗi vẫn giữ stale snapshot trong [RealCarPropertyResult.Failure].
+         *
+         * Observes typed values while preserving stale snapshots on failures.
+         */
+        fun <T : Any> observe(
+            property: RealCarProperty<T>,
+            updateRateHz: Float = SENSOR_RATE_ONCHANGE,
+        ): Flow<RealCarPropertyResult<T>> =
+            observeProperty(
+                propertyId = property.propertyId,
+                areaId = property.areaId,
+                updateRateHz = updateRateHz,
+            ).map { result ->
+                result.map { value -> value.castValue(boxedClass(property.valueClass)) }
+            }
+
         /**
          * Đọc property theo kiểu bất kỳ được framework hỗ trợ.
          *
@@ -392,8 +532,16 @@ class RealCarPropertyManager
                 Boolean::class.javaPrimitiveType,
                 -> tryGetBooleanProperty(propertyId, areaId) as RealCarPropertyResult<T>
 
+                Long::class.java,
+                Long::class.javaObjectType,
+                Long::class.javaPrimitiveType,
+                -> tryGetLongProperty(propertyId, areaId) as RealCarPropertyResult<T>
+
                 String::class.java -> tryGetStringProperty(propertyId, areaId) as RealCarPropertyResult<T>
                 IntArray::class.java -> tryGetIntArrayProperty(propertyId, areaId) as RealCarPropertyResult<T>
+                FloatArray::class.java -> tryGetFloatArrayProperty(propertyId, areaId) as RealCarPropertyResult<T>
+                LongArray::class.java -> tryGetLongArrayProperty(propertyId, areaId) as RealCarPropertyResult<T>
+                ByteArray::class.java -> tryGetByteArrayProperty(propertyId, areaId) as RealCarPropertyResult<T>
                 else ->
                     readTypedProperty(boxedClass(valueClass), propertyId, areaId) { value ->
                         value.castValue(boxedClass(valueClass))
@@ -422,6 +570,226 @@ class RealCarPropertyManager
             areaId: Int = RealCarPropertyValue.GLOBAL_AREA_ID,
             value: T,
         ): RealCarPropertyResult<Unit> = writePropertySafely(boxedClass(valueClass), propertyId, areaId, value)
+
+        /**
+         * Đọc metadata để dựng UI động và kiểm tra capability.
+         *
+         * Reads normalized metadata for dynamic UI and capability checks.
+         */
+        suspend fun getPropertyInfo(propertyId: Int): RealCarPropertyResult<RealCarPropertyInfo> =
+            withContext(carDispatcher) {
+                val manager =
+                    managerOrConnect()
+                        ?: return@withContext RealCarPropertyResult.Failure(
+                            serviceNotReadyError(
+                                operation = "metadata",
+                                propertyId = propertyId,
+                                areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                            ),
+                        )
+                try {
+                    val config =
+                        propertyConfig(manager, propertyId)
+                            ?: return@withContext RealCarPropertyResult.Failure(
+                                RealCarPropertyException.UnsupportedProperty(propertyId),
+                            )
+                    RealCarPropertyResult.Success(
+                        value = config.toPropertyInfo(),
+                        source = RealCarPropertyValueSource.REMOTE,
+                    )
+                } catch (error: RuntimeException) {
+                    RealCarPropertyResult.Failure(
+                        mapThrowable(
+                            operation = RealCarPropertyOperation.READ,
+                            propertyId = propertyId,
+                            areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                            error = error,
+                        ),
+                    )
+                }
+            }
+
+        /**
+         * Liệt kê metadata mà CarService cho phép process hiện tại truy cập.
+         *
+         * Lists every property configuration visible to the current process. The returned
+         * objects are immutable and sorted by property id, making this API suitable for
+         * capability discovery, diagnostics, and dynamically generated settings screens.
+         */
+        suspend fun getPropertyInfos(): RealCarPropertyResult<List<RealCarPropertyInfo>> =
+            withContext(carDispatcher) {
+                val manager =
+                    managerOrConnect()
+                        ?: return@withContext RealCarPropertyResult.Failure(
+                            serviceNotReadyError(
+                                operation = "metadata list",
+                                propertyId = RealCarPropertyException.UNKNOWN_PROPERTY_ID,
+                                areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                            ),
+                        )
+                try {
+                    val configs = manager.propertyList
+                    configs.forEach { config ->
+                        propertyConfigCache[config.propertyId] = config
+                    }
+                    RealCarPropertyResult.Success(
+                        value =
+                            configs
+                                .map { config -> config.toPropertyInfo() }
+                                .sortedBy(RealCarPropertyInfo::propertyId),
+                        source = RealCarPropertyValueSource.REMOTE,
+                    )
+                } catch (error: RuntimeException) {
+                    RealCarPropertyResult.Failure(
+                        mapThrowable(
+                            operation = RealCarPropertyOperation.READ,
+                            propertyId = RealCarPropertyException.UNKNOWN_PROPERTY_ID,
+                            areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                            error = error,
+                        ),
+                    )
+                }
+            }
+
+        /**
+         * Batch read dùng API async của framework, hỗ trợ partial success và giữ thứ tự.
+         *
+         * Uses the framework asynchronous API, supports partial success, preserves input
+         * order, chunks large request sets, and bounds concurrent Binder work.
+         */
+        suspend fun tryGetProperties(
+            requests: Collection<RealCarPropertyReadRequest>,
+            options: RealCarBatchOptions = RealCarBatchOptions(),
+        ): RealCarBatchResult<RealCarPropertyValue> {
+            val startedAt = SystemClock.elapsedRealtime()
+            val indexedRequests = requests.mapIndexed(::IndexedReadRequest)
+            if (indexedRequests.isEmpty()) {
+                return RealCarBatchResult(emptyList(), 0)
+            }
+            val uniqueRequests =
+                indexedRequests
+                    .associateBy { indexed ->
+                        ReadRequestIdentity(
+                            propertyId = indexed.request.propertyId,
+                            areaId = indexed.request.areaId,
+                            expectedType = indexed.request.expectedType,
+                        )
+                    }.values
+                    .toList()
+
+            val manager = managerOrConnect()
+            if (manager == null) {
+                val error =
+                    serviceNotReadyError(
+                        operation = "batch read",
+                        propertyId = RealCarPropertyException.UNKNOWN_PROPERTY_ID,
+                        areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                    )
+                return RealCarBatchResult(
+                    items = indexedRequests.map { it.failure(error) },
+                    elapsedRealtimeMillis = SystemClock.elapsedRealtime() - startedAt,
+                )
+            }
+
+            val semaphore = Semaphore(options.maxConcurrentChunks)
+            val items =
+                coroutineScope {
+                    uniqueRequests
+                        .chunked(options.maxRequestsPerChunk)
+                        .map { chunk ->
+                            async(carDispatcher) {
+                                semaphore.withPermit {
+                                    getPropertyChunk(manager, chunk, options)
+                                }
+                            }
+                        }.awaitAll()
+                        .flatten()
+                }
+            val uniqueResults =
+                items.associateBy { item ->
+                    val request = indexedRequests.first { it.index == item.requestIndex }.request
+                    ReadRequestIdentity(
+                        propertyId = request.propertyId,
+                        areaId = request.areaId,
+                        expectedType = request.expectedType,
+                    )
+                }
+            val expandedItems =
+                indexedRequests.map { indexed ->
+                    val identity =
+                        ReadRequestIdentity(
+                            propertyId = indexed.request.propertyId,
+                            areaId = indexed.request.areaId,
+                            expectedType = indexed.request.expectedType,
+                        )
+                    val result = checkNotNull(uniqueResults[identity]).result
+                    RealCarBatchItem(
+                        requestIndex = indexed.index,
+                        propertyId = indexed.request.propertyId,
+                        areaId = indexed.request.areaId,
+                        result = result,
+                    )
+                }
+            return RealCarBatchResult(
+                items = expandedItems,
+                elapsedRealtimeMillis = SystemClock.elapsedRealtime() - startedAt,
+            )
+        }
+
+        /**
+         * Batch write dùng xác nhận VHAL theo từng request và không làm mất partial result.
+         *
+         * Batch writes preserve per-request confirmation/failure and never turn a partial
+         * failure into an all-or-nothing exception. Requests for different property/area
+         * pairs can run concurrently; requests targeting the same pair are serialized in
+         * input order so a later value cannot be overwritten by an earlier in-flight call.
+         */
+        suspend fun trySetProperties(
+            requests: Collection<RealCarPropertyWriteRequest>,
+            options: RealCarBatchOptions = RealCarBatchOptions(),
+        ): RealCarBatchResult<Unit> {
+            val startedAt = SystemClock.elapsedRealtime()
+            val indexedRequests = requests.mapIndexed(::IndexedWriteRequest)
+            if (indexedRequests.isEmpty()) {
+                return RealCarBatchResult(emptyList(), 0)
+            }
+
+            val manager = managerOrConnect()
+            if (manager == null) {
+                val error =
+                    serviceNotReadyError(
+                        operation = "batch write",
+                        propertyId = RealCarPropertyException.UNKNOWN_PROPERTY_ID,
+                        areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                    )
+                return RealCarBatchResult(
+                    items = indexedRequests.map { it.failure(error) },
+                    elapsedRealtimeMillis = SystemClock.elapsedRealtime() - startedAt,
+                )
+            }
+
+            val items = mutableListOf<RealCarBatchItem<Unit>>()
+            for (wave in buildWriteWaves(indexedRequests)) {
+                val semaphore = Semaphore(options.maxConcurrentChunks)
+                items +=
+                    coroutineScope {
+                        wave
+                            .chunked(options.maxRequestsPerChunk)
+                            .map { chunk ->
+                                async(carDispatcher) {
+                                    semaphore.withPermit {
+                                        setPropertyChunk(manager, chunk, options.timeoutMillis)
+                                    }
+                                }
+                            }.awaitAll()
+                            .flatten()
+                    }
+            }
+            return RealCarBatchResult(
+                items = items.sortedBy(RealCarBatchItem<Unit>::requestIndex),
+                elapsedRealtimeMillis = SystemClock.elapsedRealtime() - startedAt,
+            )
+        }
 
         /**
          * Observe một property bằng Flow.
@@ -621,6 +989,7 @@ class RealCarPropertyManager
             }
             subscribedRates.clear()
             subscribedAreas.clear()
+            propertyConfigCache.clear()
             carPropertyManager = null
             car?.disconnect()
             car = null
@@ -680,13 +1049,30 @@ class RealCarPropertyManager
                             cache[key],
                         )
 
-                val accessError = validatePropertyAccess(manager, RealCarPropertyOperation.READ, propertyId, areaId)
+                val accessError =
+                    validatePropertyRequest(
+                        manager = manager,
+                        operation = RealCarPropertyOperation.READ,
+                        propertyId = propertyId,
+                        areaId = areaId,
+                        expectedType = valueClass,
+                    )
                 if (accessError != null) {
                     return@withContext RealCarPropertyResult.Failure(accessError, cache[key])
                 }
 
                 try {
-                    val platformValue = manager.getProperty(valueClass, propertyId, areaId)
+                    val platformValueClass =
+                        checkNotNull(propertyConfig(manager, propertyId))
+                            .propertyType
+
+                    @Suppress("UNCHECKED_CAST")
+                    val platformValue =
+                        manager.getProperty(
+                            platformValueClass as Class<Any>,
+                            propertyId,
+                            areaId,
+                        )
                     val wrappedValue = RealCarPropertyValue.from(platformValue)
                     val mappedValue = mapper(wrappedValue)
                     cache[key] = wrappedValue
@@ -715,13 +1101,30 @@ class RealCarPropertyManager
                             cache[key],
                         )
 
-                val accessError = validatePropertyAccess(manager, RealCarPropertyOperation.WRITE, propertyId, areaId)
+                val accessError =
+                    validatePropertyRequest(
+                        manager = manager,
+                        operation = RealCarPropertyOperation.WRITE,
+                        propertyId = propertyId,
+                        areaId = areaId,
+                        expectedType = valueClass,
+                    )
                 if (accessError != null) {
                     return@withContext RealCarPropertyResult.Failure(accessError, cache[key])
                 }
 
                 try {
-                    manager.setProperty(valueClass, propertyId, areaId, value)
+                    val platformValueClass =
+                        checkNotNull(propertyConfig(manager, propertyId))
+                            .propertyType
+                    val platformValue = value.toPlatformValue(platformValueClass)
+                    @Suppress("UNCHECKED_CAST")
+                    manager.setProperty(
+                        platformValueClass as Class<Any>,
+                        propertyId,
+                        areaId,
+                        platformValue,
+                    )
                     val localValue = RealCarPropertyValue.local(propertyId, areaId, value)
                     cache[key] = localValue
                     dispatch(localValue)
@@ -735,6 +1138,363 @@ class RealCarPropertyManager
                 }
             }
 
+        private suspend fun getPropertyChunk(
+            manager: CarPropertyManager,
+            requests: List<IndexedReadRequest>,
+            options: RealCarBatchOptions,
+        ): List<RealCarBatchItem<RealCarPropertyValue>> {
+            val immediateResults = mutableListOf<RealCarBatchItem<RealCarPropertyValue>>()
+            val validRequests =
+                requests.mapNotNull { indexed ->
+                    val request = indexed.request
+                    val validationError =
+                        validatePropertyRequest(
+                            manager = manager,
+                            operation = RealCarPropertyOperation.READ,
+                            propertyId = request.propertyId,
+                            areaId = request.areaId,
+                            expectedType = request.expectedType,
+                        )
+                    if (validationError == null) {
+                        indexed
+                    } else {
+                        immediateResults += indexed.failure(validationError)
+                        null
+                    }
+                }
+            if (validRequests.isEmpty()) return immediateResults.sortedBy { it.requestIndex }
+
+            val asyncResults =
+                awaitGetPropertyChunk(
+                    manager = manager,
+                    requests = validRequests,
+                    timeoutMillis = options.timeoutMillis,
+                )
+            val recoveredResults =
+                if (options.fallbackToSynchronousRead) {
+                    asyncResults.map { item ->
+                        val error = (item.result as? RealCarPropertyResult.Failure)?.error
+                        if (error is RealCarPropertyException.AsyncOperationFailed) {
+                            val indexed = validRequests.first { it.index == item.requestIndex }
+                            getPropertySynchronously(manager, indexed)
+                        } else {
+                            item
+                        }
+                    }
+                } else {
+                    asyncResults
+                }
+            return (immediateResults + recoveredResults).sortedBy { it.requestIndex }
+        }
+
+        private fun getPropertySynchronously(
+            manager: CarPropertyManager,
+            indexed: IndexedReadRequest,
+        ): RealCarBatchItem<RealCarPropertyValue> {
+            val request = indexed.request
+            return try {
+                val valueClass =
+                    checkNotNull(propertyConfig(manager, request.propertyId))
+                        .propertyType
+
+                @Suppress("UNCHECKED_CAST")
+                val platformValue =
+                    manager.getProperty(
+                        valueClass as Class<Any>,
+                        request.propertyId,
+                        request.areaId,
+                    )
+                val value = RealCarPropertyValue.from(platformValue)
+                cache[PropertyKey(request.propertyId, request.areaId)] = value
+                indexed.success(value)
+            } catch (error: RuntimeException) {
+                indexed.failure(
+                    mapThrowable(
+                        operation = RealCarPropertyOperation.READ,
+                        propertyId = request.propertyId,
+                        areaId = request.areaId,
+                        error = error,
+                    ),
+                )
+            }
+        }
+
+        private suspend fun awaitGetPropertyChunk(
+            manager: CarPropertyManager,
+            requests: List<IndexedReadRequest>,
+            timeoutMillis: Long,
+        ): List<RealCarBatchItem<RealCarPropertyValue>> =
+            suspendCancellableCoroutine { continuation ->
+                val cancellationSignal = CancellationSignal()
+                val generatedRequests =
+                    requests.map { indexed ->
+                        manager.generateGetPropertyRequest(
+                            indexed.request.propertyId,
+                            indexed.request.areaId,
+                        ) to indexed
+                    }
+                val platformRequests = generatedRequests.map { it.first }
+                val indexedByRequestId =
+                    generatedRequests.associate { (generated, indexed) ->
+                        generated.requestId to indexed
+                    }
+                val completed = ConcurrentHashMap<Int, RealCarBatchItem<RealCarPropertyValue>>()
+                val resumed = AtomicBoolean(false)
+
+                fun complete(
+                    requestId: Int,
+                    item: RealCarBatchItem<RealCarPropertyValue>,
+                ) {
+                    completed.putIfAbsent(requestId, item)
+                    if (
+                        completed.size == generatedRequests.size &&
+                        resumed.compareAndSet(false, true) &&
+                        continuation.isActive
+                    ) {
+                        continuation.resume(completed.values.sortedBy { it.requestIndex })
+                    }
+                }
+
+                continuation.invokeOnCancellation {
+                    cancellationSignal.cancel()
+                }
+
+                try {
+                    manager.getPropertiesAsync(
+                        platformRequests,
+                        timeoutMillis,
+                        cancellationSignal,
+                        callbackExecutor,
+                        object : CarPropertyManager.GetPropertyCallback {
+                            override fun onSuccess(result: CarPropertyManager.GetPropertyResult<*>) {
+                                val indexed = indexedByRequestId[result.requestId] ?: return
+                                val value =
+                                    RealCarPropertyValue.remote(
+                                        propertyId = result.propertyId,
+                                        areaId = result.areaId,
+                                        value = result.value,
+                                        timestampNanos = result.timestampNanos,
+                                    )
+                                cache[PropertyKey(result.propertyId, result.areaId)] = value
+                                complete(
+                                    result.requestId,
+                                    indexed.success(value),
+                                )
+                            }
+
+                            override fun onFailure(error: CarPropertyManager.PropertyAsyncError) {
+                                val indexed = indexedByRequestId[error.requestId] ?: return
+                                complete(
+                                    error.requestId,
+                                    indexed.failure(
+                                        asyncError(
+                                            operation = RealCarPropertyOperation.READ,
+                                            propertyId = error.propertyId,
+                                            areaId = error.areaId,
+                                            errorCode = error.errorCode,
+                                            detailedErrorCode = error.detailedErrorCode,
+                                            timeoutMillis = timeoutMillis,
+                                        ),
+                                    ),
+                                )
+                            }
+                        },
+                    )
+                } catch (error: RuntimeException) {
+                    if (resumed.compareAndSet(false, true) && continuation.isActive) {
+                        val mapped =
+                            mapThrowable(
+                                operation = RealCarPropertyOperation.READ,
+                                propertyId = RealCarPropertyException.UNKNOWN_PROPERTY_ID,
+                                areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                                error = error,
+                            )
+                        continuation.resume(requests.map { it.failure(mapped) })
+                    }
+                }
+            }
+
+        private suspend fun setPropertyChunk(
+            manager: CarPropertyManager,
+            requests: List<IndexedWriteRequest>,
+            timeoutMillis: Long,
+        ): List<RealCarBatchItem<Unit>> {
+            val immediateResults = mutableListOf<RealCarBatchItem<Unit>>()
+            val validRequests =
+                requests.mapNotNull { indexed ->
+                    val request = indexed.request
+                    val rateError =
+                        validateUpdateRate(
+                            propertyId = request.propertyId,
+                            areaId = request.areaId,
+                            updateRateHz = request.updateRateHz,
+                        )
+                    val validationError =
+                        rateError
+                            ?: validatePropertyRequest(
+                                manager = manager,
+                                operation = RealCarPropertyOperation.WRITE,
+                                propertyId = request.propertyId,
+                                areaId = request.areaId,
+                                expectedType = request.expectedType ?: request.value.javaClass,
+                            )
+                    if (validationError == null) {
+                        indexed
+                    } else {
+                        immediateResults += indexed.failure(validationError)
+                        null
+                    }
+                }
+            if (validRequests.isEmpty()) return immediateResults.sortedBy { it.requestIndex }
+
+            val asyncResults =
+                awaitSetPropertyChunk(
+                    manager = manager,
+                    requests = validRequests,
+                    timeoutMillis = timeoutMillis,
+                )
+            return (immediateResults + asyncResults).sortedBy { it.requestIndex }
+        }
+
+        private suspend fun awaitSetPropertyChunk(
+            manager: CarPropertyManager,
+            requests: List<IndexedWriteRequest>,
+            timeoutMillis: Long,
+        ): List<RealCarBatchItem<Unit>> =
+            suspendCancellableCoroutine { continuation ->
+                val cancellationSignal = CancellationSignal()
+                val requestsById = mutableMapOf<Int, IndexedWriteRequest>()
+                val platformRequests =
+                    requests.map { indexed ->
+                        val request = indexed.request
+                        val platformValueClass =
+                            checkNotNull(propertyConfig(manager, request.propertyId))
+                                .propertyType
+                        manager
+                            .generateSetPropertyRequest(
+                                request.propertyId,
+                                request.areaId,
+                                request.value.toPlatformValue(platformValueClass),
+                            ).apply {
+                                isWaitForPropertyUpdate = request.waitForPropertyUpdate
+                                updateRateHz = request.updateRateHz
+                                requestsById[requestId] = indexed
+                            }
+                    }
+                val completed = ConcurrentHashMap<Int, RealCarBatchItem<Unit>>()
+                val resumed = AtomicBoolean(false)
+
+                fun complete(
+                    requestId: Int,
+                    item: RealCarBatchItem<Unit>,
+                ) {
+                    completed.putIfAbsent(requestId, item)
+                    if (
+                        completed.size == platformRequests.size &&
+                        resumed.compareAndSet(false, true) &&
+                        continuation.isActive
+                    ) {
+                        continuation.resume(completed.values.sortedBy { it.requestIndex })
+                    }
+                }
+
+                continuation.invokeOnCancellation {
+                    cancellationSignal.cancel()
+                }
+
+                try {
+                    manager.setPropertiesAsync(
+                        platformRequests,
+                        timeoutMillis,
+                        cancellationSignal,
+                        callbackExecutor,
+                        object : CarPropertyManager.SetPropertyCallback {
+                            override fun onSuccess(result: CarPropertyManager.SetPropertyResult) {
+                                val indexed = requestsById[result.requestId] ?: return
+                                val request = indexed.request
+                                val value =
+                                    RealCarPropertyValue.remote(
+                                        propertyId = result.propertyId,
+                                        areaId = result.areaId,
+                                        value = request.value,
+                                        timestampNanos = result.updateTimestampNanos,
+                                    )
+                                cache[PropertyKey(result.propertyId, result.areaId)] = value
+                                dispatch(value)
+                                complete(
+                                    result.requestId,
+                                    indexed.success(Unit),
+                                )
+                            }
+
+                            override fun onFailure(error: CarPropertyManager.PropertyAsyncError) {
+                                val indexed = requestsById[error.requestId] ?: return
+                                complete(
+                                    error.requestId,
+                                    indexed.failure(
+                                        asyncError(
+                                            operation = RealCarPropertyOperation.WRITE,
+                                            propertyId = error.propertyId,
+                                            areaId = error.areaId,
+                                            errorCode = error.errorCode,
+                                            detailedErrorCode = error.detailedErrorCode,
+                                            timeoutMillis = timeoutMillis,
+                                        ),
+                                    ),
+                                )
+                            }
+                        },
+                    )
+                } catch (error: RuntimeException) {
+                    if (resumed.compareAndSet(false, true) && continuation.isActive) {
+                        val mapped =
+                            mapThrowable(
+                                operation = RealCarPropertyOperation.WRITE,
+                                propertyId = RealCarPropertyException.UNKNOWN_PROPERTY_ID,
+                                areaId = RealCarPropertyValue.GLOBAL_AREA_ID,
+                                error = error,
+                            )
+                        continuation.resume(requests.map { it.failure(mapped) })
+                    }
+                }
+            }
+
+        private fun asyncError(
+            operation: RealCarPropertyOperation,
+            propertyId: Int,
+            areaId: Int,
+            errorCode: Int,
+            detailedErrorCode: Int,
+            timeoutMillis: Long,
+        ): RealCarPropertyException =
+            when (errorCode) {
+                CarPropertyManager.STATUS_ERROR_TIMEOUT ->
+                    RealCarPropertyException.Timeout(
+                        operation = operation,
+                        propertyId = propertyId,
+                        areaId = areaId,
+                        timeoutMillis = timeoutMillis,
+                    )
+
+                CarPropertyManager.STATUS_ERROR_NOT_AVAILABLE ->
+                    RealCarPropertyException.PropertyUnavailable(
+                        propertyId = propertyId,
+                        areaId = areaId,
+                        detailedErrorCode = detailedErrorCode,
+                        retryable = true,
+                    )
+
+                else ->
+                    RealCarPropertyException.AsyncOperationFailed(
+                        operation = operation,
+                        propertyId = propertyId,
+                        areaId = areaId,
+                        errorCode = errorCode,
+                        detailedErrorCode = detailedErrorCode,
+                        retryable = errorCode == CarPropertyManager.STATUS_ERROR_INTERNAL_ERROR,
+                    )
+            }
+
         private suspend fun managerOrConnect(): CarPropertyManager? {
             carPropertyManager?.let { return it }
             connect()
@@ -746,7 +1506,7 @@ class RealCarPropertyManager
             areaId: Int,
             updateRateHz: Float,
         ): RealCarPropertyException? =
-            if (updateRateHz < 0f) {
+            if (!updateRateHz.isFinite() || updateRateHz < 0f) {
                 RealCarPropertyException.InvalidUpdateRate(propertyId, areaId, updateRateHz)
             } else {
                 null
@@ -759,7 +1519,7 @@ class RealCarPropertyManager
             areaId: Int,
         ): RealCarPropertyException? =
             try {
-                val config = manager.getCarPropertyConfig(propertyId)
+                val config = propertyConfig(manager, propertyId)
                 if (config == null) {
                     RealCarPropertyException.UnsupportedProperty(propertyId)
                 } else {
@@ -768,6 +1528,49 @@ class RealCarPropertyManager
             } catch (error: RuntimeException) {
                 mapThrowable(operation, propertyId, areaId, error)
             }
+
+        private fun validatePropertyRequest(
+            manager: CarPropertyManager,
+            operation: RealCarPropertyOperation,
+            propertyId: Int,
+            areaId: Int,
+            expectedType: Class<*>?,
+        ): RealCarPropertyException? {
+            val config =
+                try {
+                    propertyConfig(manager, propertyId)
+                } catch (error: RuntimeException) {
+                    return mapThrowable(operation, propertyId, areaId, error)
+                } ?: return RealCarPropertyException.UnsupportedProperty(propertyId)
+
+            validateConfigAccess(config, operation, areaId)?.let { return it }
+
+            val boxedExpectedType = expectedType?.let(::boxedClassUntyped)
+            val boxedActualType = boxedClassUntyped(config.propertyType)
+            if (
+                boxedExpectedType != null &&
+                boxedExpectedType != Any::class.java &&
+                !boxedExpectedType.isAssignableFrom(boxedActualType) &&
+                !boxedActualType.isAssignableFrom(boxedExpectedType)
+            ) {
+                return RealCarPropertyException.TypeMismatch(
+                    propertyId = propertyId,
+                    areaId = areaId,
+                    expectedType = boxedExpectedType.simpleName,
+                    actualType = boxedActualType.simpleName,
+                )
+            }
+            return null
+        }
+
+        private fun propertyConfig(
+            manager: CarPropertyManager,
+            propertyId: Int,
+        ): CarPropertyConfig<*>? =
+            propertyConfigCache[propertyId]
+                ?: manager.getCarPropertyConfig(propertyId)?.also { config ->
+                    propertyConfigCache[propertyId] = config
+                }
 
         private fun validateConfigAccess(
             config: CarPropertyConfig<*>,
@@ -780,7 +1583,7 @@ class RealCarPropertyManager
                 return RealCarPropertyException.UnsupportedArea(propertyId, areaId, supportedAreas)
             }
 
-            val access = config.access
+            val access = config.getAreaIdConfig(areaId)?.access ?: config.access
             val canRead =
                 access == CarPropertyConfig.VEHICLE_PROPERTY_ACCESS_READ ||
                     access == CarPropertyConfig.VEHICLE_PROPERTY_ACCESS_READ_WRITE
@@ -797,6 +1600,45 @@ class RealCarPropertyManager
                     if (!canWrite) RealCarPropertyException.PermissionDenied(operation, propertyId, areaId) else null
             }
         }
+
+        private fun CarPropertyConfig<*>.toPropertyInfo(): RealCarPropertyInfo {
+            val normalizedAreaIds = supportedAreaIds(this).sorted()
+            return RealCarPropertyInfo(
+                propertyId = propertyId,
+                name = RealVehiclePropertyIds.nameOf(propertyId),
+                valueClass = propertyType,
+                access = access.toRealCarPropertyAccess(),
+                changeMode =
+                    when (changeMode) {
+                        CarPropertyConfig.VEHICLE_PROPERTY_CHANGE_MODE_STATIC -> RealCarPropertyChangeMode.STATIC
+                        CarPropertyConfig.VEHICLE_PROPERTY_CHANGE_MODE_ONCHANGE -> RealCarPropertyChangeMode.ON_CHANGE
+                        CarPropertyConfig.VEHICLE_PROPERTY_CHANGE_MODE_CONTINUOUS -> RealCarPropertyChangeMode.CONTINUOUS
+                        else -> RealCarPropertyChangeMode.UNKNOWN
+                    },
+                areaType = areaType,
+                areas =
+                    normalizedAreaIds.map { areaId ->
+                        val areaConfig = getAreaIdConfig(areaId)
+                        RealCarPropertyAreaInfo(
+                            areaId = areaId,
+                            access = (areaConfig?.access ?: access).toRealCarPropertyAccess(),
+                            minimumValue = RealCarPropertyValue.defensiveCopy(areaConfig?.minValue),
+                            maximumValue = RealCarPropertyValue.defensiveCopy(areaConfig?.maxValue),
+                        )
+                    },
+                minimumSampleRateHz = minSampleRate,
+                maximumSampleRateHz = maxSampleRate,
+                configArray = configArray.toList(),
+            )
+        }
+
+        private fun Int.toRealCarPropertyAccess(): RealCarPropertyAccess =
+            when (this) {
+                CarPropertyConfig.VEHICLE_PROPERTY_ACCESS_READ -> RealCarPropertyAccess.READ
+                CarPropertyConfig.VEHICLE_PROPERTY_ACCESS_WRITE -> RealCarPropertyAccess.WRITE
+                CarPropertyConfig.VEHICLE_PROPERTY_ACCESS_READ_WRITE -> RealCarPropertyAccess.READ_WRITE
+                else -> RealCarPropertyAccess.NONE
+            }
 
         private fun supportedAreaIds(config: CarPropertyConfig<*>): Set<Int> {
             val areaIds = config.areaIds
@@ -819,6 +1661,7 @@ class RealCarPropertyManager
                     )
 
             carPropertyManager = manager
+            propertyConfigCache.clear()
             _connectionState.value = RealCarConnectionState.CONNECTED
             logInfo("platform CarPropertyManager attached")
             reconcileSubscriptionsAsync()
@@ -831,51 +1674,52 @@ class RealCarPropertyManager
             }
         }
 
-        private suspend fun reconcileSubscriptions() {
-            val manager =
-                carPropertyManager ?: run {
-                    connectAsync()
-                    return
-                }
-            val desiredSubscriptions = desiredSubscriptions()
-            val desiredPropertyIds = desiredSubscriptions.keys
-            val currentlySubscribed = subscribedRates.keys.toSet()
+        private suspend fun reconcileSubscriptions() =
+            subscriptionMutex.withLock {
+                val manager =
+                    carPropertyManager ?: run {
+                        connectAsync()
+                        return@withLock
+                    }
+                val desiredSubscriptions = desiredSubscriptions()
+                val desiredPropertyIds = desiredSubscriptions.keys
+                val currentlySubscribed = subscribedRates.keys.toSet()
 
-            (currentlySubscribed - desiredPropertyIds).forEach { propertyId ->
-                runCatching {
-                    manager.unsubscribePropertyEvents(propertyId, platformCallback)
-                    subscribedRates.remove(propertyId)
-                    subscribedAreas.remove(propertyId)
-                    logInfo("unsubscribed property=${propertyLabel(propertyId)}")
-                }.onFailure { error ->
-                    logWarn("failed to unsubscribe property=${propertyLabel(propertyId)}", error)
-                }
-            }
-
-            desiredSubscriptions.forEach { (propertyId, desired) ->
-                val currentRate = subscribedRates[propertyId]
-                val currentAreas = subscribedAreas[propertyId].orEmpty()
-                if (currentRate != null && currentRate >= desired.updateRateHz && currentAreas == desired.areaIds) {
-                    return@forEach
-                }
-
-                desired.validationAreaIds.forEach { areaId ->
-                    validatePropertyAccess(
-                        manager = manager,
-                        operation = RealCarPropertyOperation.OBSERVE,
-                        propertyId = propertyId,
-                        areaId = areaId,
-                    )?.let { error ->
-                        reportError(error)
-                        return@forEach
+                (currentlySubscribed - desiredPropertyIds).forEach { propertyId ->
+                    runCatching {
+                        manager.unsubscribePropertyEvents(propertyId, platformCallback)
+                        subscribedRates.remove(propertyId)
+                        subscribedAreas.remove(propertyId)
+                        logInfo("unsubscribed property=${propertyLabel(propertyId)}")
+                    }.onFailure { error ->
+                        logWarn("failed to unsubscribe property=${propertyLabel(propertyId)}", error)
                     }
                 }
 
-                subscribePlatform(manager, desired)?.let { error ->
-                    reportError(error)
+                desiredSubscriptions.forEach { (propertyId, desired) ->
+                    val currentRate = subscribedRates[propertyId]
+                    val currentAreas = subscribedAreas[propertyId].orEmpty()
+                    if (currentRate != null && currentRate >= desired.updateRateHz && currentAreas == desired.areaIds) {
+                        return@forEach
+                    }
+
+                    desired.validationAreaIds.forEach { areaId ->
+                        validatePropertyAccess(
+                            manager = manager,
+                            operation = RealCarPropertyOperation.OBSERVE,
+                            propertyId = propertyId,
+                            areaId = areaId,
+                        )?.let { error ->
+                            reportError(error)
+                            return@forEach
+                        }
+                    }
+
+                    subscribePlatform(manager, desired)?.let { error ->
+                        reportError(error)
+                    }
                 }
             }
-        }
 
         private fun desiredSubscriptions(): Map<Int, DesiredSubscription> =
             callbacksByKey
@@ -1037,6 +1881,7 @@ class RealCarPropertyManager
             carPropertyManager = null
             subscribedRates.clear()
             subscribedAreas.clear()
+            propertyConfigCache.clear()
             if (_connectionState.value != RealCarConnectionState.CLOSED) {
                 _connectionState.value = RealCarConnectionState.DISCONNECTED
             }
@@ -1115,7 +1960,7 @@ class RealCarPropertyManager
                         cause = error,
                     )
                 is CarInternalErrorException ->
-                    RealCarPropertyException.ServiceUnavailable(operation.name.lowercase(), propertyId, areaId, error)
+                    RealCarPropertyException.InternalError(propertyId, areaId, error)
                 is IllegalArgumentException ->
                     RealCarPropertyException.InvalidValue(
                         propertyId = propertyId,
@@ -1124,14 +1969,8 @@ class RealCarPropertyManager
                         cause = error,
                     )
                 is IllegalStateException ->
-                    RealCarPropertyException.ServiceUnavailable(operation.name.lowercase(), propertyId, areaId, error)
-                else ->
-                    RealCarPropertyException.ServiceUnavailable(
-                        operation.name.lowercase(),
-                        propertyId,
-                        areaId,
-                        error,
-                    )
+                    RealCarPropertyException.PlatformFailure(operation, propertyId, areaId, error)
+                else -> RealCarPropertyException.PlatformFailure(operation, propertyId, areaId, error)
             }
 
         @Suppress("UNCHECKED_CAST")
@@ -1140,10 +1979,41 @@ class RealCarPropertyManager
                 Float::class.javaPrimitiveType -> Float::class.javaObjectType as Class<T>
                 Int::class.javaPrimitiveType -> Int::class.javaObjectType as Class<T>
                 Boolean::class.javaPrimitiveType -> Boolean::class.javaObjectType as Class<T>
+                Long::class.javaPrimitiveType -> Long::class.javaObjectType as Class<T>
                 else -> valueClass
             }
 
+        private fun boxedClassUntyped(valueClass: Class<*>): Class<*> =
+            when (valueClass) {
+                Float::class.javaPrimitiveType -> Float::class.javaObjectType
+                Int::class.javaPrimitiveType -> Int::class.javaObjectType
+                Boolean::class.javaPrimitiveType -> Boolean::class.javaObjectType
+                Long::class.javaPrimitiveType -> Long::class.javaObjectType
+                IntArray::class.java -> Array<Int>::class.java
+                FloatArray::class.java -> Array<Float>::class.java
+                LongArray::class.java -> Array<Long>::class.java
+                ByteArray::class.java -> Array<Byte>::class.java
+                else -> valueClass
+            }
+
+        private fun Any.toPlatformValue(platformValueClass: Class<*>): Any =
+            when {
+                this is IntArray && platformValueClass == Array<Int>::class.java -> toTypedArray()
+                this is FloatArray && platformValueClass == Array<Float>::class.java -> toTypedArray()
+                this is LongArray && platformValueClass == Array<Long>::class.java -> toTypedArray()
+                this is ByteArray && platformValueClass == Array<Byte>::class.java -> toTypedArray()
+                else -> RealCarPropertyValue.defensiveCopy(this) ?: this
+            }
+
         private fun <T : Any> RealCarPropertyValue.castValue(valueClass: Class<T>): T {
+            @Suppress("UNCHECKED_CAST")
+            when (valueClass) {
+                IntArray::class.java -> return asIntArray() as T
+                FloatArray::class.java -> return asFloatArray() as T
+                LongArray::class.java -> return asLongArray() as T
+                ByteArray::class.java -> return asByteArray() as T
+            }
+
             val rawValue = requireAvailable().value
             if (rawValue == null || !valueClass.isInstance(rawValue)) {
                 throw RealCarPropertyException.TypeMismatch(
@@ -1213,6 +2083,97 @@ class RealCarPropertyManager
             val propertyId: Int,
             val areaId: Int,
         )
+
+        private data class IndexedReadRequest(
+            val index: Int,
+            val request: RealCarPropertyReadRequest,
+        )
+
+        private data class ReadRequestIdentity(
+            val propertyId: Int,
+            val areaId: Int,
+            val expectedType: Class<*>?,
+        )
+
+        private data class IndexedWriteRequest(
+            val index: Int,
+            val request: RealCarPropertyWriteRequest,
+        )
+
+        private data class WriteRequestIdentity(
+            val propertyId: Int,
+            val areaId: Int,
+        )
+
+        /**
+         * Chia batch ghi thành các lượt không trùng key.
+         *
+         * Splits writes into conflict-free waves. This preserves input order for repeated
+         * property/area pairs while retaining parallelism across independent properties.
+         */
+        private fun buildWriteWaves(requests: List<IndexedWriteRequest>): List<List<IndexedWriteRequest>> {
+            val remaining = requests.toMutableList()
+            val waves = mutableListOf<List<IndexedWriteRequest>>()
+            while (remaining.isNotEmpty()) {
+                val identities = mutableSetOf<WriteRequestIdentity>()
+                val wave = mutableListOf<IndexedWriteRequest>()
+                val iterator = remaining.listIterator()
+                while (iterator.hasNext()) {
+                    val indexed = iterator.next()
+                    val identity =
+                        WriteRequestIdentity(
+                            propertyId = indexed.request.propertyId,
+                            areaId = indexed.request.areaId,
+                        )
+                    if (identities.add(identity)) {
+                        wave += indexed
+                        iterator.remove()
+                    }
+                }
+                waves += wave
+            }
+            return waves
+        }
+
+        private fun IndexedReadRequest.success(value: RealCarPropertyValue) =
+            RealCarBatchItem(
+                requestIndex = index,
+                propertyId = request.propertyId,
+                areaId = request.areaId,
+                result = RealCarPropertyResult.Success(value, RealCarPropertyValueSource.REMOTE),
+            )
+
+        private fun IndexedReadRequest.failure(error: RealCarPropertyException) =
+            RealCarBatchItem<RealCarPropertyValue>(
+                requestIndex = index,
+                propertyId = request.propertyId,
+                areaId = request.areaId,
+                result =
+                    RealCarPropertyResult.Failure(
+                        error = error,
+                        staleValue = cache[PropertyKey(request.propertyId, request.areaId)],
+                    ),
+            )
+
+        private fun IndexedWriteRequest.success(value: Unit) =
+            RealCarBatchItem(
+                requestIndex = index,
+                propertyId = request.propertyId,
+                areaId = request.areaId,
+                result = RealCarPropertyResult.Success(value, RealCarPropertyValueSource.REMOTE),
+            )
+
+        private fun IndexedWriteRequest.failure(error: RealCarPropertyException) =
+            RealCarBatchItem<Unit>(
+                requestIndex = index,
+                propertyId = request.propertyId,
+                areaId = request.areaId,
+                result =
+                    RealCarPropertyResult.Failure(
+                        error = error,
+                        staleValue = cache[PropertyKey(request.propertyId, request.areaId)],
+                    ),
+            )
 
         private data class CallbackRegistration(
             val callback: CarPropertyEventCallback,
