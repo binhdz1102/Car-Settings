@@ -25,4 +25,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CarSettings"
 include(":app")
- 
+include(":core:realcar")
