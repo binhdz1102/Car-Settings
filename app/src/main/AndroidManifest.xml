@@ -57,6 +57,11 @@
                 android:value="true" />
         </activity-alias>
 
+        <activity
+            android:name=".LocalCallbackDemoActivity"
+            android:exported="true"
+            android:label="LocalCallback Demo" />
+
     </application>
 
 </manifest>

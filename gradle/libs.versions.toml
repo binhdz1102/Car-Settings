@@ -41,6 +41,8 @@ junit = "4.13.2"
 androidxJunit = "1.3.0"
 espresso = "3.7.0"
 
+kotlinxCoroutines = "1.7.3"
+
 [libraries]
 # Gradle plugin classpath artifacts used by build-logic
 android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
@@ -110,6 +112,9 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espresso" }
+
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 
 [plugins]
 # Android and Kotlin

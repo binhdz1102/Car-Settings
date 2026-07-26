@@ -23,6 +23,9 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "CarSettings"
 include(":app")
 include(":core:realcar")
+include(":runtime:localcallback")
