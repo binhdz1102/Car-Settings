@@ -8,6 +8,14 @@
     <uses-permission android:name="android.car.permission.CAR_SPEED" />
     <uses-permission android:name="android.car.permission.CAR_WHEEL_TICK" />
     <uses-permission android:name="android.car.permission.CAR_DIAGNOSTIC_READ_ALL" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.NEARBY_WIFI_DEVICES"
+        android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
     <uses-feature
         android:name="android.hardware.type.automotive"
@@ -26,21 +34,11 @@
             android:exported="true"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.CarSetting">
-
-            <intent-filter>
-                <action android:name="android.settings.SETTINGS" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-
-            <meta-data
-                android:name="distractionOptimized"
-                android:value="true" />
-        </activity>
+            android:theme="@style/Theme.CarSetting" />
 
         <activity-alias
             android:name=".Settings_Launcher_Homepage"
-            android:targetActivity=".MainActivity"
+            android:targetActivity=".LocalCallbackDemoActivity"
             android:enabled="true"
             android:exported="true"
             android:label="@string/app_name">
@@ -56,6 +54,23 @@
                 android:name="distractionOptimized"
                 android:value="true" />
         </activity-alias>
+
+        <activity
+            android:name=".LocalCallbackDemoActivity"
+            android:exported="true"
+            android:label="LocalCallback Demo"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.CarSetting">
+
+            <intent-filter>
+                <action android:name="android.settings.SETTINGS" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+
+            <meta-data
+                android:name="distractionOptimized"
+                android:value="true" />
+        </activity>
 
     </application>
 
