@@ -5,12 +5,29 @@
 captures/
 .externalNativeBuild/
 .cxx/
+*.class
+*.apk
+*.aab
+*.apks
+
+# Test, coverage, and analysis reports
+**/reports/
+**/coverage/
+**/jacoco/
+**/test-results/
 
 # Local Android SDK configuration
 local.properties
 
+# Local signing configuration and credentials
+keystore.properties
+*.jks
+*.keystore
+*.p12
+
 # IDE and operating-system files
 .idea/
+.fleet/
 *.iml
 .DS_Store
 Thumbs.db
@@ -18,3 +35,8 @@ Thumbs.db
 # Logs and temporary files
 *.log
 *.tmp
+*.bak
+*.orig
+*~
+*.swp
+*.swo

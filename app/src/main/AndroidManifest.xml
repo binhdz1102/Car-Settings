@@ -3,6 +3,7 @@
     android:sharedUserId="android.uid.system">
 
     <application
+        android:name=".CarSettingsApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

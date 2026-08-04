@@ -30,6 +30,10 @@ android {
         buildConfigField("String", "GIT_COMMIT_HASH", "\"$gitCommitHash\"")
     }
 
+    buildFeatures {
+        buildConfig = true
+    }
+
     signingConfigs {
         create("platform") {
             storeFile =
@@ -55,10 +59,6 @@ android {
                 "proguard-rules.pro",
             )
         }
-    }
-
-    buildFeatures {
-        buildConfig = true
     }
 }
 

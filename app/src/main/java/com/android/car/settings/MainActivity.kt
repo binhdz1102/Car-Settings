@@ -14,11 +14,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.android.car.settings.ui.theme.CarSettingTheme
+import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        Timber.d("onCreate()")
         setContent {
             CarSettingTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -26,6 +28,36 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Timber.d("onStart()")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Timber.d("onRestart()")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Timber.d("onResume()")
+    }
+
+    override fun onPause() {
+        Timber.d("onPause()")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Timber.d("onStop()")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Timber.d("onDestroy()")
+        super.onDestroy()
     }
 }
 
