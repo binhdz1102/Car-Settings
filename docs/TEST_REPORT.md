@@ -1,13 +1,17 @@
 # Car-Settings test report
 
-## Test session
+## Latest post-refactor test session
 
-- Date: 2026-08-06 (Asia/Bangkok)
+- Date: 2026-08-07 (Asia/Bangkok)
 - Target: `emulator-5554`, `sdk_car_mysystemapp_x86_64`, Android 17/Baklava
 - User: Android user 10
 - Service: `mysystemapp-avd-20260802.service`
 - APK: `app/build/outputs/apk/debug/app-debug.apk`
 - Package: `com.android.car.settings`
+
+This session was run after merging each feature's `presentation`, `data` and
+`domain` Gradle modules into one feature module. The package-level separation and
+the AAOS runtime contract were kept unchanged.
 
 The AVD was started with `-wipe-data -no-snapshot`. Boot completed with
 `sys.boot_completed=1`. A first-boot CarService notice from
@@ -19,6 +23,7 @@ Car-Settings crash. The new APK was then installed with
 
 | Check | Result |
 |---|---|
+| Gradle project graph | PASS; 12 feature modules, no `:feature:*:data/domain/presentation` projects |
 | `./gradlew testDebugUnitTest --console=plain --max-workers=2` | PASS; all unit tests passed |
 | `./gradlew :app:assembleDebug --console=plain --max-workers=2` | PASS; debug APK produced |
 | `./gradlew :app:lintDebug --console=plain --max-workers=2` | PASS; no lint errors (dependency-update/resource warnings remain) |
@@ -31,6 +36,9 @@ Car-Settings crash. The new APK was then installed with
 Every row below resolved to `com.android.car.settings/.MainActivity` (the
 legacy explicit display alias also resolved to the replacement target) and
 rendered the listed screen content without an application fatal exception.
+The 36-entry action loop was rerun after installation of the refactored APK;
+all 36 routes kept the app process alive and the follow-up UI inspection
+confirmed the expected screen for each route.
 
 | Intent/action | Screen verified |
 |---|---|

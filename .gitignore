@@ -19,8 +19,12 @@ captures/
 # Local Android SDK configuration
 local.properties
 
+# Local AOSP Settings reference source; do not commit
+/Settings/
+
 # Local signing configuration and credentials
 keystore.properties
+keystore/
 *.jks
 *.keystore
 *.p12
@@ -40,3 +44,6 @@ Thumbs.db
 *~
 *.swp
 *.swo
+*.hprof
+**/out/
+**/tmp/

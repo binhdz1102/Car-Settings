@@ -17,8 +17,9 @@ The project follows a Now In Android-style multi-module layout:
   deep-link routing and compatibility aliases.
 - `core/common`: coroutine dispatchers and shared platform result types.
 - `core/ui`: Compose theme and reusable Settings components.
-- `feature/<name>/{domain,data,presentation}`: use cases/contracts, Android
-  platform data sources, repositories, ViewModels and Compose screens.
+- `feature/<name>`: one Android library per feature. Its packages are separated
+  into `...domain` (use cases/contracts), `...data` (Android platform data
+  sources/repositories) and `...presentation` (ViewModels and Compose screens).
 - `build-logic`: convention plugins for Android, Compose, Hilt, Navigation,
   Room schema support, Ktlint, Detekt and Jacoco.
 
@@ -26,6 +27,10 @@ ViewModels expose `StateFlow` and platform callbacks are bridged into coroutine
 scopes. Hilt is enabled. Room support is available in build-logic, but the
 ported Settings state is owned by Android framework services and therefore does
 not need a local database.
+
+The project has 12 feature modules. The three logical layers are packages inside
+each feature module rather than separate Gradle projects. See
+`docs/ARCHITECTURE.md` for the architecture survey and refactor details.
 
 ## Build and install
 
