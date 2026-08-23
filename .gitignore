@@ -22,6 +22,12 @@ local.properties
 # Local AOSP Settings reference source; do not commit
 /Settings/
 
+# My-System-App reference copy used only as the migration source; do not commit
+/My-System-App/
+
+# ZCode agent workspace
+.zcode/
+
 # Local signing configuration and credentials
 keystore.properties
 keystore/
