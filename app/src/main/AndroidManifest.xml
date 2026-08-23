@@ -98,6 +98,31 @@
     <uses-permission android:name="android.permission.READ_LOCATION_BYPASS_ALLOWLIST" />
     <uses-permission android:name="android.permission.CAR_VENDOR_EXTENSION" />
 
+    <!-- Vehicle feature permissions (doors, seats, lighting, ADAS, mirrors, windows). -->
+    <uses-permission android:name="android.car.permission.CAR_DYNAMICS_STATE" />
+    <uses-permission android:name="android.car.permission.CAR_EXTERIOR_LIGHTS" />
+    <uses-permission android:name="android.car.permission.CONTROL_ADAS_SETTINGS" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_DOORS" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_DYNAMICS_STATE" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_EXTERIOR_LIGHTS" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_INTERIOR_LIGHTS" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_MIRRORS" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_SEATS" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_WATCHDOG_CONFIG" />
+    <uses-permission android:name="android.car.permission.CONTROL_CAR_WINDOWS" />
+    <uses-permission android:name="android.car.permission.CONTROL_DRIVER_MONITORING_SETTINGS" />
+    <uses-permission android:name="android.car.permission.CONTROL_STEERING_WHEEL" />
+    <uses-permission android:name="android.car.permission.READ_ADAS_SETTINGS" />
+    <uses-permission android:name="android.car.permission.READ_CAR_INTERIOR_LIGHTS" />
+    <uses-permission android:name="android.car.permission.READ_DRIVER_MONITORING_SETTINGS" />
+    <!-- Assistant/voice, roles, UWB and network usage history. -->
+    <uses-permission android:name="android.permission.GET_ROLE_HOLDERS" />
+    <uses-permission android:name="android.permission.MANAGE_ROLE_HOLDERS" />
+    <uses-permission android:name="android.permission.READ_NETWORK_USAGE_HISTORY" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS" />
+    <uses-permission android:name="android.permission.UWB_PRIVILEGED" />
+
     <application
         android:name=".CarSettingsApplication"
         android:allowBackup="false"
@@ -259,6 +284,7 @@
         <activity-alias android:name=".common.CarSettingActivities$BluetoothSettingsActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$UnitsSettingsActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$LocationSettingsActivity" android:exported="true" android:targetActivity=".MainActivity" />
+        <activity-alias android:name=".common.CarSettingActivities$AccessibilitySettingsActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$AppsActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$NotificationsActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$DatetimeSettingsActivity" android:exported="true" android:targetActivity=".MainActivity" />

@@ -16,11 +16,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.android.car.settings.core.ui.MySystemTheme
+import com.android.car.settings.feature.accessibility.presentation.ACCESSIBILITY_ROUTE
+import com.android.car.settings.feature.accessibility.presentation.accessibilityGraph
 import com.android.car.settings.feature.applications.presentation.ALL_APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.PERFORMANCE_IMPACTING_APPS_ROUTE
 import com.android.car.settings.feature.applications.presentation.SPECIAL_APP_ACCESS_ROUTE
 import com.android.car.settings.feature.applications.presentation.applicationsGraph
+import com.android.car.settings.feature.assistantvoice.presentation.ASSISTANT_VOICE_ROUTE
+import com.android.car.settings.feature.assistantvoice.presentation.assistantVoiceGraph
 import com.android.car.settings.feature.bluetooth.presentation.BLUETOOTH_ROUTE
 import com.android.car.settings.feature.bluetooth.presentation.bluetoothGraph
 import com.android.car.settings.feature.display.presentation.DATE_TIME_ROUTE
@@ -29,6 +33,8 @@ import com.android.car.settings.feature.display.presentation.TIME_ZONE_ROUTE
 import com.android.car.settings.feature.display.presentation.displayGraph
 import com.android.car.settings.feature.hvac.presentation.HVAC_ROUTE
 import com.android.car.settings.feature.hvac.presentation.hvacGraph
+import com.android.car.settings.feature.location.presentation.LOCATION_ROUTE
+import com.android.car.settings.feature.location.presentation.locationGraph
 import com.android.car.settings.feature.notifications.presentation.NOTIFICATIONS_ROUTE
 import com.android.car.settings.feature.notifications.presentation.notificationsGraph
 import com.android.car.settings.feature.privacy.presentation.PRIVACY_CAMERA_ROUTE
@@ -102,6 +108,9 @@ class MainActivity : ComponentActivity() {
                             onPrivacy = { navController.navigate(PRIVACY_ROUTE) },
                             onSecurity = { navController.navigate(SECURITY_ROUTE) },
                             onHvac = { navController.navigate(HVAC_ROUTE) },
+                            onAccessibility = { navController.navigate(ACCESSIBILITY_ROUTE) },
+                            onLocation = { navController.navigate(LOCATION_ROUTE) },
+                            onAssistantVoice = { navController.navigate(ASSISTANT_VOICE_ROUTE) },
                             onSearch = { navController.navigate(SEARCH_ROUTE) },
                         )
                     }
@@ -125,6 +134,9 @@ class MainActivity : ComponentActivity() {
                         },
                     )
                     hvacGraph(navController::popBackStack)
+                    accessibilityGraph(navController::popBackStack)
+                    locationGraph(navController, navController::popBackStack)
+                    assistantVoiceGraph(navController::popBackStack)
                 }
                 LaunchedEffect(requestedDestination) {
                     if (navController.currentDestination?.route != requestedDestination) {

@@ -77,6 +77,9 @@ dependencies {
     implementation(project(":feature:security"))
     implementation(project(":feature:search"))
     implementation(project(":feature:hvac"))
+    implementation(project(":feature:accessibility"))
+    implementation(project(":feature:location"))
+    implementation(project(":feature:assistantvoice"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.hilt.navigation.compose)

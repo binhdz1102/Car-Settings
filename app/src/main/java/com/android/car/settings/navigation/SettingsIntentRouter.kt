@@ -7,11 +7,14 @@ import android.provider.Settings
 import com.android.car.settings.feature.applications.presentation.ALL_APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.applicationDetailsRoute
+import com.android.car.settings.feature.assistantvoice.presentation.ASSISTANT_VOICE_ROUTE
+import com.android.car.settings.feature.accessibility.presentation.ACCESSIBILITY_ROUTE
 import com.android.car.settings.feature.bluetooth.presentation.BLUETOOTH_ROUTE
 import com.android.car.settings.feature.display.presentation.DATE_TIME_ROUTE
 import com.android.car.settings.feature.display.presentation.DISPLAY_ROUTE
 import com.android.car.settings.feature.display.presentation.TIME_ZONE_ROUTE
 import com.android.car.settings.feature.hvac.presentation.HVAC_ROUTE
+import com.android.car.settings.feature.location.presentation.LOCATION_ROUTE
 import com.android.car.settings.feature.notifications.presentation.NOTIFICATIONS_ROUTE
 import com.android.car.settings.feature.privacy.presentation.PRIVACY_LOCATION_ROUTE
 import com.android.car.settings.feature.privacy.presentation.PRIVACY_ROUTE
@@ -108,7 +111,9 @@ object SettingsIntentRouter {
                 action == ACTION_NOTIFICATION_LISTENER_DETAIL_SETTINGS -> NOTIFICATIONS_ROUTE
 
             action == Settings.ACTION_PRIVACY_SETTINGS -> PRIVACY_ROUTE
-            action == Settings.ACTION_LOCATION_SOURCE_SETTINGS -> PRIVACY_LOCATION_ROUTE
+            action == Settings.ACTION_LOCATION_SOURCE_SETTINGS -> LOCATION_ROUTE
+
+            action == Settings.ACTION_ACCESSIBILITY_SETTINGS -> ACCESSIBILITY_ROUTE
 
             action == Settings.ACTION_SECURITY_SETTINGS || action == ACTION_BIOMETRIC_ENROLL -> SECURITY_ROUTE
             action == ACTION_DEVICE_ADMIN_SETTINGS -> SECURITY_DEVICE_ADMINS_ROUTE
@@ -128,8 +133,8 @@ object SettingsIntentRouter {
                 action == Settings.ACTION_INPUT_METHOD_SETTINGS ||
                 action == Settings.ACTION_INPUT_METHOD_SUBTYPE_SETTINGS ||
                 action == ACTION_REQUEST_SET_AUTOFILL_SERVICE ||
-                action == ACTION_TEXT_TO_SPEECH_SETTINGS ||
-                action == Settings.ACTION_VOICE_INPUT_SETTINGS -> LANGUAGE_INPUT_ROUTE
+                action == ACTION_TEXT_TO_SPEECH_SETTINGS -> LANGUAGE_INPUT_ROUTE
+            action == Settings.ACTION_VOICE_INPUT_SETTINGS -> ASSISTANT_VOICE_ROUTE
             action == ACTION_LEGAL_INFORMATION_SETTINGS -> LEGAL_ROUTE
             action == ACTION_RESET_SETTINGS -> RESET_OPTIONS_ROUTE
             action == ACTION_SYSTEM_UPDATE_SETTINGS || action == ACTION_REGION_SETTINGS -> SYSTEM_ROUTE
@@ -167,7 +172,8 @@ object SettingsIntentRouter {
             "WifiPreferencesActivity" -> WIFI_PREFERENCES_ROUTE
             "BluetoothSettingsActivity" -> BLUETOOTH_ROUTE
             "UnitsSettingsActivity" -> UNITS_ROUTE
-            "LocationSettingsActivity", "VehicleDataActivity" -> PRIVACY_LOCATION_ROUTE
+            "LocationSettingsActivity", "VehicleDataActivity" -> LOCATION_ROUTE
+            "AccessibilitySettingsActivity" -> ACCESSIBILITY_ROUTE
             "AppsActivity" -> APPLICATIONS_ROUTE
             "ApplicationsSettingsActivity" -> ALL_APPLICATIONS_ROUTE
             "ApplicationsDetailsActivity", "AppAspectRatioActivity" ->
@@ -178,7 +184,8 @@ object SettingsIntentRouter {
             "PrivacySettingsActivity" -> PRIVACY_ROUTE
             "StorageSettingsActivity" -> STORAGE_ROUTE
             "SecuritySettingsActivity" -> SECURITY_ROUTE
-            "AssistantAndVoiceSettingsActivity", "LanguagesAndInputActivity",
+            "AssistantAndVoiceSettingsActivity" -> ASSISTANT_VOICE_ROUTE
+            "LanguagesAndInputActivity",
             "LanguagePickerActivity", "DefaultAutofillPickerActivity", "KeyboardActivity",
             "TextToSpeechOutputActivity" -> LANGUAGE_INPUT_ROUTE
             "AboutSettingsActivity" -> SYSTEM_ABOUT_ROUTE
@@ -245,10 +252,11 @@ private val APPLICATION_DETAIL_ACTIONS = setOf(
     ACTION_MANAGE_USER_ASPECT_RATIO_SETTINGS,
 )
 
-private val SPECIAL_APP_ACCESS_ACTIONS = setOf(
-    Settings.ACTION_USAGE_ACCESS_SETTINGS,
-    Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-    Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-    Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS,
-)
+    private val SPECIAL_APP_ACCESS_ACTIONS = setOf(
+        Settings.ACTION_USAGE_ACCESS_SETTINGS,
+        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+        Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+        Settings.ACTION_MANAGE_WRITE_SETTINGS,
+        Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+        Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS,
+    )

@@ -11,14 +11,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Accessibility
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Brightness6
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NetworkWifi
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.PrivacyTip
+import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
@@ -47,6 +50,9 @@ fun HomeScreen(
     onPrivacy: () -> Unit,
     onSecurity: () -> Unit,
     onHvac: () -> Unit,
+    onAccessibility: () -> Unit,
+    onLocation: () -> Unit,
+    onAssistantVoice: () -> Unit,
     onSearch: () -> Unit,
 ) {
     SettingsScaffold(
@@ -99,6 +105,24 @@ fun HomeScreen(
                 summary = "Recently opened apps, app info, permissions and special access",
                 icon = { Icon(Icons.Default.Apps, contentDescription = null) },
                 onClick = onApplications,
+            )
+            SystemFeatureCard(
+                title = "Accessibility",
+                summary = "Screen readers, captions and accessibility services",
+                icon = { Icon(Icons.Default.Accessibility, contentDescription = null) },
+                onClick = onAccessibility,
+            )
+            SystemFeatureCard(
+                title = "Location",
+                summary = "Location access, ADAS location and app permissions",
+                icon = { Icon(Icons.Default.LocationOn, contentDescription = null) },
+                onClick = onLocation,
+            )
+            SystemFeatureCard(
+                title = "Assistant & voice",
+                summary = "Default assistant, voice input and recognition services",
+                icon = { Icon(Icons.Default.RecordVoiceOver, contentDescription = null) },
+                onClick = onAssistantVoice,
             )
             SystemFeatureCard(
                 title = "Notifications",
