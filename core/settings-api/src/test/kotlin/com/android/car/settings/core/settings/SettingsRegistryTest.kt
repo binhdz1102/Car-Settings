@@ -116,8 +116,10 @@ class SettingsRegistryTest {
     }
 
     @Test
-    fun normalLaunchRootIsConnectedDevices() {
-        assertThat(DefaultSettingsRegistry.category(SettingsCategoryId.CONNECTED_DEVICES).rootDestination)
-            .isEqualTo(SettingsDestinationId.BLUETOOTH)
+    fun vehicleIsFirstRailCategoryAndNormalLaunchRoot() {
+        assertThat(DefaultSettingsRegistry.categories.first().id)
+            .isEqualTo(SettingsCategoryId.VEHICLE)
+        assertThat(DefaultSettingsRegistry.category(SettingsCategoryId.VEHICLE).rootDestination)
+            .isEqualTo(SettingsDestinationId.VEHICLE)
     }
 }

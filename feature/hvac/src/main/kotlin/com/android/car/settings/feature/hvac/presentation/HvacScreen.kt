@@ -9,6 +9,9 @@ import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleEnumOption
 import com.android.car.settings.core.ui.VehicleFeatureScreen
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiSpec
+import com.android.car.settings.core.ui.VehicleVisualizationSource
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.feature.hvac.R
 import com.android.car.settings.feature.hvac.domain.ClimateControl
@@ -127,6 +130,9 @@ internal fun HvacScreen(
         emptyMessage = stringResource(R.string.hvac_empty),
         restrictedReason = stringResource(R.string.hvac_restricted),
         showVehicleDiagram = discoveredZones.size > 1,
+        visualizationSource = VehicleVisualizationSource.LIVE_PROPERTY,
+        visualizationLabel = stringResource(R.string.hvac_visualization_label),
+        visualization = { selected -> HvacVisualization(controls, selected) },
     )
 }
 
@@ -335,6 +341,7 @@ internal fun mapClimateControls(
                     available = false,
                     pending = false,
                     usesFloatSlider = presentation.expectedKind == ClimateControlKind.FLOAT_RANGE,
+                    sliderUiSpec = climateSliderUiSpec(presentation.id),
                     errorMessage = null,
                 )
             }
@@ -412,6 +419,7 @@ private fun ClimateControl.toVehicleControl(
                     (((max - min) * 2f).roundToInt() - 1).coerceAtLeast(0)
                 else -> ((max - min).roundToInt() - 1).coerceAtLeast(0)
             },
+        sliderUiSpec = climateSliderUiSpec(presentation.id),
         selectedEnumKey = intValue?.toString(),
         enumOptions =
             capability.options.map { option ->
@@ -427,6 +435,19 @@ private fun ClimateControl.toVehicleControl(
             },
     )
 }
+
+internal fun climateSliderUiSpec(id: ClimateControlId): VehicleSliderUiSpec =
+    when (id) {
+        ClimateControlId.TEMPERATURE_SET,
+        ClimateControlId.MIRROR_HEAT,
+        ClimateControlId.SEAT_TEMPERATURE,
+        ClimateControlId.STEERING_WHEEL_HEAT,
+        -> VehicleSliderUiSpec(kind = VehicleSliderUiKind.THERMAL)
+        ClimateControlId.FAN_SPEED,
+        ClimateControlId.SEAT_VENTILATION,
+        -> VehicleSliderUiSpec(kind = VehicleSliderUiKind.LEVEL, showTicks = true)
+        else -> VehicleSliderUiSpec()
+    }
 
 private fun ClimateControlKind.toVehicleEditor(): VehicleEditorUiKind =
     when (this) {

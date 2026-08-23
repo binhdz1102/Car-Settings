@@ -6,6 +6,8 @@
     <string name="hvac_restricted">This climate control is unavailable while driving.</string>
     <string name="hvac_zone_selector">Climate zone</string>
     <string name="hvac_global_zone">Global</string>
+    <string name="hvac_visualization_label">Observed climate state</string>
+    <string name="hvac_visualization_content_description">Climate illustration driven by observed fan, temperature, recirculation and defrost properties</string>
     <string name="hvac_category_system">System and automatic modes</string>
     <string name="hvac_category_temperature">Temperature</string>
     <string name="hvac_category_airflow">Airflow</string>

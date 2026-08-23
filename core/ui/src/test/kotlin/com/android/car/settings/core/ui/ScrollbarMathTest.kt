@@ -9,6 +9,37 @@ import org.junit.Test
 class ScrollbarMathTest {
 
     @Test
+    fun scrollbarGutter_centersTrackOutsideContentBounds() {
+        val geometry = computeScrollbarGutterGeometry(
+            crossAxisSize = 500f,
+            thicknessPx = 12f,
+            gutterWidthPx = 48f,
+        )
+
+        assertNotNull(geometry)
+        assertEquals(452f, geometry!!.gutterStart, 0.001f)
+        assertEquals(500f, geometry.gutterEnd, 0.001f)
+        assertEquals(470f, geometry.trackCrossOffset, 0.001f)
+        assertEquals(12f, geometry.trackThickness, 0.001f)
+        assertTrue(geometry.trackCrossOffset >= geometry.gutterStart)
+        assertTrue(geometry.trackCrossOffset + geometry.trackThickness <= geometry.gutterEnd)
+    }
+
+    @Test
+    fun scrollbarGutter_clampsToSmallContainer() {
+        val geometry = computeScrollbarGutterGeometry(
+            crossAxisSize = 24f,
+            thicknessPx = 32f,
+            gutterWidthPx = 48f,
+        )
+
+        assertNotNull(geometry)
+        assertEquals(0f, geometry!!.gutterStart, 0.001f)
+        assertEquals(0f, geometry.trackCrossOffset, 0.001f)
+        assertEquals(24f, geometry.trackThickness, 0.001f)
+    }
+
+    @Test
     fun lazyListScrollbar_atTop_hasProgressZeroAndThumbAtTop() {
         val metrics = computeLazyListScrollbarMetrics(
             viewportSize = 800f,

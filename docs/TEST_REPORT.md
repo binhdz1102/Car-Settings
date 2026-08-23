@@ -1,5 +1,42 @@
 # Car-Settings test report
 
+## Vehicle UI acceptance session
+
+- Date: 2026-08-23 (Asia/Bangkok)
+- Target: `emulator-5554`, 1920x1080
+- APK: `app/build/outputs/apk/debug/app-debug.apk`
+- Package: `com.android.car.settings`
+
+This session validated the Vehicle-first navigation, adaptive car launcher icon,
+five new transparent 16:9 Vehicle previews, semantic BSlider 1.3.1 styling,
+normalized overlay animations and the common 24 dp Vehicle row baseline.
+
+| Check | Result |
+|---|---|
+| Vehicle/core targeted unit tests | PASS |
+| `./gradlew testDebugUnitTest` | PASS |
+| `./gradlew :app:lintDebug` | PASS; 0 errors, 104 non-blocking warnings |
+| `./gradlew :app:assembleDebug` | PASS |
+| APK install with `-r -d -g` | PASS |
+| Cold start to Vehicle landing | PASS |
+| Vehicle first in category rail | PASS |
+| Launcher/taskbar adaptive car icon | PASS |
+| Five detail panes at 1920x1080 | PASS; no crop/blur or overlay overflow |
+| Touch and rotary/direct manipulation | PASS |
+| Deep links (`HVAC_SETTINGS`, `DISPLAY_SETTINGS`) | PASS |
+| Fatal exception / app ANR scan | PASS; none found |
+
+VHAL smoke tests changed and restored one representative control in every
+Vehicle feature: HVAC power and temperature, lane departure warning, seat
+fore/aft, mirror fold and headlight mode. The final values matched their
+starting values. HVAC power was restored through the CarService diagnostic
+command because the emulator temporarily exposed the property as unavailable
+immediately after power-off.
+
+The detailed architecture audit, UI decisions and exact transitions are in
+`docs/VEHICLE_UI_AUDIT.md`. Acceptance screenshots are stored under the ignored
+local directory `captures/vehicle-ui-current/`.
+
 ## Latest post-refactor test session
 
 - Date: 2026-08-07 (Asia/Bangkok)

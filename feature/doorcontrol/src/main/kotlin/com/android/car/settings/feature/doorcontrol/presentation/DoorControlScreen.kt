@@ -10,6 +10,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.car.settings.core.ui.VehicleControlUiMetadata
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleFeatureScreen
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualizationSource
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toUiControls
@@ -119,9 +121,17 @@ internal fun buildDoorControlMetadata(
                     DoorControlKind.RANGE -> VehicleEditorUiKind.SLIDER
                     DoorControlKind.ENUM -> VehicleEditorUiKind.ENUM
                 },
+            sliderUiSpec = doorSliderUiSpec(definition.kind),
             enumLabels = movementLabels,
             valueLabel = { value -> doorValueLabel(definition.kind, movementLabels, value) },
         )
+    }
+
+internal fun doorSliderUiSpec(kind: DoorControlKind): VehicleSliderUiSpec =
+    if (kind == DoorControlKind.RANGE) {
+        VehicleSliderUiSpec(kind = VehicleSliderUiKind.POSITION, centerMarker = 0f)
+    } else {
+        VehicleSliderUiSpec()
     }
 
 @Composable

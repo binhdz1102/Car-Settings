@@ -8,6 +8,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -39,10 +40,16 @@ import kotlin.math.roundToInt
 val AutomotiveScrollbarStyle =
     BScrollbarStyle(
         thickness = 12.dp,
-        padding = 2.dp,
+        padding = 8.dp,
         minThumbLength = 64.dp,
         cornerRadius = 6.dp,
     )
+
+/**
+ * A full automotive touch target reserved outside scrollable content. The visible thumb is
+ * centered inside this gutter, so it never obscures a row or competes with the row's hit target.
+ */
+val AutomotiveScrollbarGutterWidth = 48.dp
 
 /**
  * Computed metrics for drawing and hit-testing the automotive scrollbar.
@@ -53,6 +60,32 @@ data class ScrollbarMetrics(
     val thumbOffset: Float,
     val progress: Float,
 )
+
+/** Cross-axis placement for a scrollbar that owns a dedicated trailing gutter. */
+data class ScrollbarGutterGeometry(
+    val gutterStart: Float,
+    val gutterEnd: Float,
+    val trackCrossOffset: Float,
+    val trackThickness: Float,
+)
+
+fun computeScrollbarGutterGeometry(
+    crossAxisSize: Float,
+    thicknessPx: Float,
+    gutterWidthPx: Float,
+): ScrollbarGutterGeometry? {
+    if (crossAxisSize <= 0f || thicknessPx <= 0f || gutterWidthPx <= 0f) return null
+
+    val resolvedGutterWidth = gutterWidthPx.coerceAtMost(crossAxisSize)
+    val resolvedThickness = thicknessPx.coerceAtMost(resolvedGutterWidth)
+    val gutterStart = crossAxisSize - resolvedGutterWidth
+    return ScrollbarGutterGeometry(
+        gutterStart = gutterStart,
+        gutterEnd = crossAxisSize,
+        trackCrossOffset = gutterStart + (resolvedGutterWidth - resolvedThickness) / 2f,
+        trackThickness = resolvedThickness,
+    )
+}
 
 /**
  * Pure function to calculate scrollbar metrics for a [LazyListState].
@@ -144,7 +177,6 @@ private data class TrackBounds(
     val mainEnd: Float,
     val crossStart: Float,
     val crossEnd: Float,
-    val thumbStart: Float,
     val thumbLength: Float,
     val trackLength: Float,
 ) {
@@ -158,9 +190,7 @@ private data class TrackBounds(
             } else {
                 offset.x to offset.y
             }
-        val touchMargin = 48f
-        return mainPos in (mainStart - touchMargin)..(mainEnd + touchMargin) &&
-            crossPos in (crossStart - touchMargin)..(crossEnd + touchMargin)
+        return mainPos in mainStart..mainEnd && crossPos in crossStart..crossEnd
     }
 
     fun progressFromTouch(touchPos: Float): Float {
@@ -176,9 +206,10 @@ fun Modifier.vehicleBScrollbar(
     scrollState: ScrollState,
     orientation: Orientation = Orientation.Vertical,
     style: BScrollbarStyle = AutomotiveScrollbarStyle,
+    gutterWidth: Dp = AutomotiveScrollbarGutterWidth,
     touchToSeekEnabled: Boolean = true,
     showTooltip: Boolean = true,
-    autoHideEnabled: Boolean = true,
+    autoHideEnabled: Boolean = false,
 ): Modifier =
     composed {
         val density = LocalDensity.current
@@ -220,14 +251,15 @@ fun Modifier.vehicleBScrollbar(
         val paddingPx = with(density) { style.padding.toPx() }
         val minThumbLengthPx = with(density) { style.minThumbLength.toPx() }
         val cornerRadiusPx = with(density) { style.cornerRadius.toPx() }
+        val gutterWidthPx = with(density) { gutterWidth.toPx() }
 
         var latestTrackBounds by remember { mutableStateOf<TrackBounds?>(null) }
 
         this
             .then(
-                if (touchToSeekEnabled) {
+                if (touchToSeekEnabled && canScroll) {
                     Modifier
-                        .pointerInput(orientation, scrollState, thicknessPx, paddingPx) {
+                        .pointerInput(orientation, scrollState, thicknessPx, paddingPx, gutterWidthPx) {
                             detectTapGestures { offset ->
                                 val bounds = latestTrackBounds ?: return@detectTapGestures
                                 if (!bounds.isHit(offset, orientation)) return@detectTapGestures
@@ -239,7 +271,7 @@ fun Modifier.vehicleBScrollbar(
                                 }
                             }
                         }
-                        .pointerInput(orientation, scrollState, thicknessPx, paddingPx) {
+                        .pointerInput(orientation, scrollState, thicknessPx, paddingPx, gutterWidthPx) {
                             detectDragGestures(
                                 onDragStart = { offset ->
                                     val bounds = latestTrackBounds ?: return@detectDragGestures
@@ -299,15 +331,19 @@ fun Modifier.vehicleBScrollbar(
                         minThumbLengthPx = minThumbLengthPx,
                     ) ?: return@drawWithContent
 
-                val trackCrossOffset = crossAxisSize - thicknessPx - paddingPx
+                val gutterGeometry =
+                    computeScrollbarGutterGeometry(
+                        crossAxisSize = crossAxisSize,
+                        thicknessPx = thicknessPx,
+                        gutterWidthPx = gutterWidthPx,
+                    ) ?: return@drawWithContent
 
                 latestTrackBounds =
                     TrackBounds(
                         mainStart = paddingPx,
                         mainEnd = viewportSize - paddingPx,
-                        crossStart = trackCrossOffset,
-                        crossEnd = crossAxisSize - paddingPx,
-                        thumbStart = metrics.thumbOffset,
+                        crossStart = gutterGeometry.gutterStart,
+                        crossEnd = gutterGeometry.gutterEnd,
                         thumbLength = metrics.thumbLength,
                         trackLength = metrics.trackLength,
                     )
@@ -315,15 +351,15 @@ fun Modifier.vehicleBScrollbar(
                 // Draw track
                 val trackTopLeft =
                     if (isVertical) {
-                        Offset(x = trackCrossOffset, y = paddingPx)
+                        Offset(x = gutterGeometry.trackCrossOffset, y = paddingPx)
                     } else {
-                        Offset(x = paddingPx, y = trackCrossOffset)
+                        Offset(x = paddingPx, y = gutterGeometry.trackCrossOffset)
                     }
                 val trackSize =
                     if (isVertical) {
-                        Size(width = thicknessPx, height = metrics.trackLength)
+                        Size(width = gutterGeometry.trackThickness, height = metrics.trackLength)
                     } else {
-                        Size(width = metrics.trackLength, height = thicknessPx)
+                        Size(width = metrics.trackLength, height = gutterGeometry.trackThickness)
                     }
                 drawRoundRect(
                     color = trackColor.copy(alpha = trackColor.alpha * alpha),
@@ -335,15 +371,15 @@ fun Modifier.vehicleBScrollbar(
                 // Draw thumb
                 val thumbTopLeft =
                     if (isVertical) {
-                        Offset(x = trackCrossOffset, y = metrics.thumbOffset)
+                        Offset(x = gutterGeometry.trackCrossOffset, y = metrics.thumbOffset)
                     } else {
-                        Offset(x = metrics.thumbOffset, y = trackCrossOffset)
+                        Offset(x = metrics.thumbOffset, y = gutterGeometry.trackCrossOffset)
                     }
                 val thumbSize =
                     if (isVertical) {
-                        Size(width = thicknessPx, height = metrics.thumbLength)
+                        Size(width = gutterGeometry.trackThickness, height = metrics.thumbLength)
                     } else {
-                        Size(width = metrics.thumbLength, height = thicknessPx)
+                        Size(width = metrics.thumbLength, height = gutterGeometry.trackThickness)
                     }
                 drawRoundRect(
                     color = thumbColor.copy(alpha = thumbColor.alpha * alpha),
@@ -352,6 +388,15 @@ fun Modifier.vehicleBScrollbar(
                     cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx),
                 )
             }
+            .then(
+                if (!canScroll) {
+                    Modifier
+                } else if (orientation == Orientation.Vertical) {
+                    Modifier.padding(end = gutterWidth)
+                } else {
+                    Modifier.padding(bottom = gutterWidth)
+                },
+            )
     }
 
 /**
@@ -361,9 +406,10 @@ fun Modifier.vehicleBLazyScrollbar(
     state: LazyListState,
     orientation: Orientation = Orientation.Vertical,
     style: BScrollbarStyle = AutomotiveScrollbarStyle,
+    gutterWidth: Dp = AutomotiveScrollbarGutterWidth,
     touchToSeekEnabled: Boolean = true,
     showTooltip: Boolean = true,
-    autoHideEnabled: Boolean = true,
+    autoHideEnabled: Boolean = false,
 ): Modifier =
     composed {
         val density = LocalDensity.current
@@ -405,14 +451,15 @@ fun Modifier.vehicleBLazyScrollbar(
         val paddingPx = with(density) { style.padding.toPx() }
         val minThumbLengthPx = with(density) { style.minThumbLength.toPx() }
         val cornerRadiusPx = with(density) { style.cornerRadius.toPx() }
+        val gutterWidthPx = with(density) { gutterWidth.toPx() }
 
         var latestTrackBounds by remember { mutableStateOf<TrackBounds?>(null) }
 
         this
             .then(
-                if (touchToSeekEnabled) {
+                if (touchToSeekEnabled && canScroll) {
                     Modifier
-                        .pointerInput(orientation, state, thicknessPx, paddingPx) {
+                        .pointerInput(orientation, state, thicknessPx, paddingPx, gutterWidthPx) {
                             detectTapGestures { offset ->
                                 val bounds = latestTrackBounds ?: return@detectTapGestures
                                 if (!bounds.isHit(offset, orientation)) return@detectTapGestures
@@ -427,7 +474,7 @@ fun Modifier.vehicleBLazyScrollbar(
                                 }
                             }
                         }
-                        .pointerInput(orientation, state, thicknessPx, paddingPx) {
+                        .pointerInput(orientation, state, thicknessPx, paddingPx, gutterWidthPx) {
                             detectDragGestures(
                                 onDragStart = { offset ->
                                     val bounds = latestTrackBounds ?: return@detectDragGestures
@@ -500,15 +547,19 @@ fun Modifier.vehicleBLazyScrollbar(
                         minThumbLengthPx = minThumbLengthPx,
                     ) ?: return@drawWithContent
 
-                val trackCrossOffset = crossAxisSize - thicknessPx - paddingPx
+                val gutterGeometry =
+                    computeScrollbarGutterGeometry(
+                        crossAxisSize = crossAxisSize,
+                        thicknessPx = thicknessPx,
+                        gutterWidthPx = gutterWidthPx,
+                    ) ?: return@drawWithContent
 
                 latestTrackBounds =
                     TrackBounds(
                         mainStart = paddingPx,
                         mainEnd = viewportSize - paddingPx,
-                        crossStart = trackCrossOffset,
-                        crossEnd = crossAxisSize - paddingPx,
-                        thumbStart = metrics.thumbOffset,
+                        crossStart = gutterGeometry.gutterStart,
+                        crossEnd = gutterGeometry.gutterEnd,
                         thumbLength = metrics.thumbLength,
                         trackLength = metrics.trackLength,
                     )
@@ -516,15 +567,15 @@ fun Modifier.vehicleBLazyScrollbar(
                 // Draw track
                 val trackTopLeft =
                     if (isVertical) {
-                        Offset(x = trackCrossOffset, y = paddingPx)
+                        Offset(x = gutterGeometry.trackCrossOffset, y = paddingPx)
                     } else {
-                        Offset(x = paddingPx, y = trackCrossOffset)
+                        Offset(x = paddingPx, y = gutterGeometry.trackCrossOffset)
                     }
                 val trackSize =
                     if (isVertical) {
-                        Size(width = thicknessPx, height = metrics.trackLength)
+                        Size(width = gutterGeometry.trackThickness, height = metrics.trackLength)
                     } else {
-                        Size(width = metrics.trackLength, height = thicknessPx)
+                        Size(width = metrics.trackLength, height = gutterGeometry.trackThickness)
                     }
                 drawRoundRect(
                     color = trackColor.copy(alpha = trackColor.alpha * alpha),
@@ -536,15 +587,15 @@ fun Modifier.vehicleBLazyScrollbar(
                 // Draw thumb
                 val thumbTopLeft =
                     if (isVertical) {
-                        Offset(x = trackCrossOffset, y = metrics.thumbOffset)
+                        Offset(x = gutterGeometry.trackCrossOffset, y = metrics.thumbOffset)
                     } else {
-                        Offset(x = metrics.thumbOffset, y = trackCrossOffset)
+                        Offset(x = metrics.thumbOffset, y = gutterGeometry.trackCrossOffset)
                     }
                 val thumbSize =
                     if (isVertical) {
-                        Size(width = thicknessPx, height = metrics.thumbLength)
+                        Size(width = gutterGeometry.trackThickness, height = metrics.thumbLength)
                     } else {
-                        Size(width = metrics.thumbLength, height = thicknessPx)
+                        Size(width = metrics.thumbLength, height = gutterGeometry.trackThickness)
                     }
                 drawRoundRect(
                     color = thumbColor.copy(alpha = thumbColor.alpha * alpha),
@@ -553,10 +604,19 @@ fun Modifier.vehicleBLazyScrollbar(
                     cornerRadius = CornerRadius(cornerRadiusPx, cornerRadiusPx),
                 )
             }
+            .then(
+                if (!canScroll) {
+                    Modifier
+                } else if (orientation == Orientation.Vertical) {
+                    Modifier.padding(end = gutterWidth)
+                } else {
+                    Modifier.padding(bottom = gutterWidth)
+                },
+            )
     }
 
 /**
- * Lazy-column façade that always carries the same B-Material overlay scrollbar. The compact API
+ * Lazy-column façade that always carries the same B-Material scrollbar in a dedicated gutter. The compact API
  * intentionally mirrors every call site in the app; callers that need a stable position can pass
  * their own [LazyListState].
  */

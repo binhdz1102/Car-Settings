@@ -3,31 +3,30 @@ package com.android.car.settings.feature.seatcontrol.presentation
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
+import com.android.car.settings.core.ui.VehiclePreviewAnchor
+import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.seatcontrol.R
 
 /**
@@ -53,86 +52,72 @@ internal fun SeatControlVisualization(
     val headrestHeight by animateFloatAsState(motion.headrestHeight, seatMotionSpec(), label = "seat-headrest-height")
     val headrestAngle by animateFloatAsState(motion.headrestAngle, seatMotionSpec(), label = "seat-headrest-angle")
     val lumbar by animateFloatAsState(motion.lumbar, seatMotionSpec(), label = "seat-lumbar")
-    val px = with(LocalDensity.current) { 68.dp.toPx() }
+    val selectedKey = selectedControl?.key.orEmpty()
+    val accent = MaterialTheme.colorScheme.primary
     val visualizationDescription = stringResource(R.string.seat_visualization_content_description)
 
     Surface(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(244.dp)
+                .aspectRatio(16f / 9f)
                 .semantics {
                     contentDescription = visualizationDescription
                 },
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            selectedControl?.illustrationRes?.let { illustrationRes ->
-                VehicleIllustrationImage(
-                    illustrationRes = illustrationRes,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = .16f },
-                )
+        Box {
+            VehicleIllustrationImage(
+                illustrationRes = R.drawable.vehicle_preview_seat_steering,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+            )
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val stroke = Stroke(width = size.minDimension * .018f)
+                val seatShift = (foreAft - .5f) * size.width * .08f
+                val seatLift = (.5f - height) * size.height * .08f
+                val seat = VehiclePreviewAnchor(.70f, .57f).offsetIn(size) + Offset(seatShift, seatLift)
+                val head =
+                    VehiclePreviewAnchor(.71f, .17f).offsetIn(size) +
+                        Offset(seatShift, (.5f - headrestHeight) * size.height * .10f)
+                val steering = VehiclePreviewAnchor(.34f, .38f).offsetIn(size)
+                val railStart = VehiclePreviewAnchor(.48f, .88f).offsetIn(size)
+                val railEnd = VehiclePreviewAnchor(.78f, .88f).offsetIn(size)
+
+                drawLine(accent.copy(alpha = .38f), railStart, railEnd, stroke.width)
+                drawCircle(accent.copy(alpha = .9f), size.minDimension * .022f, seat)
+
+                when {
+                    "HEADREST" in selectedKey ->
+                        drawCircle(accent.copy(alpha = .9f), size.minDimension * (.07f + headrestAngle * .025f), head, style = stroke)
+                    "STEERING" in selectedKey ->
+                        drawCircle(accent.copy(alpha = .9f), size.minDimension * .095f, steering, style = stroke)
+                    "BACKREST" in selectedKey || "LUMBAR" in selectedKey -> {
+                        val width = size.width * (.13f + lumbar * .025f)
+                        val topLeft = Offset(seat.x - width * .42f, seat.y - size.height * (.29f + backrest * .03f))
+                        drawRoundRect(
+                            accent.copy(alpha = .88f),
+                            topLeft,
+                            Size(width, size.height * .28f),
+                            CornerRadius(size.minDimension * .035f),
+                            style = stroke,
+                        )
+                    }
+                    else -> {
+                        val width = size.width * (.18f + depth * .04f)
+                        val topLeft = Offset(seat.x - width * .5f, seat.y - size.height * .02f)
+                        drawRoundRect(
+                            accent.copy(alpha = .88f),
+                            topLeft,
+                            Size(width, size.height * (.12f + tilt * .018f)),
+                            CornerRadius(size.minDimension * .035f),
+                            style = stroke,
+                        )
+                    }
+                }
             }
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .offset(y = 72.dp)
-                        .size(width = 228.dp, height = 8.dp)
-                        .background(MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .graphicsLayer {
-                            translationX = (foreAft - .5f) * px
-                            translationY = (.5f - height) * px * .48f
-                            rotationZ = (tilt - .5f) * 18f
-                            transformOrigin = TransformOrigin(.5f, .5f)
-                        }.offset(y = 34.dp)
-                        .size(width = (112 + (depth * 38).toInt()).dp, height = 48.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(18.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .graphicsLayer {
-                            translationX = (foreAft - .5f) * px - px * .52f
-                            translationY = (.5f - height) * px * .48f
-                            rotationZ = -16f + (backrest - .5f) * 44f
-                            transformOrigin = TransformOrigin(1f, 1f)
-                        }.offset(x = (-58).dp, y = (-24).dp)
-                        .size(width = 46.dp, height = 118.dp)
-                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(18.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .graphicsLayer {
-                            translationX = (foreAft - .5f) * px - px * .53f
-                            translationY = (.5f - headrestHeight) * px * .72f
-                            rotationZ = (headrestAngle - .5f) * 22f
-                        }.offset(x = (-58).dp, y = (-109).dp)
-                        .size(width = 48.dp, height = 34.dp)
-                        .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(14.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .graphicsLayer {
-                            translationX = (foreAft - .5f) * px + (lumbar - .5f) * px * .24f - px * .5f
-                            translationY = (.5f - height) * px * .42f
-                        }.offset(x = (-42).dp, y = 4.dp)
-                        .size(width = 18.dp, height = 42.dp)
-                        .background(MaterialTheme.colorScheme.tertiary, RoundedCornerShape(12.dp)),
-            )
         }
     }
 }

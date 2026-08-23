@@ -35,8 +35,11 @@ object SettingsTokens {
     val CardShape = RoundedCornerShape(18.dp)
     val DialogShape = RoundedCornerShape(24.dp)
 
-    /** Persistent rail width at automotive density; wide enough for labels and icon separation. */
-    val RailWidth = 340.dp
+    /**
+     * Persistent rail width at automotive density: 340dp of category content plus the shared
+     * 48dp scrollbar gutter. Reserving the gutter must not force category labels to wrap.
+     */
+    val RailWidth = 388.dp
 
     val ShellHorizontalPadding = 28.dp
     val ShellVerticalPadding = 20.dp

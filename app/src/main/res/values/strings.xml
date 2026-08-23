@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CarSettings</string>
+    <string name="app_name" translatable="false">CarSettings</string>
     <string name="home_title">System features</string>
     <string name="home_search_title">Search settings</string>
     <string name="home_search_summary">Find any system or vehicle control</string>

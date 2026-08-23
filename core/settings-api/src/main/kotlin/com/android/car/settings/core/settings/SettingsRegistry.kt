@@ -26,6 +26,7 @@ enum class SettingsFeatureId {
 
 /** Stable identity for the persistent two-pane Settings rail. */
 enum class SettingsCategoryId {
+    VEHICLE,
     CONNECTED_DEVICES,
     NETWORK_INTERNET,
     NOTIFICATIONS,
@@ -38,7 +39,6 @@ enum class SettingsCategoryId {
     SECURITY,
     APPS,
     ASSISTANCE_VOICE,
-    VEHICLE,
     SYSTEM,
 }
 
@@ -168,16 +168,16 @@ object DefaultSettingsRegistry {
 
     val features: List<SettingsFeatureDefinition> =
         listOf(
+            feature(SettingsFeatureId.HVAC, SettingsDestinationId.HVAC),
+            feature(SettingsFeatureId.DRIVER_ASSISTANCE, SettingsDestinationId.DRIVER_ASSISTANCE),
+            feature(SettingsFeatureId.SEAT_CONTROL, SettingsDestinationId.SEAT_CONTROL),
+            feature(SettingsFeatureId.DOOR_CONTROL, SettingsDestinationId.DOOR_CONTROL),
+            feature(SettingsFeatureId.VEHICLE_LIGHTING, SettingsDestinationId.VEHICLE_LIGHTING),
             feature(SettingsFeatureId.SEARCH, SettingsDestinationId.SEARCH),
             feature(SettingsFeatureId.DISPLAY, SettingsDestinationId.DISPLAY),
             feature(SettingsFeatureId.WIFI, SettingsDestinationId.WIFI),
             feature(SettingsFeatureId.BLUETOOTH, SettingsDestinationId.BLUETOOTH),
             feature(SettingsFeatureId.SOUND, SettingsDestinationId.SOUND),
-            feature(SettingsFeatureId.DRIVER_ASSISTANCE, SettingsDestinationId.DRIVER_ASSISTANCE),
-            feature(SettingsFeatureId.SEAT_CONTROL, SettingsDestinationId.SEAT_CONTROL),
-            feature(SettingsFeatureId.VEHICLE_LIGHTING, SettingsDestinationId.VEHICLE_LIGHTING),
-            feature(SettingsFeatureId.DOOR_CONTROL, SettingsDestinationId.DOOR_CONTROL),
-            feature(SettingsFeatureId.HVAC, SettingsDestinationId.HVAC),
             feature(SettingsFeatureId.LAUNCHER, SettingsDestinationId.LAUNCHER),
             feature(SettingsFeatureId.APPLICATIONS, SettingsDestinationId.APPLICATIONS),
             feature(SettingsFeatureId.NOTIFICATIONS, SettingsDestinationId.NOTIFICATIONS),
@@ -194,6 +194,7 @@ object DefaultSettingsRegistry {
     /** Rail order is intentionally independent from feature registration order. */
     val categories: List<SettingsCategoryDefinition> =
         listOf(
+            category(SettingsCategoryId.VEHICLE, SettingsDestinationId.VEHICLE),
             category(SettingsCategoryId.CONNECTED_DEVICES, SettingsDestinationId.BLUETOOTH),
             category(SettingsCategoryId.NETWORK_INTERNET, SettingsDestinationId.NETWORK_INTERNET),
             category(SettingsCategoryId.NOTIFICATIONS, SettingsDestinationId.NOTIFICATIONS),
@@ -206,7 +207,6 @@ object DefaultSettingsRegistry {
             category(SettingsCategoryId.SECURITY, SettingsDestinationId.SECURITY),
             category(SettingsCategoryId.APPS, SettingsDestinationId.APPLICATIONS),
             category(SettingsCategoryId.ASSISTANCE_VOICE, SettingsDestinationId.ASSISTANT_VOICE),
-            category(SettingsCategoryId.VEHICLE, SettingsDestinationId.VEHICLE),
             category(SettingsCategoryId.SYSTEM, SettingsDestinationId.SYSTEM),
         )
 

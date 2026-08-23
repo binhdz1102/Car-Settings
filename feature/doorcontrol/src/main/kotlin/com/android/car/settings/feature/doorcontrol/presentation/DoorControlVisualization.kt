@@ -4,31 +4,30 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
+import com.android.car.settings.core.ui.VehiclePreviewAnchor
+import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.doorcontrol.R
 
 /**
@@ -55,74 +54,65 @@ internal fun DoorControlVisualization(
             tween(220),
             label = "door-lock",
         )
-    val px = with(LocalDensity.current) { 74.dp.toPx() }
+    val accent = MaterialTheme.colorScheme.primary
     val visualizationDescription = stringResource(R.string.door_visualization_content_description)
 
     Surface(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(244.dp)
+                .aspectRatio(16f / 9f)
                 .semantics {
                     contentDescription = visualizationDescription
                 },
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
-        Box(contentAlignment = Alignment.Center) {
-            selectedControl?.illustrationRes?.let { illustrationRes ->
-                VehicleIllustrationImage(
-                    illustrationRes = illustrationRes,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = .16f },
+        Box {
+            VehicleIllustrationImage(
+                illustrationRes = R.drawable.vehicle_preview_doors,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+            )
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val stroke = Stroke(width = size.minDimension * .017f)
+                val hinge = VehiclePreviewAnchor(.62f, .36f).offsetIn(size)
+                val doorTopLeft = VehiclePreviewAnchor(.42f, .29f).offsetIn(size)
+                val doorSize = Size(size.width * .205f, size.height * .37f)
+                rotate(degrees = doorOpen * 18f, pivot = hinge) {
+                    drawRoundRect(
+                        color = accent.copy(alpha = .88f),
+                        topLeft = doorTopLeft,
+                        size = doorSize,
+                        cornerRadius = CornerRadius(size.minDimension * .025f),
+                        style = stroke,
+                    )
+                }
+
+                val windowY = size.height * (.28f + windowOpen * .11f)
+                drawLine(
+                    color = accent.copy(alpha = .9f),
+                    start = Offset(size.width * .44f, windowY),
+                    end = Offset(size.width * .59f, windowY),
+                    strokeWidth = stroke.width,
+                )
+
+                val mirror = VehiclePreviewAnchor(.72f, .36f).offsetIn(size)
+                rotate(degrees = mirrorAngle * .22f, pivot = mirror) {
+                    drawCircle(
+                        color = accent.copy(alpha = .9f),
+                        radius = size.minDimension * .045f,
+                        center = mirror,
+                        style = stroke,
+                    )
+                }
+                drawCircle(
+                    color = lockColor,
+                    radius = size.minDimension * .027f,
+                    center = VehiclePreviewAnchor(.48f, .43f).offsetIn(size),
                 )
             }
-            Box(
-                modifier =
-                    Modifier
-                        .size(width = 196.dp, height = 126.dp)
-                        .background(MaterialTheme.colorScheme.primaryContainer, RoundedCornerShape(42.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.CenterStart)
-                        .offset(x = 55.dp)
-                        .graphicsLayer {
-                            rotationZ = -doorOpen * 62f
-                            transformOrigin = TransformOrigin(1f, .5f)
-                        }.size(width = 72.dp, height = 88.dp)
-                        .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(14.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.CenterStart)
-                        .offset(x = 63.dp)
-                        .graphicsLayer { translationY = windowOpen * px * .52f }
-                        .size(width = 52.dp, height = 34.dp)
-                        .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(8.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.CenterEnd)
-                        .offset(x = (-31).dp, y = (-48).dp)
-                        .graphicsLayer {
-                            rotationZ = mirrorAngle
-                            transformOrigin = TransformOrigin(0f, .5f)
-                        }.size(width = 46.dp, height = 18.dp)
-                        .background(MaterialTheme.colorScheme.secondary, RoundedCornerShape(12.dp)),
-            )
-            Box(
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .offset(x = (-17).dp)
-                        .size(width = 34.dp, height = 22.dp)
-                        .background(lockColor, RoundedCornerShape(8.dp)),
-            )
         }
     }
 }

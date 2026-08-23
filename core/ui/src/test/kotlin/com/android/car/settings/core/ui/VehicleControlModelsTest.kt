@@ -2,6 +2,7 @@ package com.android.car.settings.core.ui
 
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemId
+import androidx.compose.ui.geometry.Size
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -456,6 +457,26 @@ class VehicleControlModelsTest {
         assertEquals(1f, vehicleSliderStep(0f..20f, steps = 0))
         assertEquals(5f, vehicleSliderStep(0f..100f, steps = 0))
         assertEquals(1f, vehicleSliderStep(10f..10f, steps = 4))
+    }
+
+    @Test
+    fun sliderUiSpec_boundsCenterMarkerAndDiscreteTicks() {
+        assertEquals(.5f, vehicleSliderCenterFraction(0f, -10f..10f))
+        assertEquals(null, vehicleSliderCenterFraction(0f, 0f..10f))
+        assertEquals(null, vehicleSliderCenterFraction(Float.NaN, -10f..10f))
+        val spec = VehicleSliderUiSpec(showTicks = true)
+        assertEquals(true, vehicleSliderShowsTicks(spec, steps = 5))
+        assertEquals(false, vehicleSliderShowsTicks(spec, steps = 20))
+    }
+
+    @Test
+    fun normalizedPreviewGeometry_clampsValuesAndScalesAnchors() {
+        assertEquals(.5f, normalizedVehiclePreviewValue(5f, 0f..10f))
+        assertEquals(1f, normalizedVehiclePreviewValue(20f, 0f..10f))
+        assertEquals(.25f, normalizedVehiclePreviewValue(null, 0f..10f, fallback = .25f))
+        val offset = VehiclePreviewAnchor(.25f, .75f).offsetIn(Size(400f, 200f))
+        assertEquals(100f, offset.x)
+        assertEquals(150f, offset.y)
     }
 
     @Test

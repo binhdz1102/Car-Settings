@@ -6,6 +6,8 @@
     <string name="hvac_restricted">Điều khiển này không khả dụng khi xe đang chạy.</string>
     <string name="hvac_zone_selector">Vùng điều hòa</string>
     <string name="hvac_global_zone">Toàn xe</string>
+    <string name="hvac_visualization_label">Trạng thái điều hòa quan sát được</string>
+    <string name="hvac_visualization_content_description">Minh họa điều hòa dựa trên thuộc tính quạt, nhiệt độ, tuần hoàn và khử sương quan sát được</string>
     <string name="hvac_category_system">Hệ thống và chế độ tự động</string>
     <string name="hvac_category_temperature">Nhiệt độ</string>
     <string name="hvac_category_airflow">Luồng gió</string>

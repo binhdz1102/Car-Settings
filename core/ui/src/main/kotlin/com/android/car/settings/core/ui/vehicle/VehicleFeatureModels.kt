@@ -11,6 +11,24 @@ enum class VehicleEditorUiKind {
     STATUS,
 }
 
+/** Visual treatment for a numeric control; the VHAL range remains the source of truth. */
+enum class VehicleSliderUiKind {
+    THERMAL,
+    LEVEL,
+    POSITION,
+    OFFSET,
+}
+
+@Immutable
+data class VehicleSliderUiSpec(
+    val kind: VehicleSliderUiKind = VehicleSliderUiKind.LEVEL,
+    val startLabel: String? = null,
+    val endLabel: String? = null,
+    val showTicks: Boolean = false,
+    val showValueLabel: Boolean = true,
+    val centerMarker: Float? = null,
+)
+
 /** Declares whether a preview is backed by observed vehicle data or is an explanatory demo. */
 enum class VehicleVisualizationSource {
     LIVE_PROPERTY,
@@ -67,6 +85,7 @@ data class VehicleControlUiModel(
     val valueLabel: String = "",
     val range: ClosedFloatingPointRange<Float> = 0f..1f,
     val steps: Int = 0,
+    val sliderUiSpec: VehicleSliderUiSpec = VehicleSliderUiSpec(),
     val selectedEnumKey: String? = null,
     val enumOptions: List<VehicleEnumOption> = emptyList(),
     val errorMessage: String? = null,

@@ -11,6 +11,8 @@ import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleEnumOption
 import com.android.car.settings.core.ui.VehicleFeatureScreen
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualizationSource
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.vehicle.VehicleConnectionState
@@ -166,6 +168,7 @@ internal fun mapDriverAssistanceControls(
                     } else {
                         0
                     },
+                sliderUiSpec = driverAssistanceSliderUiSpec(id),
                 selectedEnumKey = numeric?.roundToInt()?.toString(),
                 enumOptions =
                     enumValues.map { enumValue ->
@@ -178,6 +181,20 @@ internal fun mapDriverAssistanceControls(
                 requiresUnrestrictedUx = control.definition.requiresUnrestrictedUx,
             )
         }
+    }
+
+internal fun driverAssistanceSliderUiSpec(id: DriverAssistanceId): VehicleSliderUiSpec =
+    when (id) {
+        DriverAssistanceId.SPEED_LIMIT_OFFSET ->
+            VehicleSliderUiSpec(
+                kind = VehicleSliderUiKind.OFFSET,
+                showTicks = true,
+                centerMarker = 0f,
+            )
+        DriverAssistanceId.WARNING_VOLUME,
+        DriverAssistanceId.PARKING_WARNING_VOLUME,
+        -> VehicleSliderUiSpec(kind = VehicleSliderUiKind.LEVEL, showTicks = true)
+        else -> VehicleSliderUiSpec()
     }
 
 @DrawableRes

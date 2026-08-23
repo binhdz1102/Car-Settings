@@ -10,6 +10,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.car.settings.core.ui.VehicleControlUiMetadata
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleFeatureScreen
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualizationSource
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toUiControls
@@ -130,6 +132,7 @@ internal fun buildSeatControlMetadata(
                     SeatControlKind.SLOT_ACTION -> VehicleEditorUiKind.ENUM
                     SeatControlKind.STATUS -> VehicleEditorUiKind.STATUS
                 },
+            sliderUiSpec = seatSliderUiSpec(definition.kind),
             enumLabels =
                 if (definition.kind == SeatControlKind.SLOT_ACTION) {
                     (0..3).associateWith { slot -> slotFormat.replace("%1\$d", slot.toString()) }
@@ -148,6 +151,13 @@ internal fun buildSeatControlMetadata(
                 }
             },
         )
+    }
+
+internal fun seatSliderUiSpec(kind: SeatControlKind): VehicleSliderUiSpec =
+    if (kind == SeatControlKind.RANGE) {
+        VehicleSliderUiSpec(kind = VehicleSliderUiKind.POSITION, centerMarker = 0f)
+    } else {
+        VehicleSliderUiSpec()
     }
 
 private fun seatArtwork(id: SeatControlId): Int =

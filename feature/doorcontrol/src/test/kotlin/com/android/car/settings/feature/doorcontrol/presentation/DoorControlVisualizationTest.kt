@@ -2,10 +2,19 @@ package com.android.car.settings.feature.doorcontrol.presentation
 
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.feature.doorcontrol.domain.DoorControlKind
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class DoorControlVisualizationTest {
+    @Test
+    fun rangeControls_usePositionSliderContract() {
+        val spec = doorSliderUiSpec(DoorControlKind.RANGE)
+        assertEquals(VehicleSliderUiKind.POSITION, spec.kind)
+        assertEquals(0f, spec.centerMarker)
+    }
+
     @Test
     fun visualMotion_usesPositionAndStatePropertiesOnly() {
         val motion =

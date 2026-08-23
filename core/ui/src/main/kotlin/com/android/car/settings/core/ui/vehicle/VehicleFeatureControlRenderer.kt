@@ -164,7 +164,7 @@ internal fun VehicleControlsPane(
                             )
                         } else {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Box(
@@ -399,7 +399,7 @@ internal fun VehicleRotaryControlRow(
         }
     }
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         FocusItem(
@@ -589,6 +589,7 @@ internal fun VehicleFeatureControlRow(
                 },
                 valueRange = control.range,
                 steps = control.steps,
+                uiSpec = control.sliderUiSpec,
                 enabled = enabled && control.numericValue != null,
                 readOnly = !control.writable,
                 pending = control.pending,

@@ -1,5 +1,6 @@
 package com.android.car.settings.core.ui
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.horizontalScroll
@@ -7,14 +8,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.outlined.AcUnit
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.LocalFireDepartment
+import androidx.compose.material.icons.outlined.Remove
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -29,7 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.Role
@@ -151,6 +164,7 @@ fun VehicleSliderRow(
     modifier: Modifier = Modifier,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0,
+    uiSpec: VehicleSliderUiSpec = VehicleSliderUiSpec(),
     summary: String? = null,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -188,7 +202,7 @@ fun VehicleSliderRow(
             modifier
                 .fillMaxWidth()
                 .sizeIn(minHeight = 88.dp)
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 16.dp)
                 .semantics {
                     stateDescription = vehiclePendingStateDescription(valueLabel, pending, pendingDescription)
                     if (!effectiveEnabled) disabled()
@@ -219,50 +233,135 @@ fun VehicleSliderRow(
         VehicleSupportingText(summary = summary, annotation = annotation)
         if (validRange) {
             val sliderInteractive = effectiveEnabled && !readOnly
+            val normalizedValue =
+                ((clampedValue - valueRange.start) / (valueRange.endInclusive - valueRange.start))
+                    .coerceIn(0f, 1f)
+            val sliderColor =
+                when (uiSpec.kind) {
+                    VehicleSliderUiKind.THERMAL ->
+                        lerp(Color(0xFF1586B8), Color(0xFFF28C28), normalizedValue)
+                    VehicleSliderUiKind.LEVEL -> MaterialTheme.colorScheme.primary
+                    VehicleSliderUiKind.POSITION -> MaterialTheme.colorScheme.secondary
+                    VehicleSliderUiKind.OFFSET -> MaterialTheme.colorScheme.tertiary
+                }
+            val sliderStyle =
+                when (uiSpec.kind) {
+                    VehicleSliderUiKind.THERMAL -> BSliderStyle.Warning
+                    VehicleSliderUiKind.LEVEL -> BSliderStyle.Primary
+                    VehicleSliderUiKind.POSITION -> BSliderStyle.Info
+                    VehicleSliderUiKind.OFFSET -> BSliderStyle.Success
+                }
             val sliderColors =
-                BSliderDefaults.colors(BSliderStyle.Primary).copy(
-                    thumb = MaterialTheme.colorScheme.primary,
-                    trackActive = MaterialTheme.colorScheme.primary,
+                BSliderDefaults.colors(sliderStyle).copy(
+                    thumb = sliderColor,
+                    trackActive = sliderColor,
                 )
-            BSlider(
-                value = clampedValue,
-                onValueChange = if (readOnly) ({}) else onValueChange,
-                onValueChangeFinished = if (readOnly) null else onValueChangeFinished,
-                enabled = sliderInteractive,
-                valueRange = valueRange,
-                steps = steps.coerceAtLeast(0),
-                showValueLabel = false,
-                size = BSliderSize.Lg,
-                colors = sliderColors,
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .sizeIn(minHeight = 48.dp)
-                        .semantics {
-                            progressBarRangeInfo =
-                                ProgressBarRangeInfo(
-                                    current = clampedValue,
-                                    range = valueRange,
-                                    steps = steps.coerceAtLeast(0),
-                                )
-                            if (!sliderInteractive && !readOnly) disabled()
-                            if (sliderInteractive) {
-                                setProgress { requestedValue ->
-                                    onValueChange(
-                                        requestedValue.coerceIn(
-                                            valueRange.start,
-                                            valueRange.endInclusive,
-                                        ),
-                                    )
-                                    onValueChangeFinished?.invoke()
-                                    true
-                                }
-                            }
-                        },
-            )
+            val endpointIcons = vehicleSliderEndpointIcons(uiSpec.kind)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                VehicleSliderEndpoint(
+                    label = uiSpec.startLabel,
+                    icon = endpointIcons.first,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Box(modifier = Modifier.weight(1f).height(56.dp)) {
+                    val markerFraction = vehicleSliderCenterFraction(uiSpec.centerMarker, valueRange)
+                    if (markerFraction != null) {
+                        Canvas(modifier = Modifier.fillMaxSize()) {
+                            drawVehicleSliderCenterMarker(
+                                markerFraction = markerFraction,
+                                color = sliderColor,
+                            )
+                        }
+                    }
+                    BSlider(
+                        value = clampedValue,
+                        onValueChange = if (readOnly) ({}) else onValueChange,
+                        onValueChangeFinished = if (readOnly) null else onValueChangeFinished,
+                        enabled = sliderInteractive,
+                        valueRange = valueRange,
+                        steps = steps.coerceAtLeast(0),
+                        limitMin = valueRange.start,
+                        limitMax = valueRange.endInclusive,
+                        showTickMarks = vehicleSliderShowsTicks(uiSpec, steps),
+                        showValueLabel = uiSpec.showValueLabel,
+                        style = sliderStyle,
+                        size = BSliderSize.Lg,
+                        colors = sliderColors,
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .sizeIn(minHeight = 48.dp)
+                                .semantics {
+                                    progressBarRangeInfo =
+                                        ProgressBarRangeInfo(
+                                            current = clampedValue,
+                                            range = valueRange,
+                                            steps = steps.coerceAtLeast(0),
+                                        )
+                                    if (!sliderInteractive && !readOnly) disabled()
+                                    if (sliderInteractive) {
+                                        setProgress { requestedValue ->
+                                            onValueChange(
+                                                requestedValue.coerceIn(
+                                                    valueRange.start,
+                                                    valueRange.endInclusive,
+                                                ),
+                                            )
+                                            onValueChangeFinished?.invoke()
+                                            true
+                                        }
+                                    }
+                                },
+                    )
+                }
+                VehicleSliderEndpoint(
+                    label = uiSpec.endLabel,
+                    icon = endpointIcons.second,
+                    tint = sliderColor,
+                )
+            }
         }
     }
     if (showDivider) HorizontalDivider()
+}
+
+@Composable
+private fun VehicleSliderEndpoint(
+    label: String?,
+    icon: ImageVector,
+    tint: Color,
+) {
+    if (label.isNullOrBlank()) {
+        Icon(imageVector = icon, contentDescription = null, tint = tint)
+    } else {
+        Text(text = label, style = MaterialTheme.typography.labelMedium, color = tint)
+    }
+}
+
+private fun vehicleSliderEndpointIcons(kind: VehicleSliderUiKind): Pair<ImageVector, ImageVector> =
+    when (kind) {
+        VehicleSliderUiKind.THERMAL -> Icons.Outlined.AcUnit to Icons.Outlined.LocalFireDepartment
+        VehicleSliderUiKind.LEVEL -> Icons.Outlined.Remove to Icons.Outlined.Add
+        VehicleSliderUiKind.POSITION ->
+            Icons.AutoMirrored.Outlined.ArrowBack to Icons.AutoMirrored.Outlined.ArrowForward
+        VehicleSliderUiKind.OFFSET -> Icons.Outlined.Remove to Icons.Outlined.Add
+    }
+
+private fun DrawScope.drawVehicleSliderCenterMarker(
+    markerFraction: Float,
+    color: Color,
+) {
+    val x = size.width * markerFraction
+    drawLine(
+        color = color.copy(alpha = 0.55f),
+        start = Offset(x, size.height * 0.22f),
+        end = Offset(x, size.height * 0.78f),
+        strokeWidth = 2.dp.toPx(),
+    )
 }
 
 /** Enum editor backed only by a presentation key and labels supplied by the caller. */

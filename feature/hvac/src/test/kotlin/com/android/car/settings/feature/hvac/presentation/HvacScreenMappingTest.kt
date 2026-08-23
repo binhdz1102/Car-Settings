@@ -188,4 +188,13 @@ class HvacScreenMappingTest {
 
         assertThat(controls.mapNotNull { it.errorMessage }).containsExactly("Write rejected")
     }
+
+    @Test
+    fun climateSliders_areClassifiedByThermalAndLevelUx() {
+        assertThat(climateSliderUiSpec(ClimateControlId.TEMPERATURE_SET).kind)
+            .isEqualTo(com.android.car.settings.core.ui.VehicleSliderUiKind.THERMAL)
+        val fan = climateSliderUiSpec(ClimateControlId.FAN_SPEED)
+        assertThat(fan.kind).isEqualTo(com.android.car.settings.core.ui.VehicleSliderUiKind.LEVEL)
+        assertThat(fan.showTicks).isTrue()
+    }
 }

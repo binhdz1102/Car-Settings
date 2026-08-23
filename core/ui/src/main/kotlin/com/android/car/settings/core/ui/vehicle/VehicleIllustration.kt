@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
  *
  * The resources are deliberately kept at native 16:9 resolution for popup clarity, but decoding
  * all of them synchronously through painterResource made the first vehicle frame wait on several
- * multi-megabyte WebP decodes. A fixed 2x sample is sufficient for the largest on-screen preview
+ * multi-megabyte decodes. A fixed 2x sample is sufficient for the largest on-screen preview
  * (and still retains more than 768px), while the placeholder lets the rotary host register before
  * artwork finishes. The composable is cancellation-safe when the user changes category quickly.
  */
@@ -52,7 +52,9 @@ fun VehicleIllustrationImage(
                                         // 1536x864 -> 768x432, which is above the minimum visible
                                         // preview size and avoids a synchronous full-resolution decode.
                                         inSampleSize = 2
-                                        inPreferredConfig = android.graphics.Bitmap.Config.RGB_565
+                                        // Vehicle preview PNGs carry a real alpha channel. RGB_565
+                                        // flattened that transparency and produced a dark rectangle.
+                                        inPreferredConfig = android.graphics.Bitmap.Config.ARGB_8888
                                     },
                                 )
                             }

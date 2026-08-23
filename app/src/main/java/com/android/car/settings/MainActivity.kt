@@ -138,7 +138,7 @@ class MainActivity : ComponentActivity() {
                 val requestedDefinition = destinationFor(launchIntent)
                 var blockedDestination by remember { mutableStateOf<SettingsDestinationDefinition?>(null) }
                 val requestedAllowed = requestedDefinition.isAllowed(uxPolicyState)
-                val connectedDevicesRoute = DefaultSettingsRegistry.route(SettingsDestinationId.BLUETOOTH)
+                val defaultRoute = DefaultSettingsRegistry.route(SettingsDestinationId.VEHICLE)
                 val homeRoute = DefaultSettingsRegistry.route(SettingsDestinationId.HOME)
                 val searchRoute = DefaultSettingsRegistry.route(SettingsDestinationId.SEARCH)
                 val requestedRoute = requestedDefinition.route
@@ -151,7 +151,7 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                 val requestedDestination =
-                    if (requestedAllowed && requestedRoute != null) requestedRoute else connectedDevicesRoute
+                    if (requestedAllowed && requestedRoute != null) requestedRoute else defaultRoute
                 Timber.d("Cold-start destination=%s", requestedDestination)
 
                 fun openDestination(
@@ -198,8 +198,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navController,
-                        // Resolve the launch intent before composing the graph.  Starting on
-                        // Bluetooth and navigating to a deep-linked destination in a later
+                        // Resolve the launch intent before composing the graph. Starting on the
+                        // Vehicle landing page and navigating to a deep-linked destination later
                         // effect briefly composes two detail FocusAreas with identical bounds;
                         // the native CCP validator correctly reports that as an overlap.  A
                         // route-aware start keeps the first frame single-owner while the normal
@@ -217,7 +217,7 @@ class MainActivity : ComponentActivity() {
                         // the retired card-grid. Every entry point now lands in the persistent shell.
                         composable(homeRoute) {
                             LaunchedEffect(Unit) {
-                                navController.navigate(connectedDevicesRoute) {
+                                navController.navigate(defaultRoute) {
                                     popUpTo(homeRoute) { inclusive = true }
                                     launchSingleTop = true
                                 }
@@ -292,7 +292,7 @@ class MainActivity : ComponentActivity() {
                         return@LaunchedEffect
                     }
                     requestCapabilities(requestedDefinition.capabilities)
-                    if (requestedDestination != connectedDevicesRoute &&
+                    if (requestedDestination != defaultRoute &&
                         navController.currentDestination?.route != requestedDestination
                     ) {
                         Timber.d("Routing new intent to %s", requestedDestination)
@@ -308,7 +308,7 @@ class MainActivity : ComponentActivity() {
                     if (!activeDefinition.isAllowed(uxPolicyState)) {
                         blockedDestination = activeDefinition
                         if (!navController.popBackStack()) {
-                            navController.navigate(connectedDevicesRoute) { launchSingleTop = true }
+                            navController.navigate(defaultRoute) { launchSingleTop = true }
                         }
                     }
                 }

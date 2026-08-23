@@ -5,11 +5,22 @@ import com.android.car.settings.core.vehicle.VehicleFeatureDefinition
 import com.android.car.settings.core.vehicle.VehicleFeatureState
 import com.android.car.settings.core.vehicle.VehiclePropertySpec
 import com.android.car.settings.core.vehicle.VehiclePropertyValueType
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.feature.driverassistance.domain.DriverAssistanceId
 import com.android.car.settings.feature.driverassistance.domain.DRIVER_ASSISTANCE_DEFINITIONS
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class DriverAssistanceMappingTest {
+    @Test
+    fun numericControls_useOffsetAndLevelSliderContracts() {
+        val offset = driverAssistanceSliderUiSpec(DriverAssistanceId.SPEED_LIMIT_OFFSET)
+        assertThat(offset.kind).isEqualTo(VehicleSliderUiKind.OFFSET)
+        assertThat(offset.centerMarker).isEqualTo(0f)
+        assertThat(driverAssistanceSliderUiSpec(DriverAssistanceId.WARNING_VOLUME).kind)
+            .isEqualTo(VehicleSliderUiKind.LEVEL)
+    }
+
     @Test
     fun `mapping keeps every capability discoverable when vehicle exposes none`() {
         val state =

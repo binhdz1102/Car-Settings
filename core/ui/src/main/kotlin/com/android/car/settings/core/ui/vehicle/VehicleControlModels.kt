@@ -3,6 +3,22 @@ package com.android.car.settings.core.ui
 import androidx.compose.runtime.Immutable
 import com.android.car.settings.core.vehicle.VehiclePropertyAreaType
 
+internal fun vehicleSliderCenterFraction(
+    marker: Float?,
+    valueRange: ClosedFloatingPointRange<Float>,
+): Float? {
+    if (marker == null || !marker.isFinite()) return null
+    val span = valueRange.endInclusive - valueRange.start
+    if (!span.isFinite() || span <= 0f) return null
+    if (marker <= valueRange.start || marker >= valueRange.endInclusive) return null
+    return ((marker - valueRange.start) / span).coerceIn(0f, 1f)
+}
+
+internal fun vehicleSliderShowsTicks(
+    spec: VehicleSliderUiSpec,
+    steps: Int,
+): Boolean = spec.showTicks && steps in 1..11
+
 /** A presentation-only option used by [VehicleEnumRow]. */
 @Immutable
 data class VehicleEnumOption(

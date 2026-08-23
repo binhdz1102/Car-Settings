@@ -2,10 +2,19 @@ package com.android.car.settings.feature.seatcontrol.presentation
 
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.feature.seatcontrol.domain.SeatControlKind
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class SeatControlVisualizationTest {
+    @Test
+    fun rangeControls_usePositionSliderContract() {
+        val spec = seatSliderUiSpec(SeatControlKind.RANGE)
+        assertEquals(VehicleSliderUiKind.POSITION, spec.kind)
+        assertEquals(0f, spec.centerMarker)
+    }
+
     @Test
     fun normalizedPosition_clampsStartMiddleAndEnd() {
         assertEquals(0f, normalizedSeatPosition(0f, 0f..100f), 0.0001f)

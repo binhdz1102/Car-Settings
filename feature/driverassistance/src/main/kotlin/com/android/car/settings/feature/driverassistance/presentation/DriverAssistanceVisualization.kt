@@ -1,30 +1,27 @@
 package com.android.car.settings.feature.driverassistance.presentation
 
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.feature.driverassistance.R
@@ -39,16 +36,15 @@ internal fun DriverAssistanceVisualization(
     selectedControl: VehicleControlUiModel?,
     modifier: Modifier = Modifier,
 ) {
-    val transition = rememberInfiniteTransition(label = "adas-illustration")
-    val pulse by
-        transition.animateFloat(
-            initialValue = .18f,
-            targetValue = 1f,
-            animationSpec = infiniteRepeatable(tween(900), RepeatMode.Reverse),
-            label = "adas-illustration-pulse",
-        )
     val title = selectedControl?.title.orEmpty()
     val key = selectedControl?.key.orEmpty()
+    val emphasis = remember { Animatable(.55f) }
+    LaunchedEffect(key) {
+        emphasis.snapTo(.18f)
+        emphasis.animateTo(1f, tween(420, easing = FastOutSlowInEasing))
+        emphasis.animateTo(.55f, tween(240))
+    }
+    val pulse = emphasis.value
     val primary = MaterialTheme.colorScheme.primary
     val warning = MaterialTheme.colorScheme.tertiary
     val visualizationDescription =
@@ -57,7 +53,7 @@ internal fun DriverAssistanceVisualization(
         modifier =
             modifier
                 .fillMaxWidth()
-                .height(244.dp)
+                .aspectRatio(16f / 9f)
                 .semantics {
                     contentDescription = visualizationDescription
                 },
@@ -65,17 +61,14 @@ internal fun DriverAssistanceVisualization(
         color = MaterialTheme.colorScheme.surfaceContainerHighest,
     ) {
         Box {
-            selectedControl?.illustrationRes?.let { illustrationRes ->
-                VehicleIllustrationImage(
-                    illustrationRes = illustrationRes,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize().graphicsLayer { alpha = .22f },
-                )
-            }
+            VehicleIllustrationImage(
+                illustrationRes = R.drawable.vehicle_preview_driver_assistance,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize(),
+            )
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val center = Offset(size.width * .5f, size.height * .64f)
-                drawCircle(primary.copy(alpha = .85f), size.minDimension * .105f, center)
+                val center = Offset(size.width * .52f, size.height * .59f)
                 when (driverAssistanceIllustrationFamily(key)) {
                     DriverAssistanceIllustrationFamily.LANE ->
                         drawLaneIllustration(center, primary, warning, pulse)
@@ -130,16 +123,20 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLaneIllustratio
     drawLine(
         primary.copy(alpha = pulse),
         Offset(size.width * .23f, size.height * .1f),
-        Offset(center.x - 38f, size.height),
+        Offset(center.x - size.width * .08f, size.height * .94f),
         strokeWidth = stroke.width,
     )
     drawLine(
         primary.copy(alpha = pulse),
         Offset(size.width * .77f, size.height * .1f),
-        Offset(center.x + 38f, size.height),
+        Offset(center.x + size.width * .08f, size.height * .94f),
         strokeWidth = stroke.width,
     )
-    drawCircle(warning.copy(alpha = pulse), size.minDimension * .035f, Offset(center.x + 62f, center.y - 38f))
+    drawCircle(
+        warning.copy(alpha = pulse),
+        size.minDimension * .035f,
+        Offset(center.x + size.width * .13f, center.y - size.height * .12f),
+    )
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawBlindSpotIllustration(
@@ -147,8 +144,9 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawBlindSpotIllust
     warning: Color,
     pulse: Float,
 ) {
-    drawCircle(warning.copy(alpha = pulse * .2f), size.minDimension * .19f, Offset(center.x + 86f, center.y))
-    drawCircle(warning.copy(alpha = pulse), size.minDimension * .05f, Offset(center.x + 86f, center.y))
+    val target = Offset(center.x + size.width * .18f, center.y)
+    drawCircle(warning.copy(alpha = pulse * .2f), size.minDimension * .19f, target)
+    drawCircle(warning.copy(alpha = pulse), size.minDimension * .05f, target)
 }
 
 private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCollisionIllustration(
@@ -156,7 +154,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawCollisionIllust
     warning: Color,
     pulse: Float,
 ) {
-    val target = Offset(center.x, center.y - 82f)
+    val target = Offset(center.x, center.y - size.height * .26f)
     drawCircle(warning.copy(alpha = .85f), size.minDimension * .07f, target)
     drawCircle(
         warning.copy(alpha = pulse * .55f),
@@ -174,7 +172,7 @@ private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawAccIllustration
     primary: Color,
     pulse: Float,
 ) {
-    val target = Offset(center.x, center.y - (54f + pulse * 28f))
+    val target = Offset(center.x, center.y - size.height * (.17f + pulse * .09f))
     drawCircle(primary.copy(alpha = .92f), size.minDimension * .055f, target)
     drawLine(primary.copy(alpha = pulse), center, target, strokeWidth = size.minDimension * .018f, cap = StrokeCap.Round)
 }
