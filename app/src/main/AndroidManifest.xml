@@ -39,6 +39,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.CONTROL_DISPLAY_BRIGHTNESS" />
+    <uses-permission android:name="android.permission.MODIFY_DAY_NIGHT_MODE" />
     <uses-permission android:name="android.permission.CONTROL_DISPLAY_UNITS" />
     <uses-permission android:name="android.permission.READ_DISPLAY_UNITS" />
     <uses-permission android:name="android.permission.SUGGEST_MANUAL_TIME_AND_ZONE" />

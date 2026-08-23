@@ -3,6 +3,7 @@
 package com.android.car.settings.feature.display.data
 
 import android.annotation.SuppressLint
+import android.app.UiModeManager
 import android.app.time.Capabilities
 import android.app.time.TimeConfiguration
 import android.app.time.TimeManager
@@ -18,6 +19,7 @@ import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.database.ContentObserver
 import android.hardware.display.DisplayManager
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
@@ -41,6 +43,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.TimeZone
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,6 +68,7 @@ internal class AndroidDisplayPlatform
         private val displayManager = context.getSystemService(DisplayManager::class.java)
         private val powerManager = context.getSystemService(PowerManager::class.java)
         private val userManager = context.getSystemService(UserManager::class.java)
+        private val uiModeManager = context.getSystemService(UiModeManager::class.java)
         private val timeManager = context.getSystemService(TimeManager::class.java)
         private val timeDetector = context.getSystemService(TimeDetector::class.java)
         private val timeZoneDetector = context.getSystemService(TimeZoneDetector::class.java)
@@ -110,6 +114,11 @@ internal class AndroidDisplayPlatform
             )
             resolver.registerContentObserver(
                 Settings.Global.getUriFor(FORCED_DAY_NIGHT_MODE),
+                false,
+                settingObserver,
+            )
+            resolver.registerContentObserver(
+                Settings.Secure.getUriFor(UI_NIGHT_MODE),
                 false,
                 settingObserver,
             )
@@ -204,19 +213,45 @@ internal class AndroidDisplayPlatform
 
         override suspend fun setThemeMode(mode: ThemeMode): ActionResult =
             execute {
-                // Keep the framework setting in sync when the image provides it.  Some AAOS
-                // emulator/OEM images do not define the key at all; in that case the persisted
-                // app preference is the source of truth for MySystemTheme and still survives
-                // process/activity recreation.
-                if (hasGlobalThemeModeSetting()) {
-                    Settings.Global.putInt(resolver, FORCED_DAY_NIGHT_MODE, mode.toPlatformValue())
+                // Apply the theme mode across all available system layers.
+                // 1. UiModeManager nightMode (system-wide) & applicationNightMode (per-process)
+                if (uiModeManager != null) {
+                    runCatching {
+                        uiModeManager.nightMode = mode.toSystemNightMode()
+                    }.onFailure { Timber.w(it, "Failed to set UiModeManager.nightMode") }
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        runCatching {
+                            uiModeManager.setApplicationNightMode(mode.toSystemNightMode())
+                        }.onFailure { Timber.w(it, "Failed to set UiModeManager.setApplicationNightMode") }
+                    }
                 }
+
+                // 2. UiModeManagerService secure setting
+                runCatching {
+                    Settings.Secure.putString(
+                        resolver,
+                        UI_NIGHT_MODE,
+                        mode.toLegacyNightModeValue(),
+                    )
+                }.onFailure { Timber.w(it, "Failed to set Settings.Secure.UI_NIGHT_MODE") }
+
+                // 3. Automotive forced-mode global setting
+                if (hasGlobalThemeModeSetting()) {
+                    runCatching {
+                        Settings.Global.putInt(resolver, FORCED_DAY_NIGHT_MODE, mode.toPlatformValue())
+                    }.onFailure { Timber.w(it, "Failed to set Settings.Global.FORCED_DAY_NIGHT_MODE") }
+                }
+
+                // 4. Persisted app preference (guarantees local persistence & fallback)
                 check(
                     themePreferences
                         .edit()
                         .putInt(KEY_THEME_MODE, mode.toPlatformValue())
                         .commit(),
                 ) { "The system did not allow changing the day/night theme" }
+
+                Timber.i("Applied system day/night theme mode %s", mode)
                 refreshOrThrow()
             }
 
@@ -301,22 +336,38 @@ internal class AndroidDisplayPlatform
             return resourceId != 0 && context.resources.getBoolean(resourceId)
         }
 
-        private fun readThemeMode(): ThemeMode =
-            when (
-                if (hasGlobalThemeModeSetting()) {
-                    Settings.Global.getInt(
-                        resolver,
-                        FORCED_DAY_NIGHT_MODE,
-                        themePreferences.getInt(KEY_THEME_MODE, THEME_AUTO),
-                    )
-                } else {
-                    themePreferences.getInt(KEY_THEME_MODE, THEME_AUTO)
+        private fun readThemeMode(): ThemeMode {
+            // 1. Automotive Global forced mode if supported by the image
+            if (hasGlobalThemeModeSetting()) {
+                val forcedValue = Settings.Global.getInt(
+                    resolver,
+                    FORCED_DAY_NIGHT_MODE,
+                    themePreferences.getInt(KEY_THEME_MODE, THEME_AUTO),
+                )
+                return when (forcedValue) {
+                    THEME_DAY -> ThemeMode.DAY
+                    THEME_NIGHT -> ThemeMode.NIGHT
+                    else -> ThemeMode.AUTO
                 }
-            ) {
-                THEME_DAY -> ThemeMode.DAY
-                THEME_NIGHT -> ThemeMode.NIGHT
-                else -> ThemeMode.AUTO
             }
+
+            // 2. Explicitly saved theme preference
+            val savedMode = themePreferences.getInt(KEY_THEME_MODE, THEME_AUTO)
+            if (savedMode != THEME_AUTO) {
+                return when (savedMode) {
+                    THEME_DAY -> ThemeMode.DAY
+                    THEME_NIGHT -> ThemeMode.NIGHT
+                    else -> ThemeMode.AUTO
+                }
+            }
+
+            // 3. System night mode from UiModeManager
+            if (uiModeManager != null) {
+                uiModeManager.nightMode.toThemeMode()?.let { return it }
+            }
+
+            return ThemeMode.AUTO
+        }
 
         private fun hasGlobalThemeModeSetting(): Boolean =
             runCatching {
@@ -477,6 +528,7 @@ internal class AndroidDisplayPlatform
     }
 
 private const val FORCED_DAY_NIGHT_MODE = "android.car.FORCED_DAY_NIGHT_MODE"
+private const val UI_NIGHT_MODE = "ui_night_mode"
 private const val THEME_PREFERENCES_NAME = "display_theme"
 private const val KEY_THEME_MODE = "theme_mode"
 private const val HOURS_12 = "12"
@@ -528,6 +580,30 @@ private fun ThemeMode.toPlatformValue(): Int =
         ThemeMode.AUTO -> THEME_AUTO
         ThemeMode.DAY -> THEME_DAY
         ThemeMode.NIGHT -> THEME_NIGHT
+    }
+
+/** Maps a UI ThemeMode onto UiModeManager's system night mode constants (API 31+). */
+private fun ThemeMode.toSystemNightMode(): Int =
+    when (this) {
+        ThemeMode.AUTO -> UiModeManager.MODE_NIGHT_AUTO
+        ThemeMode.DAY -> UiModeManager.MODE_NIGHT_NO
+        ThemeMode.NIGHT -> UiModeManager.MODE_NIGHT_YES
+    }
+
+/** UiModeManagerService's secure-setting representation used before API 31. */
+private fun ThemeMode.toLegacyNightModeValue(): String =
+    when (this) {
+        ThemeMode.AUTO -> "auto"
+        ThemeMode.DAY -> "no"
+        ThemeMode.NIGHT -> "yes"
+    }
+
+private fun Int.toThemeMode(): ThemeMode? =
+    when (this) {
+        UiModeManager.MODE_NIGHT_NO -> ThemeMode.DAY
+        UiModeManager.MODE_NIGHT_YES -> ThemeMode.NIGHT
+        UiModeManager.MODE_NIGHT_AUTO -> ThemeMode.AUTO
+        else -> null
     }
 
 private fun Any.systemInt(methodName: String): Int? = runCatching { javaClass.getMethod(methodName).invoke(this) as Int }.getOrNull()
