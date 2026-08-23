@@ -27,6 +27,7 @@ rootProject.name = "CarSettings"
 include(":app")
 include(":core:common")
 include(":core:ui")
+include(":core:vehicle")
 include(":feature:wifi")
 include(":feature:bluetooth")
 include(":feature:sound")
