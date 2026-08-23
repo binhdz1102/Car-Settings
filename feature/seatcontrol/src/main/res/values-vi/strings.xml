@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="seat_memory_choose_slot">Chọn vị trí nhớ</string>
+    <string name="seat_control_title">Ghế và vô lăng</string>
+    <string name="seat_control_limitations">Phạm vi điều chỉnh và số ghế khả dụng phụ thuộc phần cứng. Dừng điều chỉnh nếu người hoặc vật có nguy cơ bị kẹt.</string>
+    <string name="seat_control_dependencies">Bộ truyền động của ghế hoặc vô lăng đã chọn phải có nguồn và báo vị trí hợp lệ. Chỉ cho phép đổi vị trí khi chính sách UX không hạn chế.</string>
+    <string name="seat_control_empty">Xe không cung cấp điều khiển ghế hoặc vô lăng tương thích.</string>
+    <string name="vehicle_control_unavailable_message">Điều khiển này hiện không khả dụng.</string>
+    <string name="vehicle_service_connecting">Đang kết nối dịch vụ xe…</string>
+    <string name="vehicle_control_restricted">Hãy đỗ xe để điều chỉnh mục này.</string>
+    <string name="seat_visualization_content_description">Sơ đồ vị trí ghế trực tiếp dựa trên thuộc tính vị trí quan sát được từ xe</string>
+    <string name="vehicle_zone_global">Toàn bộ xe</string>
+    <string name="seat_zone_selector">Vị trí ghế</string>
+    <string name="seat_front_left">Trước trái</string><string name="seat_front_center">Trước giữa</string><string name="seat_front_right">Trước phải</string>
+    <string name="seat_rear_left">Sau trái</string><string name="seat_rear_center">Sau giữa</string><string name="seat_rear_right">Sau phải</string>
+    <string name="vehicle_zone_id_format">Vùng 0x%1$X</string>
+    <string name="seat_belt_buckled">Đã cài</string><string name="seat_belt_unbuckled">Chưa cài</string>
+    <string name="seat_memory_slot_format">Vị trí %1$d</string>
+    <string-array name="seat_control_sections"><item>Vị trí ghế</item><item>Nâng đỡ và tựa đầu</item><item>Bộ nhớ và ra vào</item><item>Trạng thái ghế</item><item>Vô lăng</item></string-array>
+    <string-array name="seat_occupancy_labels"><item>Không rõ</item><item>Ghế trống</item><item>Có người</item></string-array>
+    <string-array name="seat_control_titles">
+        <item>Tiến và lùi</item><item>Độ cao ghế</item><item>Độ sâu đệm</item><item>Độ nghiêng đệm</item>
+        <item>Góc tựa lưng chính</item><item>Góc tựa lưng phụ</item><item>Đỡ lưng tiến và lùi</item><item>Độ cao đỡ lưng</item>
+        <item>Đỡ lưng hai bên</item><item>Đỡ hông trên đệm</item><item>Độ cao tựa đầu</item><item>Góc tựa đầu</item>
+        <item>Tựa đầu tiến và lùi</item><item>Ra vào dễ dàng</item><item>Trạng thái ghế</item><item>Dây an toàn</item>
+        <item>Gọi bộ nhớ ghế</item><item>Lưu bộ nhớ ghế</item><item>Tầm với vô lăng</item><item>Độ cao vô lăng</item>
+    </string-array>
+    <string-array name="seat_control_descriptions">
+        <item>Di chuyển ghế đã chọn gần hoặc xa bàn đạp.</item><item>Nâng hoặc hạ ghế đã chọn.</item><item>Thay đổi chiều dài nâng đỡ của đệm ghế.</item><item>Nghiêng đệm ghế khi người và vật đã tránh xa bộ phận chuyển động.</item>
+        <item>Điều chỉnh góc ngả của tựa lưng chính.</item><item>Điều chỉnh phần tựa lưng khớp nối phụ nếu xe được trang bị.</item><item>Di chuyển phần đỡ lưng ra trước hoặc sau.</item><item>Di chuyển phần đỡ lưng lên hoặc xuống.</item>
+        <item>Thay đổi mức ôm hai bên vùng thắt lưng.</item><item>Thay đổi mức ôm hai bên trên đệm ghế.</item><item>Nâng hoặc hạ tựa đầu.</item><item>Thay đổi góc tựa đầu.</item>
+        <item>Di chuyển tựa đầu ra trước hoặc sau.</item><item>Di chuyển ghế để ra vào dễ hơn khi điều kiện xe cho phép.</item><item>Báo ghế đã chọn đang trống hay có người.</item><item>Báo trạng thái khóa dây an toàn của ghế đã chọn.</item>
+        <item>Gọi lại vị trí ghế đã lưu trong ô được chọn.</item><item>Lưu các vị trí hiện tại được hỗ trợ vào ô nhớ đã chọn.</item><item>Di chuyển vô lăng gần hoặc xa người lái.</item><item>Nâng hoặc hạ vô lăng.</item>
+    </string-array>
+</resources>

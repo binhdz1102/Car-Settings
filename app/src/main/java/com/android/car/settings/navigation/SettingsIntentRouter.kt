@@ -34,6 +34,7 @@ import com.android.car.settings.feature.system.presentation.STORAGE_ROUTE
 import com.android.car.settings.feature.system.presentation.SYSTEM_ABOUT_ROUTE
 import com.android.car.settings.feature.system.presentation.SYSTEM_ROUTE
 import com.android.car.settings.feature.system.presentation.UNITS_ROUTE
+import com.android.car.settings.feature.wifi.presentation.MOBILE_NETWORK_ROUTE
 import com.android.car.settings.feature.wifi.presentation.WIFI_HOTSPOT_ROUTE
 import com.android.car.settings.feature.wifi.presentation.WIFI_PREFERENCES_ROUTE
 import com.android.car.settings.feature.wifi.presentation.WIFI_ROUTE
@@ -80,6 +81,7 @@ object SettingsIntentRouter {
                 action == ACTION_WIFI_ADD_NETWORKS -> WIFI_ROUTE
             action == Settings.ACTION_WIFI_IP_SETTINGS -> WIFI_PREFERENCES_ROUTE
             action == ACTION_WIFI_TETHER_SETTINGS -> WIFI_HOTSPOT_ROUTE
+            action == Settings.ACTION_NETWORK_OPERATOR_SETTINGS -> MOBILE_NETWORK_ROUTE
 
             action == Settings.ACTION_BLUETOOTH_SETTINGS ||
                 action == ACTION_BLUETOOTH_PAIRING_SETTINGS -> BLUETOOTH_ROUTE
@@ -191,8 +193,8 @@ object SettingsIntentRouter {
             "AboutSettingsActivity" -> SYSTEM_ABOUT_ROUTE
             "LegalInformationActivity" -> LEGAL_ROUTE
             "ResetOptionsActivity" -> RESET_OPTIONS_ROUTE
-            "SystemSettingsActivity", "MobileNetworkActivity", "MobileNetworkListActivity" ->
-                SYSTEM_ROUTE
+            "SystemSettingsActivity" -> SYSTEM_ROUTE
+            "MobileNetworkActivity", "MobileNetworkListActivity" -> MOBILE_NETWORK_ROUTE
             "SpecialAccessSettingsActivity", "ModifySystemSettingsActivity",
             "PremiumSmsAccessActivity", "UsageAccessActivity", "AlarmsAndRemindersActivity" ->
                 com.android.car.settings.feature.applications.presentation.SPECIAL_APP_ACCESS_ROUTE

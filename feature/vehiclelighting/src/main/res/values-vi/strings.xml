@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vehicle_lighting_title">Đèn trên xe</string>
+    <string name="vehicle_lighting_limitations">Khả năng hoạt động có thể phụ thuộc khóa điện, ánh sáng môi trường, quy định khu vực, lỗi bóng đèn hoặc chế độ tự động khác. Người lái vẫn chịu trách nhiệm sử dụng đèn ngoài phù hợp.</string>
+    <string name="vehicle_lighting_dependencies">Mạch đèn và bộ điều khiển được yêu cầu phải sẵn sàng. Thay đổi đèn ngoài liên quan an toàn cần trạng thái UX không hạn chế.</string>
+    <string-array name="vehicle_lighting_modes"><item>Tắt</item><item>Tự động</item><item>Bật</item><item>Nháy</item></string-array>
+    <string name="vehicle_lighting_empty">Xe không cung cấp điều khiển đèn tương thích.</string>
+    <string name="vehicle_control_unavailable_message">Đèn này hiện không khả dụng.</string>
+    <string name="vehicle_service_connecting">Đang kết nối dịch vụ xe…</string>
+    <string name="vehicle_control_restricted">Hãy đỗ xe để thay đổi chế độ đèn.</string>
+    <string name="vehicle_lighting_visualization_content_description">Minh họa trạng thái điều khiển đèn quan sát được, không phải chẩn đoán bóng đèn vật lý</string>
+    <string name="vehicle_zone_global">Toàn bộ xe</string><string name="lighting_zone_selector">Vùng chiếu sáng</string>
+    <string name="zone_front_left">Trước trái</string><string name="zone_front_right">Trước phải</string>
+    <string name="zone_rear_left">Sau trái</string><string name="zone_rear_center">Sau giữa</string><string name="zone_rear_right">Sau phải</string>
+    <string name="vehicle_zone_id_format">Vùng 0x%1$X</string>
+    <string-array name="vehicle_lighting_sections"><item>Đèn ngoài</item><item>Đèn an toàn</item><item>Đèn trong xe</item></string-array>
+    <string-array name="vehicle_lighting_titles">
+        <item>Đèn chiếu gần</item><item>Đèn chiếu xa</item><item>Đèn sương mù</item><item>Đèn cảnh báo nguy hiểm</item>
+        <item>Đèn khoang xe</item><item>Đèn đọc sách</item><item>Đèn vô lăng</item><item>Đèn khoang chân</item>
+    </string-array>
+    <string-array name="vehicle_lighting_descriptions">
+        <item>Chọn chế độ đèn đầu xe được hỗ trợ để tăng tầm nhìn và khả năng nhận biết.</item><item>Chọn đèn chiếu xa khi không gây chói cho người tham gia giao thông khác.</item><item>Chọn đèn sương mù trong điều kiện tầm nhìn thấp được hỗ trợ.</item><item>Nháy toàn bộ đèn báo rẽ để cảnh báo nguy hiểm cho phương tiện khác.</item>
+        <item>Chọn chế độ đèn chung trong khoang xe.</item><item>Chọn chế độ đèn đọc sách cho vùng hành khách đã chọn.</item><item>Chọn chiếu sáng các nút điều khiển vô lăng được hỗ trợ.</item><item>Chọn chiếu sáng nhẹ khoang chân của vị trí ghế đã chọn.</item>
+    </string-array>
+</resources>

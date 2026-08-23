@@ -65,6 +65,7 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+    implementation(project(":core:settings-api"))
     implementation(project(":feature:wifi"))
     implementation(project(":feature:bluetooth"))
     implementation(project(":feature:sound"))
@@ -80,6 +81,10 @@ dependencies {
     implementation(project(":feature:accessibility"))
     implementation(project(":feature:location"))
     implementation(project(":feature:assistantvoice"))
+    implementation(project(":feature:doorcontrol"))
+    implementation(project(":feature:seatcontrol"))
+    implementation(project(":feature:vehiclelighting"))
+    implementation(project(":feature:driverassistance"))
 
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.hilt.navigation.compose)

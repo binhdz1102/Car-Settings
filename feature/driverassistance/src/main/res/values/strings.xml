@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="driver_assistance_title">Driver assistance</string>
+    <string name="driver_assistance_limitations">Assistance cannot replace an attentive driver. Availability can change with speed, visibility, road markings, sensors, faults, or regional rules.</string>
+    <string name="driver_assistance_dependencies">The related vehicle sensors and controller must be available. Changes that affect driving behavior are allowed only when the vehicle UX policy is unrestricted.</string>
+    <string name="driver_assistance_unavailable">This assistance setting is currently unavailable.</string>
+    <string name="driver_assistance_empty">This vehicle exposes no supported driver-assistance settings.</string>
+    <string name="vehicle_zone_global">Whole vehicle</string>
+    <string name="vehicle_zone_selector">Vehicle zone</string>
+    <string name="vehicle_service_connecting">Connecting to the vehicle service…</string>
+    <string name="vehicle_control_restricted">Park the vehicle to change this setting.</string>
+    <string name="driver_assistance_visualization_content_description">Illustration for %1$s. This is guidance, not live sensor data.</string>
+
+    <string-array name="driver_assistance_sections">
+        <item>Vehicle stability</item>
+        <item>Collision avoidance</item>
+        <item>Lane support</item>
+        <item>Driver monitoring</item>
+        <item>Cruise and speed</item>
+        <item>Parking and exit</item>
+        <item>Profile and feedback</item>
+    </string-array>
+    <string-array name="driver_assistance_level_labels">
+        <item>Low</item><item>Standard</item><item>High</item><item>Custom</item>
+    </string-array>
+    <string-array name="driver_assistance_lane_mode_labels">
+        <item>Visual</item><item>Haptic</item><item>Audible</item><item>Haptic and audible</item>
+    </string-array>
+    <string-array name="driver_assistance_profile_labels">
+        <item>Comfort</item><item>Balanced</item><item>Proactive</item><item>Custom</item>
+    </string-array>
+    <string-array name="driver_assistance_titles">
+        <item>Electronic stability control</item>
+        <item>Automatic emergency braking</item>
+        <item>Forward collision warning</item>
+        <item>Blind spot warning</item>
+        <item>Lane departure warning</item>
+        <item>Lane keep assist</item>
+        <item>Lane centering assist</item>
+        <item>Emergency lane keep assist</item>
+        <item>Cruise control</item>
+        <item>Hands-on detection</item>
+        <item>Driver attention system</item>
+        <item>Drowsiness warning</item>
+        <item>Driver distraction system</item>
+        <item>Distraction warning</item>
+        <item>Low-speed collision warning</item>
+        <item>Cross-traffic monitoring</item>
+        <item>Low-speed emergency braking</item>
+        <item>Lane warning sensitivity</item>
+        <item>Steering intervention strength</item>
+        <item>Lane alert mode</item>
+        <item>Collision warning timing</item>
+        <item>ACC acceleration profile</item>
+        <item>Speed-limit warning</item>
+        <item>Speed-limit offset</item>
+        <item>Driver warning volume</item>
+        <item>Front parking assistance</item>
+        <item>Rear parking assistance</item>
+        <item>Parking warning volume</item>
+        <item>Safe exit assist</item>
+        <item>Driver-assistance profile</item>
+    </string-array>
+    <string-array name="driver_assistance_descriptions">
+        <item>Helps reduce wheel slip and loss of directional control when the vehicle detects instability.</item>
+        <item>Can apply braking when a forward collision is imminent and the driver has not reacted sufficiently.</item>
+        <item>Warns when the vehicle detects a risk of colliding with traffic or an obstacle ahead.</item>
+        <item>Warns about a detected vehicle in a side blind spot; always confirm with mirrors and a shoulder check.</item>
+        <item>Warns when the vehicle crosses a detected lane marking without an intended turn signal.</item>
+        <item>May apply steering support to help prevent an unintended departure from a detected lane.</item>
+        <item>Provides continuous steering support near the center of a clearly detected lane.</item>
+        <item>May steer away from a road edge or adjacent hazard when an emergency departure risk is detected.</item>
+        <item>Maintains a driver-selected speed when road and vehicle conditions permit; the driver remains responsible for braking.</item>
+        <item>Checks whether the driver is holding the steering wheel when an assistance function requires supervision.</item>
+        <item>Uses available driver-monitoring signals to assess attention and readiness to take control.</item>
+        <item>Warns when driver-monitoring signals indicate possible drowsiness or reduced alertness.</item>
+        <item>Uses available driver-monitoring signals to assess distraction from the driving task.</item>
+        <item>Warns when the driver-monitoring system detects sustained distraction.</item>
+        <item>Warns about a collision risk while maneuvering at low speed; sensor coverage has blind areas.</item>
+        <item>Monitors crossing traffic when reversing or moving slowly out of a parking space.</item>
+        <item>May brake automatically to reduce a detected low-speed collision, but cannot detect every obstacle.</item>
+        <item>Chooses how readily lane-departure conditions trigger a warning.</item>
+        <item>Chooses the force of supported steering intervention; it does not increase the vehicle’s steering limits.</item>
+        <item>Selects visual, steering-wheel haptic, audible, or combined lane warnings when supported.</item>
+        <item>Selects how early a forward collision warning is issued relative to the detected risk.</item>
+        <item>Chooses how adaptive cruise control requests acceleration after traffic clears.</item>
+        <item>Warns when detected or map-based speed-limit information is exceeded.</item>
+        <item>Adjusts the threshold above or below the detected speed limit before a warning is issued.</item>
+        <item>Sets the level for driver-assistance warnings without changing media or call volume.</item>
+        <item>Enables obstacle sensing and warnings for the front parking zone during low-speed maneuvers.</item>
+        <item>Enables obstacle sensing and warnings for the rear parking zone during low-speed maneuvers.</item>
+        <item>Sets the level for parking-distance warnings; visual distance information remains available when supported.</item>
+        <item>Warns occupants when opening a door could conflict with approaching traffic or cyclists.</item>
+        <item>Applies a coordinated comfort, balanced, proactive, or custom set of assistance preferences.</item>
+    </string-array>
+</resources>

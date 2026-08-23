@@ -2,14 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
         <activity
-            android:name="com.android.car.settings.feature.bluetooth.presentation.BluetoothPairingActivity"
+            android:name=".presentation.BluetoothPairingActivity"
             android:excludeFromRecents="true"
             android:exported="false"
             android:finishOnTaskLaunch="true"
             android:theme="@android:style/Theme.DeviceDefault.Dialog.Alert" />
 
         <receiver
-            android:name="com.android.car.settings.feature.bluetooth.presentation.BluetoothPairingReceiver"
+            android:name=".presentation.BluetoothPairingReceiver"
             android:exported="true"
             android:permission="android.permission.BLUETOOTH_PRIVILEGED">
             <intent-filter android:priority="1000">

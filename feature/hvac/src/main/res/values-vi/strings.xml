@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hvac_title">Điều hòa</string>
+    <string name="hvac_connecting">Đang kết nối dịch vụ điều hòa trên xe…</string>
+    <string name="hvac_empty">Phiên bản hệ thống xe này chưa cung cấp điều khiển điều hòa.</string>
+    <string name="hvac_restricted">Điều khiển này không khả dụng khi xe đang chạy.</string>
+    <string name="hvac_zone_selector">Vùng điều hòa</string>
+    <string name="hvac_global_zone">Toàn xe</string>
+    <string name="hvac_category_system">Hệ thống và chế độ tự động</string>
+    <string name="hvac_category_temperature">Nhiệt độ</string>
+    <string name="hvac_category_airflow">Luồng gió</string>
+    <string name="hvac_category_air_quality">Chất lượng không khí</string>
+    <string name="hvac_category_defrost">Khử sương và sưởi</string>
+    <string name="hvac_category_comfort">Tiện nghi ghế và vô-lăng</string>
+    <string name="hvac_limitations">Khả năng hỗ trợ, phạm vi và vùng điều khiển phụ thuộc hệ thống HVAC của xe. Chức năng chưa hỗ trợ chỉ hiển thị để tham khảo.</string>
+    <string name="hvac_dependencies">Cần thuộc tính VHAL tương ứng, cấu hình vùng đọc được và quyền ghi đối với thay đổi tương tác.</string>
+    <string name="hvac_power">Nguồn điều hòa</string>
+    <string name="hvac_temperature_set">Nhiệt độ đặt</string>
+    <string name="hvac_temperature_current">Nhiệt độ cabin hiện tại</string>
+    <string name="hvac_temperature_units">Đơn vị nhiệt độ</string>
+    <string name="hvac_fan_speed">Tốc độ quạt</string>
+    <string name="hvac_fan_direction">Hướng gió</string>
+    <string name="hvac_ac">Làm lạnh A/C</string>
+    <string name="hvac_max_ac">Làm lạnh tối đa</string>
+    <string name="hvac_auto">Điều hòa tự động</string>
+    <string name="hvac_recirculation">Tuần hoàn không khí</string>
+    <string name="hvac_auto_recirculation">Tự động tuần hoàn</string>
+    <string name="hvac_dual">Đồng bộ vùng nhiệt độ</string>
+    <string name="hvac_front_defroster">Khử sương kính trước</string>
+    <string name="hvac_rear_defroster">Khử sương kính sau</string>
+    <string name="hvac_max_defrost">Khử sương tối đa</string>
+    <string name="hvac_mirror_heat">Sưởi gương</string>
+    <string name="hvac_seat_temperature">Sưởi ghế</string>
+    <string name="hvac_seat_ventilation">Thông gió ghế</string>
+    <string name="hvac_steering_heat">Sưởi vô-lăng</string>
+</resources>

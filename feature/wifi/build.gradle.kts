@@ -13,10 +13,12 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.coroutines.android)
     implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
+    implementation("com.google.zxing:core:3.5.3")
 
     compileOnly(fileTree(rootProject.file("libs/platform")) { include("*.jar") })
     compileOnly(fileTree(rootProject.file("libs/system-server")) { include("*.jar") })

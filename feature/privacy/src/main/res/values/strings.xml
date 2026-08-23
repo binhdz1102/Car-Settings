@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="privacy_title">Privacy</string>
+    <string name="privacy_microphone">Microphone</string>
+    <string name="privacy_microphone_subject">microphone</string>
+    <string name="privacy_camera">Camera</string>
+    <string name="privacy_camera_subject">camera</string>
+    <string name="privacy_location">Location</string>
+    <string name="privacy_location_subject">location</string>
+    <string name="privacy_on">On</string>
+    <string name="privacy_off">Off</string>
+    <string name="privacy_not_supported">Not supported on this vehicle</string>
+    <string name="privacy_sensor_access_title">%1$s access</string>
+    <string name="privacy_allow_apps_sensor">Allow apps to access the %1$s</string>
+    <string name="privacy_sensor_read_only">Current state is visible, but changing it requires the automotive Settings role.</string>
+    <string name="privacy_recently_accessed">Recently accessed</string>
+    <string name="privacy_no_recent_access">No recent access</string>
+    <string name="privacy_manage_permissions_title">Manage %1$s permissions</string>
+    <string name="privacy_choose_permission_apps">Choose which apps can access this permission</string>
+    <string name="privacy_use_location">Use location</string>
+    <string name="privacy_location_summary">Allow apps and services to use this vehicle\'s location</string>
+    <string name="privacy_app_location_permissions">App location permissions</string>
+    <string name="privacy_choose_location_apps">Choose which apps can access location</string>
+    <string name="privacy_permissions_title">%1$s permissions</string>
+    <string name="privacy_no_permission_apps">No apps request this permission</string>
+    <string name="privacy_allow_subject_access">Allow %1$s access</string>
+    <string name="privacy_app_disabled">App is disabled</string>
+</resources>

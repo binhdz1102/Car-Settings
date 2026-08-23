@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.Apps
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.Brightness6
+import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.NetworkWifi
 import androidx.compose.material.icons.filled.Notifications
@@ -50,6 +51,7 @@ fun HomeScreen(
     onPrivacy: () -> Unit,
     onSecurity: () -> Unit,
     onHvac: () -> Unit,
+    onVehicle: () -> Unit,
     onAccessibility: () -> Unit,
     onLocation: () -> Unit,
     onAssistantVoice: () -> Unit,
@@ -99,6 +101,12 @@ fun HomeScreen(
                 summary = "Temperature, airflow, defrost and seat comfort",
                 icon = { Icon(Icons.Default.AcUnit, contentDescription = null) },
                 onClick = onHvac,
+            )
+            SystemFeatureCard(
+                title = "Vehicle",
+                summary = "Driver assistance, seats, doors, windows and lighting",
+                icon = { Icon(Icons.Default.DirectionsCar, contentDescription = null) },
+                onClick = onVehicle,
             )
             SystemFeatureCard(
                 title = "Apps",

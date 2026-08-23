@@ -9,12 +9,14 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:settings-api"))
     implementation(project(":core:ui"))
+    implementation(project(":core:vehicle"))
+
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coroutines.android)
-    implementation(libs.coroutines.core)
 
     testImplementation(libs.junit)
     testImplementation(libs.truth)

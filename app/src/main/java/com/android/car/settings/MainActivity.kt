@@ -15,57 +15,38 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.android.car.settings.core.settings.DefaultSettingsRegistry
+import com.android.car.settings.core.settings.SettingsDestinationId
 import com.android.car.settings.core.ui.MySystemTheme
-import com.android.car.settings.feature.accessibility.presentation.ACCESSIBILITY_ROUTE
 import com.android.car.settings.feature.accessibility.presentation.accessibilityGraph
-import com.android.car.settings.feature.applications.presentation.ALL_APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.APPLICATIONS_ROUTE
-import com.android.car.settings.feature.applications.presentation.PERFORMANCE_IMPACTING_APPS_ROUTE
-import com.android.car.settings.feature.applications.presentation.SPECIAL_APP_ACCESS_ROUTE
 import com.android.car.settings.feature.applications.presentation.applicationsGraph
-import com.android.car.settings.feature.assistantvoice.presentation.ASSISTANT_VOICE_ROUTE
 import com.android.car.settings.feature.assistantvoice.presentation.assistantVoiceGraph
 import com.android.car.settings.feature.bluetooth.presentation.BLUETOOTH_ROUTE
 import com.android.car.settings.feature.bluetooth.presentation.bluetoothGraph
-import com.android.car.settings.feature.display.presentation.DATE_TIME_ROUTE
 import com.android.car.settings.feature.display.presentation.DISPLAY_ROUTE
-import com.android.car.settings.feature.display.presentation.TIME_ZONE_ROUTE
 import com.android.car.settings.feature.display.presentation.displayGraph
+import com.android.car.settings.feature.doorcontrol.presentation.doorControlGraph
+import com.android.car.settings.feature.driverassistance.presentation.driverAssistanceGraph
 import com.android.car.settings.feature.hvac.presentation.HVAC_ROUTE
 import com.android.car.settings.feature.hvac.presentation.hvacGraph
-import com.android.car.settings.feature.location.presentation.LOCATION_ROUTE
 import com.android.car.settings.feature.location.presentation.locationGraph
 import com.android.car.settings.feature.notifications.presentation.NOTIFICATIONS_ROUTE
 import com.android.car.settings.feature.notifications.presentation.notificationsGraph
-import com.android.car.settings.feature.privacy.presentation.PRIVACY_CAMERA_ROUTE
-import com.android.car.settings.feature.privacy.presentation.PRIVACY_LOCATION_ROUTE
-import com.android.car.settings.feature.privacy.presentation.PRIVACY_MICROPHONE_ROUTE
 import com.android.car.settings.feature.privacy.presentation.PRIVACY_ROUTE
 import com.android.car.settings.feature.privacy.presentation.privacyGraph
 import com.android.car.settings.feature.profileaccounts.presentation.PROFILE_ACCOUNTS_ROUTE
-import com.android.car.settings.feature.profileaccounts.presentation.PROFILES_ROUTE
 import com.android.car.settings.feature.profileaccounts.presentation.profileAccountsGraph
-import com.android.car.settings.feature.search.domain.SearchDestination
 import com.android.car.settings.feature.search.presentation.SEARCH_ROUTE
 import com.android.car.settings.feature.search.presentation.searchGraph
-import com.android.car.settings.feature.security.presentation.SECURITY_DEVICE_ADMINS_ROUTE
-import com.android.car.settings.feature.security.presentation.SECURITY_LOCK_TYPES_ROUTE
+import com.android.car.settings.feature.seatcontrol.presentation.seatControlGraph
 import com.android.car.settings.feature.security.presentation.SECURITY_ROUTE
 import com.android.car.settings.feature.security.presentation.securityGraph
-import com.android.car.settings.feature.sound.domain.RingtoneKind
 import com.android.car.settings.feature.sound.presentation.SOUND_ROUTE
-import com.android.car.settings.feature.sound.presentation.ringtoneRoute
 import com.android.car.settings.feature.sound.presentation.soundGraph
-import com.android.car.settings.feature.system.presentation.LANGUAGE_INPUT_ROUTE
-import com.android.car.settings.feature.system.presentation.LEGAL_ROUTE
-import com.android.car.settings.feature.system.presentation.RESET_OPTIONS_ROUTE
-import com.android.car.settings.feature.system.presentation.STORAGE_ROUTE
-import com.android.car.settings.feature.system.presentation.SYSTEM_ABOUT_ROUTE
 import com.android.car.settings.feature.system.presentation.SYSTEM_ROUTE
-import com.android.car.settings.feature.system.presentation.UNITS_ROUTE
 import com.android.car.settings.feature.system.presentation.systemGraph
-import com.android.car.settings.feature.wifi.presentation.WIFI_HOTSPOT_ROUTE
-import com.android.car.settings.feature.wifi.presentation.WIFI_PREFERENCES_ROUTE
+import com.android.car.settings.feature.vehiclelighting.presentation.vehicleLightingGraph
 import com.android.car.settings.feature.wifi.presentation.WIFI_ROUTE
 import com.android.car.settings.feature.wifi.presentation.wifiGraph
 import com.android.car.settings.navigation.SettingsIntentRouter
@@ -108,10 +89,19 @@ class MainActivity : ComponentActivity() {
                             onPrivacy = { navController.navigate(PRIVACY_ROUTE) },
                             onSecurity = { navController.navigate(SECURITY_ROUTE) },
                             onHvac = { navController.navigate(HVAC_ROUTE) },
+                            onVehicle = { navController.navigate(VEHICLE_ROUTE) },
                             onAccessibility = { navController.navigate(ACCESSIBILITY_ROUTE) },
                             onLocation = { navController.navigate(LOCATION_ROUTE) },
                             onAssistantVoice = { navController.navigate(ASSISTANT_VOICE_ROUTE) },
                             onSearch = { navController.navigate(SEARCH_ROUTE) },
+                        )
+                    }
+                    composable(VEHICLE_ROUTE) {
+                        VehicleLandingScreen(
+                            onDestination = { destination ->
+                                navController.navigate(destinationRoute(destination)) { launchSingleTop = true }
+                            },
+                            onBack = navController::popBackStack,
                         )
                     }
                     wifiGraph(navController, navController::popBackStack)
@@ -127,7 +117,7 @@ class MainActivity : ComponentActivity() {
                     searchGraph(
                         onBack = navController::popBackStack,
                         onDestination = { destination ->
-                            navController.navigate(searchDestinationRoute(destination)) {
+                            navController.navigate(destinationRoute(destination)) {
                                 popUpTo(SEARCH_ROUTE) { inclusive = true }
                                 launchSingleTop = true
                             }
@@ -137,6 +127,10 @@ class MainActivity : ComponentActivity() {
                     accessibilityGraph(navController::popBackStack)
                     locationGraph(navController, navController::popBackStack)
                     assistantVoiceGraph(navController::popBackStack)
+                    doorControlGraph(navController::popBackStack)
+                    seatControlGraph(navController::popBackStack)
+                    vehicleLightingGraph(navController::popBackStack)
+                    driverAssistanceGraph(navController::popBackStack)
                 }
                 LaunchedEffect(requestedDestination) {
                     if (navController.currentDestination?.route != requestedDestination) {
@@ -184,40 +178,24 @@ class MainActivity : ComponentActivity() {
             permissionLauncher.launch(missing.toTypedArray())
         }
     }
+
+    private companion object {
+        val VEHICLE_ROUTE: String = DefaultSettingsRegistry.route(SettingsDestinationId.VEHICLE)
+        val ACCESSIBILITY_ROUTE: String = DefaultSettingsRegistry.route(SettingsDestinationId.ACCESSIBILITY)
+        val LOCATION_ROUTE: String = DefaultSettingsRegistry.route(SettingsDestinationId.LOCATION)
+        val ASSISTANT_VOICE_ROUTE: String = DefaultSettingsRegistry.route(SettingsDestinationId.ASSISTANT_VOICE)
+    }
 }
 
-private fun searchDestinationRoute(destination: SearchDestination): String = when (destination) {
-    SearchDestination.DISPLAY -> DISPLAY_ROUTE
-    SearchDestination.DATE_TIME -> DATE_TIME_ROUTE
-    SearchDestination.TIME_ZONE -> TIME_ZONE_ROUTE
-    SearchDestination.WIFI -> WIFI_ROUTE
-    SearchDestination.WIFI_HOTSPOT -> WIFI_HOTSPOT_ROUTE
-    SearchDestination.WIFI_PREFERENCES -> WIFI_PREFERENCES_ROUTE
-    SearchDestination.BLUETOOTH -> BLUETOOTH_ROUTE
-    SearchDestination.SOUND -> SOUND_ROUTE
-    SearchDestination.PHONE_RINGTONE -> ringtoneRoute(RingtoneKind.PHONE)
-    SearchDestination.NOTIFICATION_RINGTONE -> ringtoneRoute(RingtoneKind.NOTIFICATION)
-    SearchDestination.ALARM_RINGTONE -> ringtoneRoute(RingtoneKind.ALARM)
-    SearchDestination.APPLICATIONS -> APPLICATIONS_ROUTE
-    SearchDestination.ALL_APPLICATIONS -> ALL_APPLICATIONS_ROUTE
-    SearchDestination.SPECIAL_APP_ACCESS -> SPECIAL_APP_ACCESS_ROUTE
-    SearchDestination.PERFORMANCE_APPS -> PERFORMANCE_IMPACTING_APPS_ROUTE
-    SearchDestination.NOTIFICATIONS -> NOTIFICATIONS_ROUTE
-    SearchDestination.PRIVACY -> PRIVACY_ROUTE
-    SearchDestination.PRIVACY_MICROPHONE -> PRIVACY_MICROPHONE_ROUTE
-    SearchDestination.PRIVACY_CAMERA -> PRIVACY_CAMERA_ROUTE
-    SearchDestination.PRIVACY_LOCATION -> PRIVACY_LOCATION_ROUTE
-    SearchDestination.SECURITY -> SECURITY_ROUTE
-    SearchDestination.SCREEN_LOCK -> SECURITY_LOCK_TYPES_ROUTE
-    SearchDestination.DEVICE_ADMINS -> SECURITY_DEVICE_ADMINS_ROUTE
-    SearchDestination.PROFILE_ACCOUNTS -> PROFILE_ACCOUNTS_ROUTE
-    SearchDestination.PROFILES -> PROFILES_ROUTE
-    SearchDestination.SYSTEM -> SYSTEM_ROUTE
-    SearchDestination.ABOUT -> SYSTEM_ABOUT_ROUTE
-    SearchDestination.LANGUAGE_INPUT -> LANGUAGE_INPUT_ROUTE
-    SearchDestination.UNITS -> UNITS_ROUTE
-    SearchDestination.STORAGE -> STORAGE_ROUTE
-    SearchDestination.LEGAL -> LEGAL_ROUTE
-    SearchDestination.RESET_OPTIONS -> RESET_OPTIONS_ROUTE
-    SearchDestination.HVAC -> HVAC_ROUTE
-}
+/** Destinations that are not part of this build fall back to the settings home. */
+private val UNROUTED_DESTINATIONS =
+    setOf(
+        SettingsDestinationId.LAUNCHER,
+        SettingsDestinationId.SYSTEM_UI_CATALOG,
+        SettingsDestinationId.SYSTEM_UI_COCKPIT,
+        SettingsDestinationId.SYSTEM_UI_NOTIFICATION_CENTER,
+        SettingsDestinationId.SYSTEM_UI_USER_CENTER,
+    )
+
+internal fun destinationRoute(destination: SettingsDestinationId): String =
+    if (destination in UNROUTED_DESTINATIONS) SettingsIntentRouter.HOME_ROUTE else DefaultSettingsRegistry.route(destination)

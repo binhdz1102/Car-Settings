@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="privacy_title">Quyền riêng tư</string>
+    <string name="privacy_microphone">Micrô</string>
+    <string name="privacy_microphone_subject">micrô</string>
+    <string name="privacy_camera">Máy ảnh</string>
+    <string name="privacy_camera_subject">máy ảnh</string>
+    <string name="privacy_location">Vị trí</string>
+    <string name="privacy_location_subject">vị trí</string>
+    <string name="privacy_on">Bật</string>
+    <string name="privacy_off">Tắt</string>
+    <string name="privacy_not_supported">Xe này không hỗ trợ</string>
+    <string name="privacy_sensor_access_title">Quyền truy cập %1$s</string>
+    <string name="privacy_allow_apps_sensor">Cho phép ứng dụng truy cập %1$s</string>
+    <string name="privacy_sensor_read_only">Có thể xem trạng thái hiện tại, nhưng việc thay đổi cần vai trò Cài đặt ô tô.</string>
+    <string name="privacy_recently_accessed">Truy cập gần đây</string>
+    <string name="privacy_no_recent_access">Không có truy cập gần đây</string>
+    <string name="privacy_manage_permissions_title">Quản lý quyền %1$s</string>
+    <string name="privacy_choose_permission_apps">Chọn ứng dụng có thể sử dụng quyền này</string>
+    <string name="privacy_use_location">Sử dụng vị trí</string>
+    <string name="privacy_location_summary">Cho phép ứng dụng và dịch vụ sử dụng vị trí của xe</string>
+    <string name="privacy_app_location_permissions">Quyền vị trí của ứng dụng</string>
+    <string name="privacy_choose_location_apps">Chọn ứng dụng có thể truy cập vị trí</string>
+    <string name="privacy_permissions_title">Quyền %1$s</string>
+    <string name="privacy_no_permission_apps">Không có ứng dụng yêu cầu quyền này</string>
+    <string name="privacy_allow_subject_access">Cho phép truy cập %1$s</string>
+    <string name="privacy_app_disabled">Ứng dụng đã bị tắt</string>
+</resources>
