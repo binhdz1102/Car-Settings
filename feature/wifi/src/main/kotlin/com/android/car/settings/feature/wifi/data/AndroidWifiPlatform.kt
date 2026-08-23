@@ -59,6 +59,7 @@ import java.net.Inet4Address
 import java.util.concurrent.Executor
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Singleton
 internal class AndroidWifiPlatform
@@ -839,6 +840,7 @@ internal class AndroidWifiPlatform
             }
 
         private fun fail(throwable: Throwable): ActionResult.Failure {
+            Timber.w(throwable, "Wi-Fi platform action failed")
             val message = throwable.cause?.message ?: throwable.message ?: "Unknown Wi-Fi error"
             mutableState.value = mutableState.value.copy(lastError = message)
             return ActionResult.Failure(message, throwable)

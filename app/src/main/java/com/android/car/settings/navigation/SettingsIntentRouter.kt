@@ -38,6 +38,7 @@ import com.android.car.settings.feature.wifi.presentation.MOBILE_NETWORK_ROUTE
 import com.android.car.settings.feature.wifi.presentation.WIFI_HOTSPOT_ROUTE
 import com.android.car.settings.feature.wifi.presentation.WIFI_PREFERENCES_ROUTE
 import com.android.car.settings.feature.wifi.presentation.WIFI_ROUTE
+import timber.log.Timber
 
 /** Maps the public AAOS Settings contract to this app's Compose destinations. */
 object SettingsIntentRouter {
@@ -66,6 +67,7 @@ object SettingsIntentRouter {
         ringtoneType: Int = RingtoneManager.TYPE_RINGTONE,
     ): String {
         componentDestination(componentClassName, dataPackage, packageExtra, ringtoneType)?.let {
+            Timber.d("Routing component %s to %s", componentClassName, it)
             return it
         }
         action ?: return HOME_ROUTE

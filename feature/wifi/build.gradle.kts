@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coroutines.core)
+    implementation(libs.timber)
     implementation(libs.coroutines.android)
     implementation("com.google.zxing:core:3.5.3")
 

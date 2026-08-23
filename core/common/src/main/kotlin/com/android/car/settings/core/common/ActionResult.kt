@@ -1,6 +1,7 @@
 package com.android.car.settings.core.common
 
 import kotlinx.coroutines.CancellationException
+import timber.log.Timber
 
 /** Stable, machine-readable reason for a failed application action. */
 enum class ActionFailureCode {
@@ -40,12 +41,14 @@ inline fun runAction(block: () -> Unit): ActionResult =
 fun Throwable.toActionFailure(
     fallbackMessage: String = message ?: javaClass.simpleName,
     code: ActionFailureCode = toActionFailureCode(),
-): ActionResult.Failure =
-    ActionResult.Failure(
+): ActionResult.Failure {
+    Timber.w(this, "Settings action failed: %s", fallbackMessage)
+    return ActionResult.Failure(
         message = fallbackMessage,
         cause = this,
         code = code,
     )
+}
 
 fun Throwable?.toActionFailureCode(): ActionFailureCode =
     when (this) {

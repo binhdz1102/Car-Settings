@@ -14,6 +14,7 @@ class CarSettingsApplication : Application() {
                 appVersionName = BuildConfig.VERSION_NAME,
                 appVersionCode = BuildConfig.VERSION_CODE,
                 gitCommitHash = BuildConfig.GIT_COMMIT_HASH,
+                isDebugBuild = BuildConfig.DEBUG,
             ),
         )
     }

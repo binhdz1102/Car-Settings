@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(libs.dagger.hilt.android)
     implementation(libs.coroutines.core)
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     testImplementation(libs.truth)

@@ -51,6 +51,7 @@ import java.time.Duration
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 import javax.inject.Singleton
+import timber.log.Timber
 
 @Singleton
 internal class AndroidBluetoothPlatform
@@ -452,6 +453,7 @@ internal class AndroidBluetoothPlatform
             }
 
         private fun fail(throwable: Throwable): ActionResult.Failure {
+            Timber.w(throwable, "Bluetooth platform action failed")
             val message =
                 throwable.cause?.message ?: throwable.message ?: "Unknown Bluetooth error"
             mutableState.value = mutableState.value.copy(lastError = message)
