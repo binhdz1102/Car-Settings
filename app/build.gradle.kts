@@ -96,6 +96,11 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.timber)
 
+    // The search index provider and system app integration compile against hidden
+    // framework APIs; at runtime these resolve against the platform boot classpath.
+    compileOnly(fileTree(rootProject.file("libs/platform")) { include("*.jar") })
+    compileOnly(fileTree(rootProject.file("libs/system-server")) { include("*.jar") })
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)

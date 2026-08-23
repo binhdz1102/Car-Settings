@@ -320,5 +320,15 @@
         <activity-alias android:name=".common.CarSettingActivities$KeyboardActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$TextToSpeechOutputActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$AlarmsAndRemindersActivity" android:exported="true" android:targetActivity=".MainActivity" />
+        <provider
+            android:name=".search.CarSettingsSearchIndexablesProvider"
+            android:authorities="com.android.car.settings.search"
+            android:exported="true"
+            android:grantUriPermissions="true"
+            android:permission="android.permission.READ_SEARCH_INDEXABLES">
+            <intent-filter>
+                <action android:name="android.content.action.SEARCH_INDEXABLES_PROVIDER" />
+            </intent-filter>
+        </provider>
     </application>
 </manifest>
