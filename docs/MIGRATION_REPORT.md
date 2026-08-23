@@ -124,7 +124,30 @@ App module: thêm `VehicleLandingScreen` + card "Vehicle" trên HomeScreen, 3 ca
   custom (nếu có) cần kiểm tra thêm khi gặp.
 - Room/benchmark/baselineprofile/Soong của MSA không port (không cần cho app thay thế).
 
-## 8. Danh sách commit (nhánh migrate-from-my-system-app)
+## 9. Bổ sung: UI parity với My-System-App (shell + CCP)
+
+Sau báo cáo ban đầu, phần shell của app đã được đưa về trùng khớp 100% với
+My-System-App:
+
+- `MainActivity` cài đặt `setSafeRotaryContent` (host CCP "main-window" +
+  `RotaryFocusController`, back handling cho Direct Manipulation +
+  `VehicleDialogBackGuard`), render `SettingsAppShell` hai pane (rail 340dp +
+  detail) với 14 category từ `DefaultSettingsRegistry`, theme follow
+  `DisplayRepository.ThemeMode`, gating UX restriction bằng `VehicleUxPolicy`
+  (+dialog `ux_restricted`), và permission request theo capability từng
+  destination. Card-grid HomeScreen cũ đã nghỉ hưu (route `home` chỉ còn là
+  deep link tương thích, redirect về Connected devices) — đúng hành vi MSA.
+- `VehicleLandingScreen` dùng string resources; app res có đủ EN + VI (74
+  strings/ngôn ngữ) port từ MSA.
+- Deep-link matrix đổi sang verify bằng Timber route logs (shell dùng native
+  CCP views nên uiautomator không thấy text): **53/53 PASS**.
+- So sánh screenshot với MSA trên cùng emulator: shell rail + detail pane
+  hiển thị giống hệt (đã đối chiếu từng khu vực).
+- Thiết kế chi tiết (tokens, components, focus/CCP contract, ràng buộc
+  automotive) được ghi lại tại `DESIGN.md` (port từ DESIGN.md của MSA, điều
+  chỉnh khác biệt về destination count và router contract).
+
+## 9. Danh sách commit (nhánh migrate-from-my-system-app)
 
 ```
 f287000 chore: ignore My-System-App reference copy and add keystore template

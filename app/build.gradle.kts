@@ -65,7 +65,9 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:ui"))
+    implementation(project(":core:vehicle"))
     implementation(project(":core:settings-api"))
+    implementation(project(":third_party:bmaterial-ccp-rotary-focus"))
     implementation(project(":feature:wifi"))
     implementation(project(":feature:bluetooth"))
     implementation(project(":feature:sound"))
@@ -104,6 +106,7 @@ dependencies {
     compileOnly(fileTree(rootProject.file("libs/system-server")) { include("*.jar") })
 
     testImplementation(libs.junit)
+    testImplementation(libs.truth)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
 }
