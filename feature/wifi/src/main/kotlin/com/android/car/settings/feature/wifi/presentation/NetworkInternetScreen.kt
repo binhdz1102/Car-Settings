@@ -45,6 +45,7 @@ fun NetworkInternetRoute(
                     checked = state.wifi.hotspot.isEnabled,
                     enabled = !state.isWorking,
                     busy = state.wifi.hotspot.isTransitioning,
+                    retainFocusWhenDisabled = state.isWorking || state.wifi.hotspot.isTransitioning,
                     leading = { Icon(Icons.Default.WifiTethering, contentDescription = null) },
                     onCheckedChange = viewModel::setHotspotEnabled,
                     onRowClick = onHotspot,
@@ -61,6 +62,7 @@ fun NetworkInternetRoute(
                             ?.ifBlank { "Mobile data" } ?: if (mobile.isSupported) "No SIM selected" else "Not supported",
                     checked = mobile.mobileDataEnabled,
                     enabled = mobile.isSupported && mobile.subscriptions.isNotEmpty() && !state.isWorking,
+                    retainFocusWhenDisabled = state.isWorking,
                     leading = { Icon(Icons.Default.NetworkCell, contentDescription = null) },
                     onCheckedChange = viewModel::setMobileDataEnabled,
                     onRowClick = onMobileNetwork,
@@ -74,6 +76,9 @@ fun NetworkInternetRoute(
                     checked = wifiEnabled,
                     enabled = !state.isWorking,
                     busy = state.wifi.radioState == WifiRadioState.ENABLING || state.wifi.radioState == WifiRadioState.DISABLING,
+                    retainFocusWhenDisabled = state.isWorking ||
+                        state.wifi.radioState == WifiRadioState.ENABLING ||
+                        state.wifi.radioState == WifiRadioState.DISABLING,
                     leading = { Icon(Icons.Default.Wifi, contentDescription = null) },
                     onCheckedChange = viewModel::setWifiEnabled,
                     onRowClick = onWifi,

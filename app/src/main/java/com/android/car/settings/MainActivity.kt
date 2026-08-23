@@ -169,20 +169,44 @@ class MainActivity : ComponentActivity() {
                     navController.navigate(DefaultSettingsRegistry.route(destinationId)) {
                         if (replaceSearch) popUpTo(searchRoute) { inclusive = true }
                         if (replaceStack) {
-                            popUpTo(navController.graph.startDestinationId) { inclusive = false }
+                            // A category selection replaces the whole destination stack. Popping
+                            // only to startDestinationId retained the launch category underneath
+                            // every later category, so Back could unexpectedly re-select it.
+                            popUpTo(navController.graph.id) { inclusive = false }
                         }
                         launchSingleTop = true
                     }
                 }
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
-                var lastKnownDefinition by remember { mutableStateOf(requestedDefinition) }
-                val activeDefinition = DefaultSettingsRegistry
-                    .destinationForRoute(currentBackStackEntry?.destination?.route)
-                    ?.also { lastKnownDefinition = it }
-                    ?: lastKnownDefinition
-                val activeCategory = activeDefinition.categoryId.name
+                val currentEntryId = currentBackStackEntry?.id
+                val currentDefinition =
+                    DefaultSettingsRegistry.destinationForRoute(
+                        currentBackStackEntry?.destination?.route,
+                    )
+                var activeCategory by remember(requestedDestination) {
+                    mutableStateOf(
+                        DefaultSettingsRegistry.destinationForRoute(requestedDestination)
+                            ?.categoryId
+                            ?.name
+                            ?: SettingsCategoryId.VEHICLE.name,
+                    )
+                }
+                // During a pop Navigation briefly publishes graph/null entries. Retain the last
+                // real destination instead of flashing a stale launch category in the rail.
+                LaunchedEffect(currentDefinition?.categoryId) {
+                    currentDefinition?.let { activeCategory = it.categoryId.name }
+                }
+                val backNavigationGate = remember { NavigationBackGate() }
+                LaunchedEffect(currentEntryId) {
+                    backNavigationGate.onDestinationChanged(currentEntryId)
+                }
                 val navigateBack: () -> Unit = {
-                    if (!navController.popBackStack()) finish()
+                    if (backNavigationGate.tryStart(currentEntryId)) {
+                        if (!navController.popBackStack()) {
+                            backNavigationGate.release()
+                            finish()
+                        }
+                    }
                 }
 
                 SettingsAppShell(

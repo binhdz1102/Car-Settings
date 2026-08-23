@@ -163,6 +163,7 @@ fun NotificationAppDetailsRoute(
                         },
                     checked = app.notificationsEnabled,
                     enabled = app.notificationsChangeable && !uiState.isWorking,
+                    retainFocusWhenDisabled = uiState.isWorking,
                     onCheckedChange = { viewModel.setNotificationsEnabled(app.packageName, it) },
                 )
             }

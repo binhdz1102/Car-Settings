@@ -50,6 +50,7 @@ fun MobileNetworkRoute(
                     summary = if (mobile.mobileDataEnabled) "On" else "Off",
                     checked = mobile.mobileDataEnabled,
                     enabled = mobile.mobileDataChangeAllowed && mobile.isSupported && mobile.subscriptions.isNotEmpty() && !state.isWorking,
+                    retainFocusWhenDisabled = state.isWorking,
                     onCheckedChange = { enabled ->
                         if (!enabled && mobile.mobileDataEnabled) {
                             confirmation = MobileConfirmation.DisableData
@@ -65,6 +66,7 @@ fun MobileNetworkRoute(
                     summary = "Use mobile data while roaming",
                     checked = mobile.roamingEnabled,
                     enabled = mobile.roamingChangeAllowed && mobile.isSupported && mobile.subscriptions.isNotEmpty() && !state.isWorking,
+                    retainFocusWhenDisabled = state.isWorking,
                     onCheckedChange = { enabled ->
                         if (enabled && !mobile.roamingEnabled) {
                             confirmation = MobileConfirmation.EnableRoaming

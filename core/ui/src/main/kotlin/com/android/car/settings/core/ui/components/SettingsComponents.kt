@@ -1,6 +1,7 @@
 package com.android.car.settings.core.ui
 
 import androidx.annotation.DrawableRes
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -107,6 +108,10 @@ fun SettingsScaffold(
     actions: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
+    // Every Settings destination owns Back at the screen boundary. This handler is composed
+    // inside NavHost, so it takes precedence over NavHost's generic pop while nested handlers
+    // (dialogs, direct manipulation and Vehicle sub-pages) can still consume Back first.
+    BackHandler(enabled = onBack != null) { onBack?.invoke() }
     val routeKey = destinationKey?.takeIf { it.isNotBlank() } ?: stableRotaryKey(title)
     // Navigation keeps the old and new destination composed for a short frame even when
     // transitions are disabled.  Scope FocusAreas by stable destination identity so that frame
@@ -200,6 +205,7 @@ fun CarPanelScaffold(
     actions: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
+    BackHandler(onBack = onClose)
     val routeKey = stableRotaryKey(title)
     val areaKey = stableRotaryKey("panel-$routeKey")
     val appBarAreaId = FocusAreaId("settings-header-$areaKey")
@@ -296,25 +302,29 @@ fun SettingsSwitchRow(
     checked: Boolean,
     enabled: Boolean = true,
     busy: Boolean = false,
+    /** Keeps the currently focused row parked while an asynchronous write is in flight. */
+    retainFocusWhenDisabled: Boolean = busy,
     focusId: String = title,
     leading: @Composable (() -> Unit)? = null,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+    val interactionEnabled = enabled && !busy
     val rowHeight = settingsRowHeight(summary)
     RotarySettingsItem(
         focusId = focusId,
         label = title,
         stateDescription = if (checked) "On" else "Off",
         role = FocusItemRole.Toggle,
-        enabled = enabled && !busy,
-        onClick = { onCheckedChange(!checked) },
+        enabled = interactionEnabled,
+        retainFocusWhenUnavailable = retainFocusWhenDisabled,
+        onClick = { if (interactionEnabled) onCheckedChange(!checked) },
         itemHeight = rowHeight,
         touchBehavior = FocusItemTouchBehavior.ComposeContent,
     ) { focused ->
         SettingsCardSurface(
             modifier = Modifier.fillMaxWidth().height(rowHeight),
             focused = focused && !LocalIsInTouchMode.current,
-            enabled = enabled && !busy,
+            enabled = interactionEnabled,
             selected = focused && !LocalIsInTouchMode.current,
         ) {
             Row(
@@ -325,7 +335,7 @@ fun SettingsSwitchRow(
                         // finger taps anywhere and rotary Center share one activation path.
                         .toggleable(
                             value = checked,
-                            enabled = enabled && !busy,
+                            enabled = interactionEnabled,
                             role = Role.Switch,
                             onValueChange = onCheckedChange,
                         ).padding(
@@ -352,7 +362,7 @@ fun SettingsSwitchRow(
                 } else {
                     BSwitch(
                         checked = checked,
-                        enabled = enabled,
+                        enabled = interactionEnabled,
                         onCheckedChange = onCheckedChange,
                         modifier = Modifier.clearAndSetSemantics {},
                     )
@@ -373,6 +383,8 @@ fun SettingsActionToggleRow(
     checked: Boolean,
     enabled: Boolean = true,
     busy: Boolean = false,
+    /** Keeps the row focusable only if it already owned focus before becoming unavailable. */
+    retainFocusWhenDisabled: Boolean = busy,
     switchEnabled: Boolean = enabled,
     focusId: String = title,
     leading: @Composable (() -> Unit)? = null,
@@ -387,6 +399,7 @@ fun SettingsActionToggleRow(
         stateDescription = if (checked) "On" else "Off",
         role = FocusItemRole.Button,
         enabled = rowEnabled,
+        retainFocusWhenUnavailable = retainFocusWhenDisabled,
         onClick = onRowClick,
         itemHeight = rowHeight,
         // Let the nested Compose switch receive a touch.  Rotary Center still invokes the
@@ -727,6 +740,7 @@ private fun RotarySettingsItem(
     stateDescription: String? = null,
     role: FocusItemRole,
     enabled: Boolean,
+    retainFocusWhenUnavailable: Boolean = false,
     onClick: () -> Unit,
     itemHeight: androidx.compose.ui.unit.Dp,
     directManipulation: DirectManipulationConfig? = null,
@@ -738,15 +752,19 @@ private fun RotarySettingsItem(
     // development if needed) is the auditable contract for UIAutomator verifiers.
     val scopedFocusId = "${LocalSettingsDestinationKey.current}/$focusId"
     val focusItemId = FocusItemId("settings-item-${stableRotaryKey(scopedFocusId)}")
+    val controller = LocalRotaryFocusController.current
+    val focusEnabled =
+        enabled ||
+            (retainFocusWhenUnavailable && controller?.currentFocusTarget?.itemId == focusItemId)
     if (LocalSettingsRotaryArea.current) {
         val registerFirstFocus = LocalSettingsFirstFocusRegistration.current
         SideEffect {
-            if (enabled) registerFirstFocus(focusItemId)
+            if (focusEnabled) registerFirstFocus(focusItemId)
         }
         FocusItem(
             id = focusItemId,
-            isEnabled = enabled,
-            onClick = onClick,
+            isEnabled = focusEnabled,
+            onClick = if (enabled) onClick else null,
             directManipulation = directManipulation,
             semantics =
                 FocusItemSemantics(
@@ -767,8 +785,8 @@ private fun RotarySettingsItem(
         // still need the same stable FocusItem contract for list rows and switches.
         FocusItem(
             id = focusItemId,
-            isEnabled = enabled,
-            onClick = onClick,
+            isEnabled = focusEnabled,
+            onClick = if (enabled) onClick else null,
             directManipulation = directManipulation,
             semantics =
                 FocusItemSemantics(
@@ -930,12 +948,11 @@ fun SettingsFormSlider(
                 },
             )
         }
-    val render: @Composable (Boolean) -> Unit = { focused ->
+    val render: @Composable (Boolean) -> Unit = {
         Column(
             modifier =
                 modifier
                     .height(SettingsTokens.FormSliderHeight)
-                    .rotaryFocusBorder(focused)
                     .padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {

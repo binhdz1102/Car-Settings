@@ -172,6 +172,7 @@ private fun WifiScreen(
                     checked = wifiEnabled,
                     enabled = !state.isWorking,
                     busy = transitioning,
+                    retainFocusWhenDisabled = state.isWorking || transitioning,
                     onCheckedChange = onSetEnabled,
                 )
             }

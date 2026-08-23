@@ -528,6 +528,7 @@ fun KeyboardRoute(
                             },
                         checked = keyboard.enabled,
                         enabled = !state.isWorking && (!keyboard.enabled || keyboard.canDisable),
+                        retainFocusWhenDisabled = state.isWorking,
                         onCheckedChange = { shouldEnable ->
                             if (shouldEnable && !keyboard.isSystem) {
                                 pendingKeyboardId = keyboard.id
@@ -888,6 +889,7 @@ fun ResetNetworkRoute(
                         summary = "Also remove downloaded carrier profiles",
                         checked = eraseEsim,
                         enabled = !state.isWorking,
+                        retainFocusWhenDisabled = state.isWorking,
                         onCheckedChange = { eraseEsim = it },
                     )
                 }
@@ -1021,6 +1023,7 @@ fun FactoryResetRoute(
                         summary = "Remove downloaded carrier profiles as part of reset",
                         checked = eraseEsim,
                         enabled = !state.isWorking,
+                        retainFocusWhenDisabled = state.isWorking,
                         onCheckedChange = { eraseEsim = it },
                     )
                 }

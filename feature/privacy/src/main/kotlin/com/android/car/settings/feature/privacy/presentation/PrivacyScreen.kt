@@ -125,6 +125,7 @@ fun SensorPrivacyRoute(
                     summary = sensorWriteSummary(sensor, typeSubject),
                     checked = sensor.accessEnabled,
                     enabled = sensor.supported && sensor.writable && !uiState.isWorking,
+                    retainFocusWhenDisabled = uiState.isWorking,
                     onCheckedChange = {
                         if (type == PrivacyPermissionType.MICROPHONE) {
                             viewModel.setMicrophoneAccessEnabled(it)
@@ -176,6 +177,7 @@ fun LocationPrivacyRoute(
                     summary = stringResource(R.string.privacy_location_summary),
                     checked = uiState.privacy.locationEnabled,
                     enabled = !uiState.isWorking,
+                    retainFocusWhenDisabled = uiState.isWorking,
                     onCheckedChange = viewModel::setLocationEnabled,
                 )
             }
@@ -242,6 +244,7 @@ fun PermissionAppsRoute(
                     checked = app.granted,
                     focusId = "privacy-permission-${app.packageName}",
                     enabled = app.isEnabled && !uiState.isWorking,
+                    retainFocusWhenDisabled = uiState.isWorking,
                     onCheckedChange = { viewModel.setAppPermission(app.packageName, type, it) },
                 )
             }

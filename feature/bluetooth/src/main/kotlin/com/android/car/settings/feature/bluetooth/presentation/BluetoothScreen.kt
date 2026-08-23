@@ -152,6 +152,7 @@ private fun BluetoothScreen(
                     checked = enabled,
                     enabled = !state.isWorking,
                     busy = transitioning,
+                    retainFocusWhenDisabled = state.isWorking || transitioning,
                     onCheckedChange = onSetEnabled,
                 )
             }

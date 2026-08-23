@@ -110,7 +110,11 @@ fun AutomotiveAlertDialog(
         ) {
             FocusArea(
                 id = areaId,
-                layout = FocusAreaLayout(itemSpacing = SettingsTokens.DialogActionGap),
+                layout =
+                    FocusAreaLayout(
+                        itemSpacing = SettingsTokens.DialogActionGap,
+                        fillMainAxis = false,
+                    ),
                 focusOrder =
                     buildList {
                         if (dismissButton != null) add(dismissId)

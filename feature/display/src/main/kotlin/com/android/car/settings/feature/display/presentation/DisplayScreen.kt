@@ -124,6 +124,7 @@ private fun DisplayScreen(
                         summary = "Automatically adjust brightness using ambient light",
                         checked = state.display.adaptiveBrightnessEnabled,
                         enabled = !state.isWorking,
+                        retainFocusWhenDisabled = state.isWorking,
                         leading = { SettingsLeadingIcon(Icons.Default.Brightness6) },
                         onCheckedChange = onAdaptiveBrightness,
                     )
@@ -137,6 +138,7 @@ private fun DisplayScreen(
                         summary = state.display.themeMode.themeSummary(),
                         checked = state.display.themeMode == ThemeMode.NIGHT,
                         enabled = !state.isWorking,
+                        retainFocusWhenDisabled = state.isWorking,
                         focusId = "display-dark-mode",
                         leading = { SettingsLeadingIcon(Icons.Default.DarkMode) },
                         onCheckedChange = { enabled ->

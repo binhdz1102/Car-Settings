@@ -139,7 +139,9 @@ public data class FocusItemLayout(
 @Immutable
 public data class FocusAreaLayout(
     val orientation: FocusAreaOrientation = FocusAreaOrientation.Vertical,
-    val itemSpacing: Dp = 0.dp
+    val itemSpacing: Dp = 0.dp,
+    /** Fill the available main axis; false lets compact surfaces such as dialogs wrap content. */
+    val fillMainAxis: Boolean = true
 )
 
 public enum class RotaryValidationMode {

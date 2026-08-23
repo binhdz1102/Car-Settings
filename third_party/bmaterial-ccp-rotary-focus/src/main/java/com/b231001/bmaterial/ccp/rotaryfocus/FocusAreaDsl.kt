@@ -300,14 +300,18 @@ private fun FocusAreaLayoutContent(
     CompositionLocalProvider(LocalRotaryFocusArea provides area) {
         when (layout.orientation) {
             FocusAreaOrientation.Vertical -> Column(
-                modifier = Modifier.fillMaxSize().padding(contentPadding),
+                modifier =
+                    (if (layout.fillMainAxis) Modifier.fillMaxSize() else Modifier.fillMaxWidth())
+                        .padding(contentPadding),
                 verticalArrangement = Arrangement.spacedBy(layout.itemSpacing)
             ) {
                 content(scope)
             }
 
             FocusAreaOrientation.Horizontal -> Row(
-                modifier = Modifier.fillMaxSize().padding(contentPadding),
+                modifier =
+                    (if (layout.fillMainAxis) Modifier.fillMaxSize() else Modifier.fillMaxHeight())
+                        .padding(contentPadding),
                 horizontalArrangement = Arrangement.spacedBy(layout.itemSpacing)
             ) {
                 content(scope)

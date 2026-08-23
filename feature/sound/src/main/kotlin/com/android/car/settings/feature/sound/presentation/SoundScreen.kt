@@ -135,6 +135,7 @@ private fun SoundScreen(
                         summary = "Vibrate when a call is received",
                         checked = state.sound.vibrateWhenRinging,
                         enabled = !state.isWorking,
+                        retainFocusWhenDisabled = state.isWorking,
                         onCheckedChange = onVibrate,
                     )
                 }
