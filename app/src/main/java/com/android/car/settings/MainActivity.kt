@@ -72,6 +72,7 @@ class MainActivity : ComponentActivity() {
             MySystemTheme {
                 val navController = rememberNavController()
                 val requestedDestination = SettingsIntentRouter.destinationFor(launchIntent)
+                Timber.d("Cold-start destination=%s", requestedDestination)
                 NavHost(
                     navController = navController,
                     startDestination = requestedDestination,

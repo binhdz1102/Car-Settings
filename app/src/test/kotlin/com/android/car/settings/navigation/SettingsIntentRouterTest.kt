@@ -117,4 +117,21 @@ class SettingsIntentRouterTest {
             ),
         )
     }
+
+    @Test
+    fun customFrameworkActionSpellingsRouteToSpecialAccess() {
+        // Some automotive images redefine the constants with an ".action." infix.
+        assertEquals(
+            SPECIAL_APP_ACCESS_ROUTE,
+            SettingsIntentRouter.destinationFor(
+                action = "android.settings.action.MANAGE_OVERLAY_PERMISSION",
+            ),
+        )
+        assertEquals(
+            SPECIAL_APP_ACCESS_ROUTE,
+            SettingsIntentRouter.destinationFor(
+                action = "android.settings.action.MANAGE_WRITE_SETTINGS",
+            ),
+        )
+    }
 }

@@ -256,11 +256,17 @@ private val APPLICATION_DETAIL_ACTIONS = setOf(
     ACTION_MANAGE_USER_ASPECT_RATIO_SETTINGS,
 )
 
+    // Some automotive images redefine these two constants with an ".action." infix
+    // (android.settings.action.MANAGE_*); accept both spellings so standard AOSP
+    // callers and this image's framework agree.
     private val SPECIAL_APP_ACCESS_ACTIONS = setOf(
         Settings.ACTION_USAGE_ACCESS_SETTINGS,
-        Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+        "android.settings.MANAGE_OVERLAY_PERMISSION",
+        "android.settings.action.MANAGE_OVERLAY_PERMISSION",
+        "android.settings.MANAGE_APP_OVERLAY_PERMISSION",
         Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-        Settings.ACTION_MANAGE_WRITE_SETTINGS,
+        "android.settings.MANAGE_WRITE_SETTINGS",
+        "android.settings.action.MANAGE_WRITE_SETTINGS",
         Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
         Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS,
     )
