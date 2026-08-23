@@ -1,6 +1,7 @@
 package com.android.car.settings.navigation
 
 import com.android.car.settings.feature.applications.presentation.APPLICATIONS_ROUTE
+import com.android.car.settings.feature.applications.presentation.SPECIAL_APP_ACCESS_ROUTE
 import com.android.car.settings.feature.applications.presentation.applicationDetailsRoute
 import com.android.car.settings.feature.display.presentation.DISPLAY_ROUTE
 import com.android.car.settings.feature.notifications.presentation.NOTIFICATIONS_ROUTE
@@ -91,6 +92,28 @@ class SettingsIntentRouterTest {
             APPLICATIONS_ROUTE,
             SettingsIntentRouter.destinationFor(
                 action = "android.settings.APPLICATION_DETAILS_SETTINGS",
+            ),
+        )
+    }
+
+    @Test
+    fun specialAppAccessActionsRouteToSpecialAccess() {
+        assertEquals(
+            SPECIAL_APP_ACCESS_ROUTE,
+            SettingsIntentRouter.destinationFor(
+                action = android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+            ),
+        )
+        assertEquals(
+            SPECIAL_APP_ACCESS_ROUTE,
+            SettingsIntentRouter.destinationFor(
+                action = android.provider.Settings.ACTION_MANAGE_WRITE_SETTINGS,
+            ),
+        )
+        assertEquals(
+            SPECIAL_APP_ACCESS_ROUTE,
+            SettingsIntentRouter.destinationFor(
+                action = android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS,
             ),
         )
     }

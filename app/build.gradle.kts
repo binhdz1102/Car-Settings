@@ -95,6 +95,8 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.material)
     implementation(libs.timber)
+    // Hilt's generated view-model key maps reference Guava collections at runtime.
+    implementation(libs.guava.android)
 
     // The search index provider and system app integration compile against hidden
     // framework APIs; at runtime these resolve against the platform boot classpath.
