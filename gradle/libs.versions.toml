@@ -35,6 +35,8 @@ media3 = "1.10.1"
 # Utilities
 glide = "4.16.0"
 timber = "5.0.1"
+annotation = "1.9.1"
+bmaterial = "1.3.1"
 
 # Code quality and coverage
 ktlintGradle = "14.2.0"
@@ -111,6 +113,35 @@ androidx-media3-session = { group = "androidx.media3", name = "media3-session", 
 # Utilities
 glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
+
+# Vendored B-Material design system (local maven repo in libs/bmaterial)
+bmaterial-ui-core-tokens = { group = "com.b231001.bmaterial", name = "ui-core-tokens", version.ref = "bmaterial" }
+bmaterial-ui-core-resources = { group = "com.b231001.bmaterial", name = "ui-core-resources", version.ref = "bmaterial" }
+bmaterial-ui-core-foundation = { group = "com.b231001.bmaterial", name = "ui-core-foundation", version.ref = "bmaterial" }
+bmaterial-runtime-ktx = { group = "com.b231001.bmaterial", name = "runtime-ktx", version.ref = "bmaterial" }
+bmaterial-runtime-flow = { group = "com.b231001.bmaterial", name = "runtime-flow", version.ref = "bmaterial" }
+bmaterial-runtime-localcallback = { group = "com.b231001.bmaterial", name = "runtime-localcallback", version.ref = "bmaterial" }
+bmaterial-ui-components-bottomsheet = { group = "com.b231001.bmaterial", name = "ui-components-bottomsheet", version.ref = "bmaterial" }
+bmaterial-ui-components-button = { group = "com.b231001.bmaterial", name = "ui-components-button", version.ref = "bmaterial" }
+bmaterial-ui-components-card = { group = "com.b231001.bmaterial", name = "ui-components-card", version.ref = "bmaterial" }
+bmaterial-ui-components-chart = { group = "com.b231001.bmaterial", name = "ui-components-chart", version.ref = "bmaterial" }
+bmaterial-ui-components-checkbox = { group = "com.b231001.bmaterial", name = "ui-components-checkbox", version.ref = "bmaterial" }
+bmaterial-ui-components-chip = { group = "com.b231001.bmaterial", name = "ui-components-chip", version.ref = "bmaterial" }
+bmaterial-ui-components-dialog = { group = "com.b231001.bmaterial", name = "ui-components-dialog", version.ref = "bmaterial" }
+bmaterial-ui-components-dropdown = { group = "com.b231001.bmaterial", name = "ui-components-dropdown", version.ref = "bmaterial" }
+bmaterial-ui-components-indicator = { group = "com.b231001.bmaterial", name = "ui-components-indicator", version.ref = "bmaterial" }
+bmaterial-ui-components-layout = { group = "com.b231001.bmaterial", name = "ui-components-layout", version.ref = "bmaterial" }
+bmaterial-ui-components-listitem = { group = "com.b231001.bmaterial", name = "ui-components-listitem", version.ref = "bmaterial" }
+bmaterial-ui-components-loading = { group = "com.b231001.bmaterial", name = "ui-components-loading", version.ref = "bmaterial" }
+bmaterial-ui-components-navigation = { group = "com.b231001.bmaterial", name = "ui-components-navigation", version.ref = "bmaterial" }
+bmaterial-ui-components-reorderable = { group = "com.b231001.bmaterial", name = "ui-components-reorderable", version.ref = "bmaterial" }
+bmaterial-ui-components-scrollbar = { group = "com.b231001.bmaterial", name = "ui-components-scrollbar", version.ref = "bmaterial" }
+bmaterial-ui-components-slider = { group = "com.b231001.bmaterial", name = "ui-components-slider", version.ref = "bmaterial" }
+bmaterial-ui-components-snackbar = { group = "com.b231001.bmaterial", name = "ui-components-snackbar", version.ref = "bmaterial" }
+bmaterial-ui-components-switch = { group = "com.b231001.bmaterial", name = "ui-components-switch", version.ref = "bmaterial" }
+bmaterial-ui-components-text = { group = "com.b231001.bmaterial", name = "ui-components-text", version.ref = "bmaterial" }
+bmaterial-ui-components-textfield = { group = "com.b231001.bmaterial", name = "ui-components-textfield", version.ref = "bmaterial" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

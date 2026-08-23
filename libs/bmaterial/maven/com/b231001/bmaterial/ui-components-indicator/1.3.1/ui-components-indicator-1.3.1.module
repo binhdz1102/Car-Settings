@@ -1,0 +1,236 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.b231001.bmaterial",
+    "module": "ui-components-indicator",
+    "version": "1.3.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-indicator-1.3.1.aar",
+          "url": "ui-components-indicator-1.3.1.aar",
+          "size": 29374,
+          "sha512": "6ce1801a8a2fd569df4b3c1380fa65e52e303a9963d194d5431f9eae21089b69cf59a8874b21cfdfa4a5594c55cd3b118bcc45be415ac82cfb8682459faac037",
+          "sha256": "178a13c476035dae6f1adb4442fa6e4a097dc73459981726982416469f57517f",
+          "sha1": "fe30ebb524ad32efbbd4f5bd7f917890b3edf127",
+          "md5": "92789c9aa22f9e57d99dc4366500792b"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-indicator-1.3.1.aar",
+          "url": "ui-components-indicator-1.3.1.aar",
+          "size": 29374,
+          "sha512": "6ce1801a8a2fd569df4b3c1380fa65e52e303a9963d194d5431f9eae21089b69cf59a8874b21cfdfa4a5594c55cd3b118bcc45be415ac82cfb8682459faac037",
+          "sha256": "178a13c476035dae6f1adb4442fa6e4a097dc73459981726982416469f57517f",
+          "sha1": "fe30ebb524ad32efbbd4f5bd7f917890b3edf127",
+          "md5": "92789c9aa22f9e57d99dc4366500792b"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ui-components-indicator-1.3.1-sources.jar",
+          "url": "ui-components-indicator-1.3.1-sources.jar",
+          "size": 3136,
+          "sha512": "fea14b6983e6a1174ee224c763ab035bea3fc59b6751218af7a6e33fa6d03d4c0c67e307b6064630ddec5f10dd37437b059efbdebd02d6d26b7b6d3ee29b5221",
+          "sha256": "6b0f9f555fd0ed8b5233655a823d3591f04a24f6e76d0154993fe581c008226c",
+          "sha1": "1b7080b756501ed339f64ed7e075f00887474921",
+          "md5": "de20726e5f182d4c5ed38bf9b680b3af"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,236 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.b231001.bmaterial",
+    "module": "ui-components-switch",
+    "version": "1.3.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-switch-1.3.1.aar",
+          "url": "ui-components-switch-1.3.1.aar",
+          "size": 27373,
+          "sha512": "1e9532744ab7b903a2397a4ab3109d2ca68f9c07ce426cb3b1e115226b98632ffff3667091aa8174eaf6873db5a4955c2f58138a13081ff9a883b9aab6a73b04",
+          "sha256": "545e4e06f1103c0a160deffdfcc229641421d64afcf58c27c02b3f8a7af7e566",
+          "sha1": "ce654d3e19bed1b578cfeff59e79f52e343668e6",
+          "md5": "62f13e663f2df4d629f3eb6b74e04c43"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-switch-1.3.1.aar",
+          "url": "ui-components-switch-1.3.1.aar",
+          "size": 27373,
+          "sha512": "1e9532744ab7b903a2397a4ab3109d2ca68f9c07ce426cb3b1e115226b98632ffff3667091aa8174eaf6873db5a4955c2f58138a13081ff9a883b9aab6a73b04",
+          "sha256": "545e4e06f1103c0a160deffdfcc229641421d64afcf58c27c02b3f8a7af7e566",
+          "sha1": "ce654d3e19bed1b578cfeff59e79f52e343668e6",
+          "md5": "62f13e663f2df4d629f3eb6b74e04c43"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ui-components-switch-1.3.1-sources.jar",
+          "url": "ui-components-switch-1.3.1-sources.jar",
+          "size": 3450,
+          "sha512": "150fd5a4cadabd518f5fbd1dea33d0f375e25336bd6916306967a85a8defda55491841beeb7b4e91fabc51ac2b634260a1cd3d6bdaa549ab55fd73beb48632f8",
+          "sha256": "6e72257a7e92486c074b69ed00c3137b9e1b9806ce427fa4c6e2ce18b6aa0e35",
+          "sha1": "d427e4856191b0c0ad0c633127501c3bc8374985",
+          "md5": "50baa5046e5fd9cccd5f0cf4217d941c"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,229 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.b231001.bmaterial",
+    "module": "ui-core-tokens",
+    "version": "1.3.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-core-tokens-1.3.1.aar",
+          "url": "ui-core-tokens-1.3.1.aar",
+          "size": 97770,
+          "sha512": "751dc158f02ec11c788d4b61a0875f833160eaa1250247df8eaf0624f844766e9c199b805b1b9101e455dc5cb2af17748c551f60810f8f811c3a21ec6e5e266f",
+          "sha256": "e5ef08099ea08ff2f7af8d0cc8588011805fc5e30291cd3e4c9d1bcbe000b7f9",
+          "sha1": "a75f07de8da8e4bf5f17a808f6d8d4d4d8ace52d",
+          "md5": "311e8c57ab9ca2611de49e3bf5a0cbfa"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-resources",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-core-tokens-1.3.1.aar",
+          "url": "ui-core-tokens-1.3.1.aar",
+          "size": 97770,
+          "sha512": "751dc158f02ec11c788d4b61a0875f833160eaa1250247df8eaf0624f844766e9c199b805b1b9101e455dc5cb2af17748c551f60810f8f811c3a21ec6e5e266f",
+          "sha256": "e5ef08099ea08ff2f7af8d0cc8588011805fc5e30291cd3e4c9d1bcbe000b7f9",
+          "sha1": "a75f07de8da8e4bf5f17a808f6d8d4d4d8ace52d",
+          "md5": "311e8c57ab9ca2611de49e3bf5a0cbfa"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ui-core-tokens-1.3.1-sources.jar",
+          "url": "ui-core-tokens-1.3.1-sources.jar",
+          "size": 13663,
+          "sha512": "caedd8a9d625524ef098e8c6f1a5637192168cbdcd28267a92adf7892bf4d0353ef2cb245a880192975069738f0aa56a0efe8843d1d621c8a395b3d37f66f5ad",
+          "sha256": "94bd921190c707b6348ee403129de8c7d4dbac799bed17b2222144cd80612e42",
+          "sha1": "ad2e9ece469d1adc2252bab4cf0af01e0cb9aa3e",
+          "md5": "742bd87760cc81ce87ce4ce45f81447d"
+        }
+      ]
+    }
+  ]
+}

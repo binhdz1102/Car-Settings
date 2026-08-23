@@ -1,0 +1,32 @@
+B-Material CCP Rotary Focus
+Copyright 2026 B-Material contributors
+
+This directory contains source vendored from:
+  D:/Desktop/AndroidProjects/B-Material/ccp-rotary-focus
+  https://github.com/binhdz1102/B-Material/tree/a855dc5202b9a15299cb7b2557f728aeaeb19b6c/ccp-rotary-focus
+
+Upstream checkout: a855dc5202b9a15299cb7b2557f728aeaeb19b6c
+Last upstream module commit: 2a24ba8e4653ff910d92bc5b491cdfa0fe679361
+Vendored on: 2026-08-09
+
+The files under src/, README.md, consumer-rules.pro, and proguard-rules.pro were
+copied from that checkout; the small source changes listed below are the only local
+runtime deviations. The Gradle build file was adapted to the
+My-System-App convention plugins and dependency catalog so the source is
+compiled by this repository's Kotlin and Compose toolchain. First-party
+ktlint/Detekt tasks are disabled for this third-party module so upstream source
+can remain byte-for-byte identical; compile and upstream unit tests remain
+enabled.
+
+Local source compatibility changes, if required, are recorded below:
+  - Added FocusItemView.requestRotaryFocus() and routed controller/area initial-focus requests
+    through it. Android rejects requestFocus() for non-touch-focusable views while a window is in
+    touch mode; the temporary flag is restored immediately. This lets an app launched by intent
+    receive its first rotary focus without requiring an extra detent, while preserving the
+    upstream focus policy for subsequent navigation.
+  - Deferred FocusArea geometry validation by 120 ms on the main looper so Compose AndroidView
+    replacement can detach the outgoing area before validation. Persistent overlap is still
+    reported or failed according to RotaryValidationMode; this only removes a one-frame hand-off
+    false positive.
+
+This software is distributed under the Apache License 2.0 included in LICENSE.

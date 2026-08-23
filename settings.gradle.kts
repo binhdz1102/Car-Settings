@@ -18,6 +18,22 @@ plugins {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        exclusiveContent {
+            forRepository {
+                maven {
+                    name = "BundledBMaterial"
+                    url = uri("$rootDir/libs/bmaterial/maven")
+                    metadataSources {
+                        gradleMetadata()
+                        mavenPom()
+                        artifact()
+                    }
+                }
+            }
+            filter {
+                includeGroup("com.b231001.bmaterial")
+            }
+        }
         google()
         mavenCentral()
     }
@@ -28,6 +44,7 @@ include(":app")
 include(":core:common")
 include(":core:ui")
 include(":core:vehicle")
+include(":third_party:bmaterial-ccp-rotary-focus")
 include(":feature:wifi")
 include(":feature:bluetooth")
 include(":feature:sound")

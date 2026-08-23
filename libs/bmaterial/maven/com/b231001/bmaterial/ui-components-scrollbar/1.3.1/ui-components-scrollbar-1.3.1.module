@@ -1,0 +1,240 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.b231001.bmaterial",
+    "module": "ui-components-scrollbar",
+    "version": "1.3.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-scrollbar-1.3.1.aar",
+          "url": "ui-components-scrollbar-1.3.1.aar",
+          "size": 49431,
+          "sha512": "357754e72e71e6358073901042b2b8aa4d6701dbc15e09ff0159bc55ae4949da9649872edf3ac3374a0a8b6b3e9424b4fc0cac400cd2bf6d35529157816afd44",
+          "sha256": "e78e37f1c2e5f5a94d53e91fc806dae460cf0864f3208ae2f7eead7f93ccae01",
+          "sha1": "c8629a913edd53347419a4ec0fc3e13aeff5aa32",
+          "md5": "ab6bd87b9ad5860962b3232db25da18e"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose.animation",
+          "module": "animation-core"
+        },
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-scrollbar-1.3.1.aar",
+          "url": "ui-components-scrollbar-1.3.1.aar",
+          "size": 49431,
+          "sha512": "357754e72e71e6358073901042b2b8aa4d6701dbc15e09ff0159bc55ae4949da9649872edf3ac3374a0a8b6b3e9424b4fc0cac400cd2bf6d35529157816afd44",
+          "sha256": "e78e37f1c2e5f5a94d53e91fc806dae460cf0864f3208ae2f7eead7f93ccae01",
+          "sha1": "c8629a913edd53347419a4ec0fc3e13aeff5aa32",
+          "md5": "ab6bd87b9ad5860962b3232db25da18e"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ui-components-scrollbar-1.3.1-sources.jar",
+          "url": "ui-components-scrollbar-1.3.1-sources.jar",
+          "size": 5681,
+          "sha512": "259819c8930543f054f78928f44c780c6bc9581717d96eccc78697cc242994360b65cfd0ead41e0c5985b67c9fe8e0278f90a0fcc86451dba60d6450c8c693a6",
+          "sha256": "f0fbc9d6aae2a9b3bbcb46ea0b7acd239171370b767fd95055637da0196549a0",
+          "sha1": "0a1524f650cf3db3cb0fc6f277103f1c381de9c5",
+          "md5": "cce8ff4631b38d3a4cf78ccb74bb88fd"
+        }
+      ]
+    }
+  ]
+}

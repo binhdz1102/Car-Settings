@@ -1,0 +1,236 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.b231001.bmaterial",
+    "module": "ui-components-textfield",
+    "version": "1.3.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.7"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-textfield-1.3.1.aar",
+          "url": "ui-components-textfield-1.3.1.aar",
+          "size": 59224,
+          "sha512": "b0d4059dd259c1fff3af56828784d119b0c54460bbe4bd7048187e5f68a2d7f11a1b162b4967ebf1b213e007aeb877d62686abba9f7e529cd0a95b6a18693c97",
+          "sha256": "66801df0ff85db5769d0c3bb2c6e3b260bc289ca266ff1bd1828eb663b2f57b0",
+          "sha1": "639e7c988fde9ed68b39aa186ef73a2a1d01dfc0",
+          "md5": "aca31fa7202224f1b3a1c66c8d2aea92"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "androidx.compose",
+          "module": "compose-bom",
+          "version": {
+            "requires": "2023.10.01"
+          },
+          "attributes": {
+            "org.gradle.category": "platform"
+          }
+        },
+        {
+          "group": "androidx.compose.foundation",
+          "module": "foundation"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-graphics"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-tooling-preview"
+        },
+        {
+          "group": "androidx.compose.ui",
+          "module": "ui-util"
+        },
+        {
+          "group": "androidx.compose.material3",
+          "module": "material3"
+        },
+        {
+          "group": "androidx.compose.material",
+          "module": "material-icons-extended"
+        },
+        {
+          "group": "androidx.compose.runtime",
+          "module": "runtime-android"
+        },
+        {
+          "group": "androidx.activity",
+          "module": "activity-compose",
+          "version": {
+            "requires": "1.8.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-runtime-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-compose",
+          "version": {
+            "requires": "2.6.2"
+          }
+        },
+        {
+          "group": "com.b231001.bmaterial",
+          "module": "ui-core-tokens",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib",
+          "version": {
+            "requires": "1.9.21"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "ui-components-textfield-1.3.1.aar",
+          "url": "ui-components-textfield-1.3.1.aar",
+          "size": 59224,
+          "sha512": "b0d4059dd259c1fff3af56828784d119b0c54460bbe4bd7048187e5f68a2d7f11a1b162b4967ebf1b213e007aeb877d62686abba9f7e529cd0a95b6a18693c97",
+          "sha256": "66801df0ff85db5769d0c3bb2c6e3b260bc289ca266ff1bd1828eb663b2f57b0",
+          "sha1": "639e7c988fde9ed68b39aa186ef73a2a1d01dfc0",
+          "md5": "aca31fa7202224f1b3a1c66c8d2aea92"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseSourcePublication",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "ui-components-textfield-1.3.1-sources.jar",
+          "url": "ui-components-textfield-1.3.1-sources.jar",
+          "size": 4766,
+          "sha512": "da834acbdb42f5a64e9facd7b1e71fd4d2bbb111b6e68dee3d91d0824f500a19b0d50e7a0cb9f0ea0680341491cfa78eddf039fd5421be4a0d5ca5088e2dfbe7",
+          "sha256": "896b0db69e4607518078ae3717e7f41a377a56d85302022f31a8be0808dd030d",
+          "sha1": "2884806956ac53fe75e979c1e6b083c319f60dc4",
+          "md5": "970f3a56d65419327b43d6ec910d7987"
+        }
+      ]
+    }
+  ]
+}
