@@ -72,8 +72,10 @@ internal class AndroidDisplayPlatform
         private val timeManager = context.getSystemService(TimeManager::class.java)
         private val timeDetector = context.getSystemService(TimeDetector::class.java)
         private val timeZoneDetector = context.getSystemService(TimeZoneDetector::class.java)
+        private val deviceProtectedContext =
+            if (context.isDeviceProtectedStorage) context else context.createDeviceProtectedStorageContext()
         private val themePreferences: SharedPreferences =
-            context.getSharedPreferences(THEME_PREFERENCES_NAME, Context.MODE_PRIVATE)
+            deviceProtectedContext.getSharedPreferences(THEME_PREFERENCES_NAME, Context.MODE_PRIVATE)
         private val scope = CoroutineScope(SupervisorJob() + dispatcher)
         private val mutableState = MutableStateFlow(DisplayState())
         private val minimumBacklight = powerManager?.systemInt("getMinimumScreenBrightnessSetting") ?: 1

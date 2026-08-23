@@ -71,8 +71,10 @@ internal class AndroidApplicationsPlatform
         private val storageStatsManager = context.getSystemService(StorageStatsManager::class.java)
         private val permissionControllerManager = context.getSystemService(PermissionControllerManager::class.java)
         private val roleManager = context.getSystemService(RoleManager::class.java)
+        private val deviceProtectedContext =
+            if (context.isDeviceProtectedStorage) context else context.createDeviceProtectedStorageContext()
         private val preferences: SharedPreferences =
-            context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+            deviceProtectedContext.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
         private val scope = CoroutineScope(SupervisorJob() + dispatcher)
 
         @Volatile private var carWatchdogManager: CarWatchdogManager? = null

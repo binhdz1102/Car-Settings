@@ -271,6 +271,7 @@
             <intent-filter android:priority="1">
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity-alias>
@@ -321,15 +322,57 @@
         <activity-alias android:name=".common.CarSettingActivities$KeyboardActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$TextToSpeechOutputActivity" android:exported="true" android:targetActivity=".MainActivity" />
         <activity-alias android:name=".common.CarSettingActivities$AlarmsAndRemindersActivity" android:exported="true" android:targetActivity=".MainActivity" />
+
         <provider
             android:name=".search.CarSettingsSearchIndexablesProvider"
             android:authorities="com.android.car.settings.search"
             android:exported="true"
+            android:directBootAware="true"
             android:grantUriPermissions="true"
             android:permission="android.permission.READ_SEARCH_INDEXABLES">
             <intent-filter>
                 <action android:name="android.content.action.SEARCH_INDEXABLES_PROVIDER" />
             </intent-filter>
         </provider>
+
+        <provider
+            android:name=".qc.SettingsQCProvider"
+            android:authorities="com.android.car.settings.qc"
+            android:exported="true"
+            android:directBootAware="true" />
+
+        <receiver
+            android:name=".qc.SettingsQCBroadcastReceiver"
+            android:exported="true"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="com.android.car.settings.qc.ACTION_QC_ITEM_TOGGLED" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".qc.DisabledQCToastBroadcastReceiver"
+            android:exported="true"
+            android:directBootAware="true" />
+
+        <receiver
+            android:name=".storage.StorageUnmountReceiver"
+            android:exported="true"
+            android:directBootAware="true">
+            <intent-filter>
+                <action android:name="android.os.storage.action.VOLUME_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".setupservice.InitialLockSetupService"
+            android:exported="true"
+            android:directBootAware="true"
+            android:permission="android.permission.MANAGE_USERS" />
+
+        <service
+            android:name=".bluetooth.BluetoothPairingService"
+            android:exported="true"
+            android:directBootAware="true" />
     </application>
 </manifest>
