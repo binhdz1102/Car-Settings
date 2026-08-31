@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="seat_memory_choose_slot">Choose slot</string>
+    <string name="seat_control_title">Seats and steering wheel</string>
+    <string name="seat_control_limitations">Adjustment range and available seats depend on the installed hardware. Stop an adjustment if an occupant or object could be trapped.</string>
+    <string name="seat_control_dependencies">The selected seat or steering actuator must be powered and report a valid position. Position changes are allowed only while the vehicle UX policy is unrestricted.</string>
+    <string name="seat_control_empty">This vehicle exposes no supported seat or steering controls.</string>
+    <string name="vehicle_control_unavailable_message">This control is currently unavailable.</string>
+    <string name="vehicle_service_connecting">Connecting to the vehicle service…</string>
+    <string name="vehicle_control_restricted">Park the vehicle to adjust this control.</string>
+    <string name="seat_visualization_content_description">Live seat position diagram based on observed vehicle position properties</string>
+    <string name="vehicle_zone_global">Whole vehicle</string>
+    <string name="seat_zone_selector">Seat zone</string>
+    <string name="seat_front_left">Front left</string><string name="seat_front_center">Front center</string><string name="seat_front_right">Front right</string>
+    <string name="seat_rear_left">Rear left</string><string name="seat_rear_center">Rear center</string><string name="seat_rear_right">Rear right</string>
+    <string name="vehicle_zone_id_format">Zone 0x%1$X</string>
+    <string name="seat_belt_buckled">Buckled</string><string name="seat_belt_unbuckled">Unbuckled</string>
+    <string name="seat_memory_slot_format">Slot %1$d</string>
+    <string-array name="seat_control_sections"><item>Seat position</item><item>Support and headrest</item><item>Memory and access</item><item>Seat status</item><item>Steering wheel</item></string-array>
+    <string-array name="seat_occupancy_labels"><item>Unknown</item><item>Vacant</item><item>Occupied</item></string-array>
+    <string-array name="seat_control_titles">
+        <item>Fore and aft</item><item>Seat height</item><item>Cushion depth</item><item>Cushion tilt</item>
+        <item>Primary backrest angle</item><item>Secondary backrest angle</item><item>Lumbar fore and aft</item><item>Lumbar height</item>
+        <item>Lumbar side support</item><item>Cushion side support</item><item>Headrest height</item><item>Headrest angle</item>
+        <item>Headrest fore and aft</item><item>Easy access</item><item>Seat occupancy</item><item>Seat belt</item>
+        <item>Recall seat memory</item><item>Save seat memory</item><item>Steering-wheel reach</item><item>Steering-wheel height</item>
+    </string-array>
+    <string-array name="seat_control_descriptions">
+        <item>Moves the selected seat closer to or farther from the pedals.</item><item>Raises or lowers the selected seat.</item><item>Changes the supported length of the seat cushion.</item><item>Tilts the seat cushion while keeping occupants clear of moving parts.</item>
+        <item>Adjusts the main backrest recline angle.</item><item>Adjusts the secondary articulated backrest section when fitted.</item><item>Moves lumbar support forward or backward.</item><item>Moves lumbar support up or down.</item>
+        <item>Changes side support around the lower back.</item><item>Changes side bolstering on the seat cushion.</item><item>Raises or lowers the head restraint.</item><item>Changes the head-restraint angle.</item>
+        <item>Moves the head restraint forward or backward.</item><item>Moves the seat for easier entry or exit when vehicle conditions permit.</item><item>Reports whether the selected seat is vacant or occupied.</item><item>Reports the buckle state for the selected seat.</item>
+        <item>Recalls the selected stored seat position slot.</item><item>Saves current supported positions into the selected memory slot.</item><item>Moves the steering wheel closer to or farther from the driver.</item><item>Raises or lowers the steering wheel.</item>
+    </string-array>
+</resources>

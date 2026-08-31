@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_title">Tìm kiếm cài đặt</string>
+    <string name="search_query_label">Tìm kiếm cài đặt</string>
+    <string name="search_empty">Không tìm thấy cài đặt</string>
+    <string name="search_result_summary">%1$s · %2$s</string>
+    <string name="search_parked_only_reason">Hãy đỗ xe để mở cài đặt này</string>
+</resources>

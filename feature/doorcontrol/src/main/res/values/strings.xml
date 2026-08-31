@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="door_control_title">Doors, windows and mirrors</string>
+    <string name="door_control_limitations">Confirm that occupants and objects are clear before moving a door, window, or mirror. Lock state shown by the app does not replace a physical safety check.</string>
+    <string name="door_control_dependencies">The selected actuator, anti-pinch protection, and body controller must be available. Motion commands require an unrestricted vehicle UX state.</string>
+    <string name="door_control_empty">This vehicle exposes no supported door, window, or mirror controls.</string>
+    <string name="vehicle_control_unavailable_message">This body control is currently unavailable.</string>
+    <string name="vehicle_service_connecting">Connecting to the vehicle service…</string>
+    <string name="vehicle_control_restricted">Park the vehicle to change this control.</string>
+    <string name="door_visualization_content_description">Live door, window, mirror and lock diagram based on observed position properties</string>
+    <string name="vehicle_zone_global">Whole vehicle</string><string name="door_zone_selector">Door, window or mirror area</string>
+    <string name="vehicle_zone_id_format">Area 0x%1$X</string>
+    <string name="door_area_front_left_context">Front-left door / windshield / left mirror</string>
+    <string name="door_area_front_windshield_context">Rear windshield / right mirror</string>
+    <string name="door_area_front_combined_context">Combined front areas</string>
+    <string name="door_area_front_right_context">Front-right door / center mirror</string>
+    <string name="door_area_rear_left_context">Rear-left door / front-left window</string>
+    <string name="door_area_rear_right_context">Rear-right door / front-right window</string>
+    <string name="door_area_third_left_context">Third-row left door / rear-left window</string>
+    <string name="door_area_third_right_context">Third-row right door / rear-right window</string>
+    <string name="door_area_rear_combined_context">Combined rear door/window areas</string>
+    <string name="door_area_roof_one_context">Roof window 1</string>
+    <string name="door_area_tailgate_context">Tailgate</string>
+    <string name="door_area_row_1_left">Front-left door</string>
+    <string name="door_area_row_1_right">Front-right door</string>
+    <string name="door_area_row_2_left">Rear-left door</string>
+    <string name="door_area_row_2_right">Rear-right door</string>
+    <string name="door_area_row_3_left">Third-row left door</string>
+    <string name="door_area_row_3_right">Third-row right door</string>
+    <string name="door_area_hood">Hood</string>
+    <string name="door_area_tailgate">Tailgate</string>
+    <string name="door_area_id_format">Door area 0x%1$X</string>
+    <string name="window_area_front_windshield">Front windshield</string>
+    <string name="window_area_rear_windshield">Rear windshield</string>
+    <string name="window_area_row_1_left">Front-left window</string>
+    <string name="window_area_row_1_right">Front-right window</string>
+    <string name="window_area_row_2_left">Rear-left window</string>
+    <string name="window_area_row_2_right">Rear-right window</string>
+    <string name="window_area_row_3_left">Third-row left window</string>
+    <string name="window_area_row_3_right">Third-row right window</string>
+    <string name="window_area_roof_1">Roof window 1</string>
+    <string name="window_area_id_format">Window area 0x%1$X</string>
+    <string name="mirror_area_driver_left">Left exterior mirror</string>
+    <string name="mirror_area_driver_right">Right exterior mirror</string>
+    <string name="mirror_area_driver_center">Interior rear-view mirror</string>
+    <string name="mirror_area_id_format">Mirror area 0x%1$X</string>
+    <string-array name="door_control_sections"><item>Doors and locks</item><item>Windows</item><item>Mirrors</item></string-array>
+    <string-array name="door_movement_labels"><item>Close</item><item>Stop</item><item>Open</item></string-array>
+    <string-array name="door_control_titles">
+        <item>Door lock</item><item>Child lock</item><item>Door position</item><item>Door movement</item>
+        <item>Window lock</item><item>Window position</item><item>Window movement</item><item>Mirror lock</item>
+        <item>Fold mirror</item><item>Automatic mirror fold</item><item>Automatic reverse tilt</item><item>Mirror vertical position</item><item>Mirror horizontal position</item>
+    </string-array>
+    <string-array name="door_control_descriptions">
+        <item>Locks or unlocks the selected door area and confirms the resulting vehicle state.</item><item>Prevents the selected rear door from being opened using its interior handle.</item><item>Shows and sets the supported opening position of a powered door.</item><item>Requests powered closing, stop, or opening for the selected door.</item>
+        <item>Enables the supported passenger-window lock for the selected area.</item><item>Shows and sets the supported opening position of the selected window.</item><item>Requests closing, stop, or opening for the selected window.</item><item>Locks or unlocks powered mirror adjustment when supported.</item>
+        <item>Folds or unfolds the selected exterior mirror.</item><item>Allows exterior mirrors to fold automatically with the vehicle lock policy.</item><item>Allows the selected mirror to tilt while reversing when supported.</item><item>Adjusts the selected mirror upward or downward.</item><item>Adjusts the selected mirror left or right.</item>
+    </string-array>
+</resources>

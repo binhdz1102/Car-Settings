@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="door_control_title">Cửa, kính và gương</string>
+    <string name="door_control_limitations">Đảm bảo người và vật đã tránh xa trước khi di chuyển cửa, kính hoặc gương. Trạng thái khóa trong ứng dụng không thay thế kiểm tra an toàn thực tế.</string>
+    <string name="door_control_dependencies">Bộ truyền động, chống kẹt và bộ điều khiển thân xe của vùng đã chọn phải sẵn sàng. Lệnh chuyển động cần trạng thái UX không hạn chế.</string>
+    <string name="door_control_empty">Xe không cung cấp điều khiển cửa, kính hoặc gương tương thích.</string>
+    <string name="vehicle_control_unavailable_message">Điều khiển thân xe này hiện không khả dụng.</string>
+    <string name="vehicle_service_connecting">Đang kết nối dịch vụ xe…</string>
+    <string name="vehicle_control_restricted">Hãy đỗ xe để thay đổi điều khiển này.</string>
+    <string name="door_visualization_content_description">Sơ đồ trực tiếp của cửa, kính, gương và khóa dựa trên thuộc tính vị trí quan sát được</string>
+    <string name="vehicle_zone_global">Toàn bộ xe</string><string name="door_zone_selector">Vùng cửa, kính hoặc gương</string>
+    <string name="vehicle_zone_id_format">Vùng 0x%1$X</string>
+    <string name="door_area_front_left_context">Cửa trước trái / kính chắn gió / gương trái</string>
+    <string name="door_area_front_windshield_context">Kính sau / gương phải</string>
+    <string name="door_area_front_combined_context">Các vùng phía trước kết hợp</string>
+    <string name="door_area_front_right_context">Cửa trước phải / gương giữa</string>
+    <string name="door_area_rear_left_context">Cửa sau trái / kính trước trái</string>
+    <string name="door_area_rear_right_context">Cửa sau phải / kính trước phải</string>
+    <string name="door_area_third_left_context">Cửa hàng ba trái / kính sau trái</string>
+    <string name="door_area_third_right_context">Cửa hàng ba phải / kính sau phải</string>
+    <string name="door_area_rear_combined_context">Các vùng cửa/kính sau kết hợp</string>
+    <string name="door_area_roof_one_context">Kính nóc 1</string>
+    <string name="door_area_tailgate_context">Cửa hậu</string>
+    <string name="door_area_row_1_left">Cửa trước trái</string>
+    <string name="door_area_row_1_right">Cửa trước phải</string>
+    <string name="door_area_row_2_left">Cửa sau trái</string>
+    <string name="door_area_row_2_right">Cửa sau phải</string>
+    <string name="door_area_row_3_left">Cửa hàng ba bên trái</string>
+    <string name="door_area_row_3_right">Cửa hàng ba bên phải</string>
+    <string name="door_area_hood">Nắp ca-pô</string>
+    <string name="door_area_tailgate">Cửa hậu</string>
+    <string name="door_area_id_format">Vùng cửa 0x%1$X</string>
+    <string name="window_area_front_windshield">Kính chắn gió trước</string>
+    <string name="window_area_rear_windshield">Kính chắn gió sau</string>
+    <string name="window_area_row_1_left">Kính trước trái</string>
+    <string name="window_area_row_1_right">Kính trước phải</string>
+    <string name="window_area_row_2_left">Kính sau trái</string>
+    <string name="window_area_row_2_right">Kính sau phải</string>
+    <string name="window_area_row_3_left">Kính hàng ba bên trái</string>
+    <string name="window_area_row_3_right">Kính hàng ba bên phải</string>
+    <string name="window_area_roof_1">Kính nóc 1</string>
+    <string name="window_area_id_format">Vùng kính 0x%1$X</string>
+    <string name="mirror_area_driver_left">Gương ngoài bên trái</string>
+    <string name="mirror_area_driver_right">Gương ngoài bên phải</string>
+    <string name="mirror_area_driver_center">Gương chiếu hậu trong xe</string>
+    <string name="mirror_area_id_format">Vùng gương 0x%1$X</string>
+    <string-array name="door_control_sections"><item>Cửa và khóa</item><item>Kính cửa</item><item>Gương</item></string-array>
+    <string-array name="door_movement_labels"><item>Đóng</item><item>Dừng</item><item>Mở</item></string-array>
+    <string-array name="door_control_titles">
+        <item>Khóa cửa</item><item>Khóa trẻ em</item><item>Vị trí cửa</item><item>Di chuyển cửa</item>
+        <item>Khóa kính</item><item>Vị trí kính</item><item>Di chuyển kính</item><item>Khóa điều chỉnh gương</item>
+        <item>Gập gương</item><item>Tự động gập gương</item><item>Tự hạ gương khi lùi</item><item>Vị trí gương theo chiều dọc</item><item>Vị trí gương theo chiều ngang</item>
+    </string-array>
+    <string-array name="door_control_descriptions">
+        <item>Khóa hoặc mở khóa vùng cửa đã chọn và xác nhận trạng thái thực tế của xe.</item><item>Ngăn mở cửa sau đã chọn bằng tay nắm phía trong.</item><item>Hiển thị và đặt vị trí mở được hỗ trợ của cửa điện.</item><item>Yêu cầu đóng điện, dừng hoặc mở cửa đã chọn.</item>
+        <item>Bật khóa kính hành khách được hỗ trợ cho vùng đã chọn.</item><item>Hiển thị và đặt vị trí mở được hỗ trợ của kính đã chọn.</item><item>Yêu cầu đóng, dừng hoặc mở kính đã chọn.</item><item>Khóa hoặc mở khóa điều chỉnh gương điện khi được hỗ trợ.</item>
+        <item>Gập hoặc mở gương ngoài đã chọn.</item><item>Cho phép gương ngoài tự gập theo chính sách khóa xe.</item><item>Cho phép gương đã chọn tự hạ khi lùi nếu được hỗ trợ.</item><item>Điều chỉnh gương đã chọn lên hoặc xuống.</item><item>Điều chỉnh gương đã chọn sang trái hoặc phải.</item>
+    </string-array>
+</resources>

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="driver_assistance_title">Hỗ trợ người lái</string>
+    <string name="driver_assistance_limitations">Hệ thống hỗ trợ không thay thế người lái tập trung. Khả năng hoạt động có thể thay đổi theo tốc độ, tầm nhìn, vạch đường, cảm biến, lỗi hoặc quy định khu vực.</string>
+    <string name="driver_assistance_dependencies">Cảm biến và bộ điều khiển liên quan trên xe phải sẵn sàng. Thay đổi ảnh hưởng tới hành vi lái chỉ được phép khi chính sách UX của xe không hạn chế.</string>
+    <string name="driver_assistance_unavailable">Cài đặt hỗ trợ này hiện không khả dụng.</string>
+    <string name="driver_assistance_empty">Xe này không cung cấp cài đặt hỗ trợ người lái tương thích.</string>
+    <string name="vehicle_zone_global">Toàn bộ xe</string>
+    <string name="vehicle_zone_selector">Vùng trên xe</string>
+    <string name="vehicle_service_connecting">Đang kết nối dịch vụ xe…</string>
+    <string name="vehicle_control_restricted">Hãy đỗ xe để thay đổi cài đặt này.</string>
+    <string name="driver_assistance_visualization_content_description">Hình minh họa cho %1$s. Đây là hướng dẫn, không phải dữ liệu cảm biến trực tiếp.</string>
+
+    <string-array name="driver_assistance_sections">
+        <item>Ổn định thân xe</item>
+        <item>Tránh va chạm</item>
+        <item>Hỗ trợ làn đường</item>
+        <item>Giám sát người lái</item>
+        <item>Ga tự động và tốc độ</item>
+        <item>Đỗ xe và rời xe</item>
+        <item>Cấu hình và phản hồi</item>
+    </string-array>
+    <string-array name="driver_assistance_level_labels">
+        <item>Thấp</item><item>Tiêu chuẩn</item><item>Cao</item><item>Tùy chỉnh</item>
+    </string-array>
+    <string-array name="driver_assistance_lane_mode_labels">
+        <item>Hình ảnh</item><item>Rung</item><item>Âm thanh</item><item>Rung và âm thanh</item>
+    </string-array>
+    <string-array name="driver_assistance_profile_labels">
+        <item>Êm dịu</item><item>Cân bằng</item><item>Chủ động</item><item>Tùy chỉnh</item>
+    </string-array>
+    <string-array name="driver_assistance_titles">
+        <item>Cân bằng điện tử</item>
+        <item>Phanh khẩn cấp tự động</item>
+        <item>Cảnh báo va chạm phía trước</item>
+        <item>Cảnh báo điểm mù</item>
+        <item>Cảnh báo chệch làn</item>
+        <item>Hỗ trợ giữ làn</item>
+        <item>Hỗ trợ căn giữa làn</item>
+        <item>Giữ làn khẩn cấp</item>
+        <item>Ga tự động</item>
+        <item>Phát hiện tay trên vô lăng</item>
+        <item>Hệ thống theo dõi chú ý</item>
+        <item>Cảnh báo buồn ngủ</item>
+        <item>Hệ thống theo dõi mất tập trung</item>
+        <item>Cảnh báo mất tập trung</item>
+        <item>Cảnh báo va chạm tốc độ thấp</item>
+        <item>Giám sát phương tiện cắt ngang</item>
+        <item>Phanh khẩn cấp tốc độ thấp</item>
+        <item>Độ nhạy cảnh báo làn</item>
+        <item>Mức can thiệp vô lăng</item>
+        <item>Kiểu cảnh báo làn</item>
+        <item>Thời điểm cảnh báo va chạm</item>
+        <item>Phản hồi tăng tốc ACC</item>
+        <item>Cảnh báo giới hạn tốc độ</item>
+        <item>Độ lệch giới hạn tốc độ</item>
+        <item>Âm lượng cảnh báo lái xe</item>
+        <item>Hỗ trợ đỗ xe phía trước</item>
+        <item>Hỗ trợ đỗ xe phía sau</item>
+        <item>Âm lượng cảnh báo đỗ xe</item>
+        <item>Hỗ trợ mở cửa an toàn</item>
+        <item>Cấu hình hỗ trợ người lái</item>
+    </string-array>
+    <string-array name="driver_assistance_descriptions">
+        <item>Giúp giảm trượt bánh và mất hướng khi xe phát hiện trạng thái mất ổn định.</item>
+        <item>Có thể tự phanh khi va chạm phía trước sắp xảy ra và người lái chưa phản ứng đủ.</item>
+        <item>Cảnh báo khi xe phát hiện nguy cơ va chạm với phương tiện hoặc chướng ngại phía trước.</item>
+        <item>Cảnh báo phương tiện ở điểm mù bên hông; luôn kiểm tra gương và quan sát qua vai.</item>
+        <item>Cảnh báo khi xe đi qua vạch làn được nhận diện mà không có tín hiệu chuyển hướng phù hợp.</item>
+        <item>Có thể hỗ trợ đánh lái để tránh vô tình rời khỏi làn đường được nhận diện.</item>
+        <item>Hỗ trợ đánh lái liên tục gần giữa làn khi các vạch làn được nhận diện rõ.</item>
+        <item>Có thể đánh lái tránh mép đường hoặc nguy hiểm bên cạnh khi phát hiện nguy cơ khẩn cấp.</item>
+        <item>Duy trì tốc độ do người lái chọn khi điều kiện cho phép; người lái vẫn chịu trách nhiệm phanh.</item>
+        <item>Kiểm tra tay người lái trên vô lăng khi chức năng hỗ trợ yêu cầu giám sát.</item>
+        <item>Dùng tín hiệu giám sát sẵn có để đánh giá sự chú ý và khả năng tiếp quản của người lái.</item>
+        <item>Cảnh báo khi tín hiệu giám sát cho thấy người lái có thể buồn ngủ hoặc giảm tỉnh táo.</item>
+        <item>Dùng tín hiệu giám sát sẵn có để đánh giá việc mất tập trung khỏi nhiệm vụ lái xe.</item>
+        <item>Cảnh báo khi hệ thống giám sát phát hiện người lái mất tập trung kéo dài.</item>
+        <item>Cảnh báo nguy cơ va chạm khi di chuyển chậm; vùng phủ cảm biến vẫn có điểm mù.</item>
+        <item>Giám sát phương tiện cắt ngang khi lùi hoặc rời chỗ đỗ ở tốc độ thấp.</item>
+        <item>Có thể tự phanh để giảm va chạm tốc độ thấp nhưng không nhận diện được mọi vật cản.</item>
+        <item>Chọn mức độ dễ kích hoạt cảnh báo khi có điều kiện chệch làn.</item>
+        <item>Chọn lực hỗ trợ đánh lái; cài đặt này không tăng giới hạn điều khiển của xe.</item>
+        <item>Chọn cảnh báo làn bằng hình ảnh, rung vô lăng, âm thanh hoặc kết hợp khi được hỗ trợ.</item>
+        <item>Chọn mức sớm hay muộn của cảnh báo va chạm phía trước so với nguy cơ được phát hiện.</item>
+        <item>Chọn cách ga tự động thích ứng yêu cầu tăng tốc sau khi đường phía trước thông thoáng.</item>
+        <item>Cảnh báo khi vượt quá giới hạn tốc độ nhận diện từ biển báo hoặc bản đồ.</item>
+        <item>Điều chỉnh ngưỡng cao hoặc thấp hơn giới hạn tốc độ trước khi phát cảnh báo.</item>
+        <item>Đặt mức âm thanh cảnh báo hỗ trợ lái, không làm đổi âm lượng nhạc hoặc cuộc gọi.</item>
+        <item>Bật cảm biến vật cản và cảnh báo vùng trước khi đỗ xe ở tốc độ thấp.</item>
+        <item>Bật cảm biến vật cản và cảnh báo vùng sau khi đỗ xe ở tốc độ thấp.</item>
+        <item>Đặt mức âm thanh cảnh báo khoảng cách đỗ xe; thông tin hình ảnh vẫn hiện khi được hỗ trợ.</item>
+        <item>Cảnh báo hành khách khi mở cửa có thể xung đột với phương tiện hoặc xe đạp đang tới.</item>
+        <item>Áp dụng đồng bộ nhóm tùy chọn êm dịu, cân bằng, chủ động hoặc tùy chỉnh.</item>
+    </string-array>
+</resources>

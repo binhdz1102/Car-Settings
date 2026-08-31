@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_shell_default_title">Settings</string>
+    <string name="settings_shell_categories">Categories</string>
+    <string name="settings_shell_search">Search settings</string>
+    <string name="settings_back_content_description">Navigate back</string>
+    <string name="panel_close_content_description">Close panel</string>
+    <string name="panel_action_failed_title">Panel action failed</string>
+
+    <string name="vehicle_back_content_description">Navigate back</string>
+    <string name="vehicle_control_read_only">Read only</string>
+    <string name="vehicle_control_unavailable">Unavailable</string>
+    <string name="vehicle_control_on">On</string>
+    <string name="vehicle_control_off">Off</string>
+    <string name="vehicle_control_error_title">Couldn’t apply vehicle setting</string>
+    <string name="vehicle_control_retry">Try again</string>
+    <string name="vehicle_control_show_all">Show all controls</string>
+    <string name="vehicle_control_hide_unavailable">Hide unavailable controls</string>
+    <string name="vehicle_control_no_supported_controls">This vehicle image does not expose supported controls yet.</string>
+    <string name="vehicle_control_service_unavailable">Vehicle service is unavailable. Controls are safely disabled.</string>
+    <string name="vehicle_control_partial_support">Some controls are unavailable in this vehicle image. You can review them safely.</string>
+    <string name="vehicle_control_dismiss_error">Dismiss error</string>
+    <string name="vehicle_control_info_content_description">Information about %1$s</string>
+    <string name="vehicle_control_info_image_content_description">Illustration for %1$s</string>
+    <string name="vehicle_control_info_close">Close</string>
+    <string name="vehicle_control_info_close_content_description">Close information</string>
+    <string name="vehicle_control_info_limitations_heading">Limitations</string>
+    <string name="vehicle_control_info_dependencies_heading">Dependencies</string>
+    <string name="vehicle_control_current_status_heading">Current status</string>
+    <string name="vehicle_control_categories_heading">Control categories</string>
+    <string name="vehicle_control_category_count">%1$d controls</string>
+    <string name="vehicle_control_illustrated_guide">View illustrated guide</string>
+    <string name="vehicle_control_rotary_hint">Rotate to browse controls. Press Center to adjust or learn more.</string>
+    <string name="vehicle_control_category_empty">No controls are exposed for this category and vehicle zone.</string>
+    <string name="vehicle_zone_selector_content_description">Vehicle zones</string>
+    <string name="vehicle_top_view_content_description">Top view of the vehicle</string>
+</resources>

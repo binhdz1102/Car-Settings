@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="vehicle_lighting_title">Vehicle lighting</string>
+    <string name="vehicle_lighting_limitations">Lighting availability can depend on ignition, ambient light, regional rules, lamp faults, or another active automatic mode. The driver remains responsible for appropriate exterior lighting.</string>
+    <string name="vehicle_lighting_dependencies">The requested lamp circuit and controller must be available. Safety-related exterior changes require an unrestricted vehicle UX state.</string>
+    <string-array name="vehicle_lighting_modes"><item>Off</item><item>Automatic</item><item>On</item><item>Flash</item></string-array>
+    <string name="vehicle_lighting_empty">This vehicle exposes no supported lighting controls.</string>
+    <string name="vehicle_control_unavailable_message">This light is currently unavailable.</string>
+    <string name="vehicle_service_connecting">Connecting to the vehicle service…</string>
+    <string name="vehicle_control_restricted">Park the vehicle to change this lighting mode.</string>
+    <string name="vehicle_lighting_visualization_content_description">Observed lighting control visualisation, not a physical lamp diagnostic</string>
+    <string name="vehicle_zone_global">Whole vehicle</string><string name="lighting_zone_selector">Lighting zone</string>
+    <string name="zone_front_left">Front left</string><string name="zone_front_right">Front right</string>
+    <string name="zone_rear_left">Rear left</string><string name="zone_rear_center">Rear center</string><string name="zone_rear_right">Rear right</string>
+    <string name="vehicle_zone_id_format">Zone 0x%1$X</string>
+    <string-array name="vehicle_lighting_sections"><item>Exterior lighting</item><item>Safety lighting</item><item>Interior lighting</item></string-array>
+    <string-array name="vehicle_lighting_titles">
+        <item>Headlights</item><item>High beam</item><item>Fog lights</item><item>Hazard lights</item>
+        <item>Cabin lights</item><item>Reading lights</item><item>Steering-wheel lights</item><item>Footwell lights</item>
+    </string-array>
+    <string-array name="vehicle_lighting_descriptions">
+        <item>Selects the supported headlight mode for visibility and conspicuity.</item><item>Selects high-beam operation when it will not dazzle other road users.</item><item>Selects fog-lamp operation for supported low-visibility conditions.</item><item>Flashes all turn indicators to warn other road users of a stationary hazard.</item>
+        <item>Selects the general interior cabin-light mode.</item><item>Selects the reading-light mode for the chosen occupant zone.</item><item>Selects illumination of supported steering-wheel controls.</item><item>Selects low-level footwell illumination for the chosen seat zone.</item>
+    </string-array>
+</resources>

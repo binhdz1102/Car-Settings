@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hvac_title">Climate</string>
+    <string name="hvac_connecting">Connecting to vehicle climate service…</string>
+    <string name="hvac_empty">No climate controls are exposed by this vehicle image.</string>
+    <string name="hvac_restricted">This climate control is unavailable while driving.</string>
+    <string name="hvac_zone_selector">Climate zone</string>
+    <string name="hvac_global_zone">Global</string>
+    <string name="hvac_visualization_label">Observed climate state</string>
+    <string name="hvac_visualization_content_description">Climate illustration driven by observed fan, temperature, recirculation and defrost properties</string>
+    <string name="hvac_category_system">System and automatic modes</string>
+    <string name="hvac_category_temperature">Temperature</string>
+    <string name="hvac_category_airflow">Airflow</string>
+    <string name="hvac_category_air_quality">Air quality</string>
+    <string name="hvac_category_defrost">Defrost and heating</string>
+    <string name="hvac_category_comfort">Seat and steering comfort</string>
+    <string name="hvac_limitations">Availability, ranges and supported zones depend on the vehicle HVAC implementation. Unsupported controls remain view-only.</string>
+    <string name="hvac_dependencies">Requires the corresponding VHAL property, a readable area configuration and write access for interactive changes.</string>
+    <string name="hvac_power">Climate power</string>
+    <string name="hvac_temperature_set">Set temperature</string>
+    <string name="hvac_temperature_current">Current cabin temperature</string>
+    <string name="hvac_temperature_units">Temperature units</string>
+    <string name="hvac_fan_speed">Fan speed</string>
+    <string name="hvac_fan_direction">Fan direction</string>
+    <string name="hvac_ac">Air conditioning</string>
+    <string name="hvac_max_ac">Maximum cooling</string>
+    <string name="hvac_auto">Automatic climate</string>
+    <string name="hvac_recirculation">Air recirculation</string>
+    <string name="hvac_auto_recirculation">Automatic recirculation</string>
+    <string name="hvac_dual">Dual / Sync zones</string>
+    <string name="hvac_front_defroster">Front defroster</string>
+    <string name="hvac_rear_defroster">Rear defroster</string>
+    <string name="hvac_max_defrost">Maximum defrost</string>
+    <string name="hvac_mirror_heat">Heated mirrors</string>
+    <string name="hvac_seat_temperature">Seat heating</string>
+    <string name="hvac_seat_ventilation">Seat ventilation</string>
+    <string name="hvac_steering_heat">Steering wheel heating</string>
+</resources>

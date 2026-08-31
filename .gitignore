@@ -1,0 +1,60 @@
+# Gradle and Android build output
+.gradle/
+.kotlin/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.class
+*.apk
+*.aab
+*.apks
+
+# Test, coverage, and analysis reports
+**/reports/
+**/coverage/
+**/jacoco/
+**/test-results/
+
+# Local Android SDK configuration
+local.properties
+
+# Local AOSP Settings reference source; do not commit
+/Settings/
+
+# My-System-App reference copy used only as the migration source; do not commit
+/My-System-App/
+
+# ZCode agent workspace
+.zcode/
+
+# Local signing configuration and credentials
+keystore.properties
+keystore/
+*.jks
+*.keystore
+*.p12
+
+# Private design-system source and binaries must only be resolved from GitHub Packages
+/libs/bmaterial/
+/third_party/bmaterial-ccp-rotary-focus/
+*.aar
+
+# IDE and operating-system files
+.idea/
+.fleet/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.orig
+*~
+*.swp
+*.swo
+*.hprof
+**/out/
+**/tmp/
