@@ -16,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemId
+import com.b231001.bmaterial.ccp.rotaryfocus.LocalIsInTouchMode
 import com.b231001.bmaterial.ccp.rotaryfocus.LocalRotaryFocusController
 import com.b231001.bmaterial.ccp.rotaryfocus.RotaryFocusTarget
 import kotlinx.coroutines.delay
@@ -169,6 +170,7 @@ fun VehicleFeatureScreen(
         }
     }
     val rotaryController = LocalRotaryFocusController.current
+    val isInTouchMode = LocalIsInTouchMode.current
     // Keep this handler enabled for the short hand-off window after a rotary dialog closes or
     // while a control is in direct-manipulation mode.
     // Some AAOS builds dispatch the same hardware Back event again after removing the dialog
@@ -307,7 +309,13 @@ fun VehicleFeatureScreen(
                         presentation = overviewPresentation,
                         showAllControls = showAllControls,
                         onToggleShowAll = { showAllControls = !showAllControls },
-                        onOpenCategory = { selectedCategoryKey = it },
+                        onOpenCategory = { categoryKey ->
+                            prepareVehicleDetailNavigation(
+                                isInTouchMode = isInTouchMode,
+                                parkFocus = { rotaryController?.parkFocus() == true },
+                                navigate = { selectedCategoryKey = categoryKey },
+                            )
+                        },
                         onBack = onBack,
                         onRefresh = onRefresh,
                         modifier = modifier,

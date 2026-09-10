@@ -6,6 +6,16 @@ import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemId
 import com.b231001.bmaterial.ccp.rotaryfocus.RotaryFocusTarget
 
+/** Parks rotary focus before Vehicle swaps the detail content tree. */
+internal fun prepareVehicleDetailNavigation(
+    isInTouchMode: Boolean,
+    parkFocus: () -> Boolean,
+    navigate: () -> Unit,
+) {
+    if (!isInTouchMode) parkFocus()
+    navigate()
+}
+
 /**
  * Pure presentation decisions shared by the rotary and hostless vehicle surfaces.
  *
