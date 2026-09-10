@@ -7,11 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+
+internal fun vehicleRouteCompositionKey(categoryKey: String?): String = categoryKey ?: "overview"
 
 /**
  * Single-tree route transition for vehicle settings.
@@ -27,6 +30,7 @@ internal fun AutomotiveRouteMotion(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    val compositionKey = vehicleRouteCompositionKey(routeKey)
     val progress = remember { Animatable(1f) }
     // A graphicsLayer kept attached after the transition settles breaks pointer hit-testing
     // for the interop AndroidView children (FocusItem/FocusArea hosts) rendered inside this
@@ -57,6 +61,8 @@ internal fun AutomotiveRouteMotion(
                     },
                 ),
     ) {
-        content()
+        key(compositionKey) {
+            content()
+        }
     }
 }
