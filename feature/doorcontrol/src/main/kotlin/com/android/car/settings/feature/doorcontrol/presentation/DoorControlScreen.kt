@@ -13,6 +13,7 @@ import com.android.car.settings.core.ui.VehicleFeatureScreen
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualizationSource
+import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toUiControls
 import com.android.car.settings.core.vehicle.VehicleConnectionState
@@ -91,8 +92,9 @@ fun DoorControlRoute(
         // overlap; the dedicated preview only uses actual position/state property values.
         showVehicleDiagram = false,
         visualizationSource = VehicleVisualizationSource.LIVE_PROPERTY,
-        visualizationLabel = "Live position diagram from observed door, window and mirror properties",
-        visualization = { selected -> DoorControlVisualization(controls, selected) },
+        visualizationLabel = "Observed position setting — not live sensor data",
+        visualization = { selected, policy -> DoorControlVisualization(controls, selected, visualPolicy = policy) },
+        visualPolicy = state.uxPolicy.toVehicleVisualPolicy(),
     )
 }
 

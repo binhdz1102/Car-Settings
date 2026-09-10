@@ -50,7 +50,14 @@ fun VehicleFeatureScreen(
     showVehicleDiagram: Boolean = false,
     visualizationSource: VehicleVisualizationSource? = null,
     visualizationLabel: String? = null,
-    visualization: (@Composable (VehicleControlUiModel?) -> Unit)? = null,
+    visualization: (@Composable (VehicleControlUiModel?, VehicleVisualPolicy) -> Unit)? = null,
+    guideVisualization: (@Composable (VehicleControlUiModel, Float) -> Unit)? = null,
+    visualPolicy: VehicleVisualPolicy =
+        VehicleVisualPolicy(
+            allowPreviewTransition = false,
+            allowGuide = false,
+            allowGuidePlayback = false,
+        ),
 ) {
     if (isRotaryFallbackMode()) {
         VehicleFeatureHostlessFallback(
@@ -75,6 +82,8 @@ fun VehicleFeatureScreen(
             visualizationSource = visualizationSource,
             visualizationLabel = visualizationLabel,
             visualization = visualization,
+            guideVisualization = guideVisualization,
+            visualPolicy = visualPolicy,
         )
         return
     }
@@ -143,6 +152,13 @@ fun VehicleFeatureScreen(
             it.key == selectedInfoKey && it.areaId == selectedInfoAreaId
         }
 
+    LaunchedEffect(visualPolicy.allowGuide, selectedInfoControl?.key, selectedInfoControl?.areaId) {
+        if (selectedInfoControl != null && !visualPolicy.allowGuide) {
+            selectedInfoKey = null
+            suppressParentBackAfterInfoDismiss = true
+        }
+    }
+
     // The rotary dialog owns the Back event while it is visible.  Keeping the parent handler
     // from consuming the same hardware event after the dialog posts its dismiss callback is
     // important on AAOS: a dialog window can dispatch Back again when it is removed.
@@ -184,6 +200,8 @@ fun VehicleFeatureScreen(
     if (selectedInfoControl != null) {
         VehicleInfoGuideDialog(
             control = selectedInfoControl,
+            visualPolicy = visualPolicy,
+            guideVisualization = guideVisualization,
             onDismissRequest = {
                 // RotaryFocusDialog owns native focus restoration for rotary dismissal. In touch
                 // mode it intentionally leaves focus parked; requesting focus here would paint a
@@ -257,6 +275,8 @@ fun VehicleFeatureScreen(
                         visualizationSource = visualizationSource,
                         visualizationLabel = visualizationLabel,
                         visualization = visualization,
+                        guideVisualization = guideVisualization,
+                        visualPolicy = visualPolicy,
                     )
                 }
             }

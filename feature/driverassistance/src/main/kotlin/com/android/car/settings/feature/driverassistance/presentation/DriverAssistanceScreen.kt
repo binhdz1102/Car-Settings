@@ -13,8 +13,13 @@ import com.android.car.settings.core.ui.VehicleEnumOption
 import com.android.car.settings.core.ui.VehicleFeatureScreen
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.core.ui.VehicleSliderUiSpec
+import com.android.car.settings.core.ui.VehicleObservationStatus
+import com.android.car.settings.core.ui.VehicleObservedSnapshot
 import com.android.car.settings.core.ui.VehicleVisualizationSource
+import com.android.car.settings.core.ui.VehicleVisualBinding
+import com.android.car.settings.core.ui.VehicleVisualMeaning
 import com.android.car.settings.core.ui.VehicleZoneOption
+import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.vehicle.VehicleConnectionState
 import com.android.car.settings.core.vehicle.VehicleFeatureAreaState
 import com.android.car.settings.core.vehicle.VehicleFeatureState
@@ -94,7 +99,11 @@ fun DriverAssistanceRoute(
         restrictedReason = stringResource(R.string.vehicle_control_restricted),
         visualizationSource = VehicleVisualizationSource.ILLUSTRATION,
         visualizationLabel = "Illustration / demo — not live sensor data",
-        visualization = { selected -> DriverAssistanceVisualization(selected) },
+        visualization = { selected, policy -> DriverAssistanceVisualization(selected, visualPolicy = policy) },
+        guideVisualization = { selected, progress ->
+            DriverAssistanceGuideVisualization(selected, progress)
+        },
+        visualPolicy = state.uxPolicy.toVehicleVisualPolicy(),
     )
 }
 
@@ -180,9 +189,59 @@ internal fun mapDriverAssistanceControls(
                     },
                 errorMessage = (area.error ?: control.error)?.toMessage(unavailable),
                 requiresUnrestrictedUx = control.definition.requiresUnrestrictedUx,
+                observedSnapshot =
+                    when {
+                        !area.access.canRead -> VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+                        area.error != null || control.error != null || area.status == VehiclePropertyStatus.ERROR ->
+                            VehicleObservedSnapshot(status = VehicleObservationStatus.ERROR)
+                        area.status == VehiclePropertyStatus.UNAVAILABLE || area.confirmedValue == null ->
+                            VehicleObservedSnapshot(status = VehicleObservationStatus.UNAVAILABLE)
+                        area.confirmedValue is Boolean ->
+                            VehicleObservedSnapshot(
+                                booleanValue = area.confirmedValue as Boolean,
+                                status = VehicleObservationStatus.CONFIRMED,
+                                timestampNanos = area.confirmedTimestampNanos.takeIf { it != Long.MIN_VALUE },
+                            )
+                        area.confirmedValue is Number ->
+                            VehicleObservedSnapshot(
+                                numericValue = (area.confirmedValue as Number).toFloat(),
+                                enumValue = (area.confirmedValue as Number).toInt(),
+                                status = VehicleObservationStatus.CONFIRMED,
+                                timestampNanos = area.confirmedTimestampNanos.takeIf { it != Long.MIN_VALUE },
+                            )
+                        else -> VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+                    },
+                visualBinding = driverAssistanceVisualBinding(id),
             )
         }
     }
+
+private fun driverAssistanceVisualBinding(id: DriverAssistanceId): VehicleVisualBinding {
+    val guideSceneId =
+        when (id) {
+            DriverAssistanceId.BLIND_SPOT_WARNING -> "adas_blind_spot_warning"
+            DriverAssistanceId.CROSS_TRAFFIC_MONITORING -> "adas_cross_traffic_monitoring"
+            DriverAssistanceId.FORWARD_COLLISION_WARNING -> "adas_forward_collision_warning"
+            DriverAssistanceId.AUTOMATIC_EMERGENCY_BRAKING -> "adas_automatic_emergency_braking"
+            DriverAssistanceId.LANE_DEPARTURE_WARNING -> "adas_lane_departure_warning"
+            DriverAssistanceId.LANE_KEEP_ASSIST -> "adas_lane_keep_assist"
+            DriverAssistanceId.LANE_CENTERING_ASSIST -> "adas_lane_centering_assist"
+            DriverAssistanceId.FRONT_PARKING_ASSISTANCE,
+            DriverAssistanceId.REAR_PARKING_ASSISTANCE,
+            -> "adas_parking_assistance"
+            else -> null
+        }
+    return VehicleVisualBinding(
+        previewSceneId = "adas_context_top_view",
+        guideSceneId = guideSceneId,
+        meaning =
+            if (guideSceneId == null) {
+                VehicleVisualMeaning.CONTEXT_ONLY
+            } else {
+                VehicleVisualMeaning.INSTRUCTIONAL
+            },
+    )
+}
 
 internal fun driverAssistanceSliderUiSpec(id: DriverAssistanceId): VehicleSliderUiSpec =
     when (id) {

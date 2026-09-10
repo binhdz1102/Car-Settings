@@ -35,12 +35,17 @@ internal object ClimateEventReducer {
             return copy(
                 status = ClimateValueStatus.UNAVAILABLE,
                 unavailableReason = "Unavailable in the current vehicle state",
+                observedBooleanValue = null,
+                observedIntValue = null,
+                observedFloatValue = null,
+                observedTimestampNanos = null,
             )
         }
         return when (capability.kind) {
             ClimateControlKind.TOGGLE ->
                 copy(
                     booleanValue = value as? Boolean,
+                    observedBooleanValue = value as? Boolean,
                     status = ClimateValueStatus.AVAILABLE,
                     unavailableReason = null,
                 )
@@ -49,6 +54,7 @@ internal object ClimateEventReducer {
             ->
                 copy(
                     floatValue = (value as? Number)?.toFloat(),
+                    observedFloatValue = (value as? Number)?.toFloat(),
                     status = ClimateValueStatus.AVAILABLE,
                     unavailableReason = null,
                 )
@@ -57,6 +63,7 @@ internal object ClimateEventReducer {
             ->
                 copy(
                     intValue = (value as? Number)?.toInt(),
+                    observedIntValue = (value as? Number)?.toInt(),
                     status = ClimateValueStatus.AVAILABLE,
                     unavailableReason = null,
                 )

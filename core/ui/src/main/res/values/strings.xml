@@ -24,6 +24,10 @@
     <string name="vehicle_control_info_image_content_description">Illustration for %1$s</string>
     <string name="vehicle_control_info_close">Close</string>
     <string name="vehicle_control_info_close_content_description">Close information</string>
+    <string name="vehicle_control_info_play">Play illustration</string>
+    <string name="vehicle_control_info_stop">Stop illustration</string>
+    <string name="vehicle_control_info_replay">Replay illustration</string>
+    <string name="vehicle_control_info_illustration_disclaimer">Illustration / demo — not live sensor data.</string>
     <string name="vehicle_control_info_limitations_heading">Limitations</string>
     <string name="vehicle_control_info_dependencies_heading">Dependencies</string>
     <string name="vehicle_control_current_status_heading">Current status</string>

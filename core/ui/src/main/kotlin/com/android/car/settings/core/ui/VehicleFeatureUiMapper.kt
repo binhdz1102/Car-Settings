@@ -63,6 +63,7 @@ private fun VehicleFeatureAreaState.toUiModel(
     val min = (minValue as? Number)?.toFloat()
     val max = (maxValue as? Number)?.toFloat()
     val enumValues = resolvedEnumValues(presentation.editor, min, max)
+    val observedSnapshot = observedSnapshot()
     return VehicleControlUiModel(
         key = control.definition.key,
         propertyId = control.definition.spec.propertyId,
@@ -92,7 +93,47 @@ private fun VehicleFeatureAreaState.toUiModel(
         enumOptions = enumValues.toOptions(presentation.enumLabels),
         errorMessage = (error ?: control.error)?.let(errorMessage),
         requiresUnrestrictedUx = control.definition.requiresUnrestrictedUx,
+        observedSnapshot = observedSnapshot,
     )
+}
+
+private fun VehicleFeatureAreaState.observedSnapshot(): VehicleObservedSnapshot {
+    if (!access.canRead) {
+        return VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+    }
+    if (error != null || status == VehiclePropertyStatus.ERROR) {
+        return VehicleObservedSnapshot(status = VehicleObservationStatus.ERROR)
+    }
+    val observed = confirmedValue ?: return VehicleObservedSnapshot(
+        status =
+            if (status == VehiclePropertyStatus.UNAVAILABLE) {
+                VehicleObservationStatus.UNAVAILABLE
+            } else {
+                VehicleObservationStatus.UNKNOWN
+            },
+    )
+    return when (observed) {
+        is Boolean ->
+            VehicleObservedSnapshot(
+                booleanValue = observed,
+                status = VehicleObservationStatus.CONFIRMED,
+                timestampNanos = confirmedTimestampNanos.takeIf { it != Long.MIN_VALUE },
+            )
+        is Number -> {
+            val numeric = observed.toFloat()
+            if (!numeric.isFinite()) {
+                VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+            } else {
+                VehicleObservedSnapshot(
+                    numericValue = numeric,
+                    enumValue = observed.toInt().takeIf { observed is Int || observed is Long },
+                    status = VehicleObservationStatus.CONFIRMED,
+                    timestampNanos = confirmedTimestampNanos.takeIf { it != Long.MIN_VALUE },
+                )
+            }
+        }
+        else -> VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+    }
 }
 
 private fun VehicleFeatureAreaState.resolvedEnumValues(

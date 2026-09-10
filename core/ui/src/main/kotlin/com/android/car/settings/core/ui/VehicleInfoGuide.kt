@@ -3,11 +3,8 @@ package com.android.car.settings.core.ui
 import android.util.Log
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,11 +60,20 @@ import com.b231001.bmaterial.uicomponents.card.BCardStyle
 @Composable
 fun VehicleInfoGuideDialog(
     control: VehicleControlUiModel,
+    visualPolicy: VehicleVisualPolicy,
+    guideVisualization: (@Composable (VehicleControlUiModel, Float) -> Unit)?,
     onDismissRequest: () -> Unit,
 ) {
     val infoScrollState = rememberScrollState()
     val areaId = FocusAreaId("vehicle-info-dialog-${rotarySafeKey(control.key)}-${control.areaId}")
     val closeId = FocusItemId("${areaId.value}-close")
+    val guideActionId = FocusItemId("${areaId.value}-guide-action")
+    val guideAvailable =
+        visualPolicy.allowGuide &&
+            guideVisualization != null &&
+            control.visualBinding.guideSceneId != null
+    var playback by remember(control.key, control.areaId) { mutableStateOf(VehicleGuidePlaybackState()) }
+    val playbackProgress = remember(control.key, control.areaId) { Animatable(0f) }
     var dismissed by remember { mutableStateOf(false) }
     LaunchedEffect(control.key, control.areaId) {
         VehicleDialogBackGuard.armForShownDialog()
@@ -86,12 +92,58 @@ fun VehicleInfoGuideDialog(
         }
     }
 
+    LaunchedEffect(playback.phase, visualPolicy.allowGuidePlayback, guideAvailable) {
+        if (!guideAvailable || !visualPolicy.allowGuidePlayback) {
+            playback = VehicleGuidePlaybackState()
+            playbackProgress.snapTo(0f)
+            return@LaunchedEffect
+        }
+        if (playback.phase == VehicleGuidePhase.PLAYING) {
+            playbackProgress.snapTo(0f)
+            playbackProgress.animateTo(1f, tween(VEHICLE_GUIDE_DURATION_MILLIS))
+            playback =
+                reduceVehicleGuidePlayback(
+                    playback,
+                    VehicleGuideIntent.Complete,
+                    visualPolicy,
+                )
+        } else {
+            playbackProgress.snapTo(playback.progress)
+        }
+    }
+
     @Composable
     fun DialogBody() {
         // Consume Back inside the dialog's own dispatcher. Relying only on the platform dialog
         // onDismiss callback can leak the same hardware event to the parent activity on AAOS API
         // 37, which would close the vehicle destination after dismissing the popup.
         BackHandler(enabled = true, onBack = dismiss)
+        @Composable
+        fun StaticArtwork() {
+            if (control.illustrationRes != null) {
+                VehicleIllustrationImage(
+                    illustrationRes = control.illustrationRes,
+                    contentDescription = control.info,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+                )
+            } else {
+                Surface(
+                    modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
+                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    shape = MaterialTheme.shapes.extraLarge,
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.DirectionsCar,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(96.dp),
+                        )
+                    }
+                }
+            }
+        }
         Surface(
             modifier = Modifier.widthIn(min = 620.dp, max = 980.dp),
             color = MaterialTheme.colorScheme.surface,
@@ -127,39 +179,22 @@ fun VehicleInfoGuideDialog(
                         style = BCardStyle.Elevated,
                         size = BCardSize.Lg,
                         content = {
-                            AnimatedContent(
-                                targetState = control.illustrationRes,
-                                transitionSpec = {
-                                    fadeIn(tween(VehicleMotionTokens.CONTENT_ENTER_DURATION_MILLIS)) togetherWith
-                                        fadeOut(tween(VehicleMotionTokens.CONTENT_EXIT_DURATION_MILLIS))
-                                },
-                                label = "vehicle-info-artwork",
-                            ) { illustrationRes ->
-                                if (illustrationRes != null) {
-                                    VehicleIllustrationImage(
-                                        illustrationRes = illustrationRes,
-                                        contentDescription = control.info,
-                                        contentScale = ContentScale.Fit,
-                                        modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
-                                    )
-                                } else {
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth().aspectRatio(16f / 9f),
-                                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                        shape = MaterialTheme.shapes.extraLarge,
-                                    ) {
-                                        Box(contentAlignment = Alignment.Center) {
-                                            Icon(
-                                                imageVector = Icons.Default.DirectionsCar,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(96.dp),
-                                            )
-                                        }
-                                    }
-                                }
+                            if (
+                                guideAvailable &&
+                                    (playback.phase == VehicleGuidePhase.PLAYING ||
+                                        playback.phase == VehicleGuidePhase.COMPLETE)
+                            ) {
+                                requireNotNull(guideVisualization)(control, playbackProgress.value)
+                            } else {
+                                StaticArtwork()
                             }
                         },
+                    )
+
+                    Text(
+                        text = stringResource(R.string.vehicle_control_info_illustration_disclaimer),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
 
                     GuideDialogSection(
@@ -176,17 +211,74 @@ fun VehicleInfoGuideDialog(
                     )
                     GuideDialogSection(
                         title = stringResource(R.string.vehicle_control_current_status_heading),
-                        body = vehicleGuideStatus(control),
+                        body = vehicleObservedStatusLabel(control),
                     )
                 }
 
                 FocusArea(
                     id = areaId,
-                    firstFocusAt = closeId,
-                    focusOrder = listOf(closeId),
+                    firstFocusAt = if (guideAvailable) guideActionId else closeId,
+                    focusOrder = buildList {
+                        if (guideAvailable) add(guideActionId)
+                        add(closeId)
+                    },
                     contentPadding = PaddingValues(vertical = SettingsTokens.FocusRingClearance),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
+                    if (guideAvailable) {
+                        FocusItem(
+                            id = guideActionId,
+                            onClick = {
+                                val intent =
+                                    if (playback.phase == VehicleGuidePhase.PLAYING) {
+                                        VehicleGuideIntent.Stop
+                                    } else if (playback.phase == VehicleGuidePhase.COMPLETE) {
+                                        VehicleGuideIntent.Replay
+                                    } else {
+                                        VehicleGuideIntent.Play
+                                    }
+                                playback = reduceVehicleGuidePlayback(playback, intent, visualPolicy)
+                            },
+                            touchBehavior = FocusItemTouchBehavior.ComposeContent,
+                            layout = FocusItemLayout(minHeight = 60.dp),
+                            semantics =
+                                FocusItemSemantics(
+                                    label =
+                                        stringResource(
+                                            when (playback.phase) {
+                                                VehicleGuidePhase.PLAYING -> R.string.vehicle_control_info_stop
+                                                VehicleGuidePhase.COMPLETE -> R.string.vehicle_control_info_replay
+                                                else -> R.string.vehicle_control_info_play
+                                            },
+                                        ),
+                                    role = FocusItemRole.Button,
+                                ),
+                        ) { _ ->
+                            AutomotiveButton(
+                                label =
+                                    stringResource(
+                                        when (playback.phase) {
+                                            VehicleGuidePhase.PLAYING -> R.string.vehicle_control_info_stop
+                                            VehicleGuidePhase.COMPLETE -> R.string.vehicle_control_info_replay
+                                            else -> R.string.vehicle_control_info_play
+                                        },
+                                    ),
+                                onClick = {
+                                    val intent =
+                                        if (playback.phase == VehicleGuidePhase.PLAYING) {
+                                            VehicleGuideIntent.Stop
+                                        } else if (playback.phase == VehicleGuidePhase.COMPLETE) {
+                                            VehicleGuideIntent.Replay
+                                        } else {
+                                            VehicleGuideIntent.Play
+                                        }
+                                    playback = reduceVehicleGuidePlayback(playback, intent, visualPolicy)
+                                },
+                                size = BButtonSize.Lg,
+                                modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp),
+                            )
+                        }
+                    }
                     FocusItem(
                         id = closeId,
                         onClick = dismiss,
@@ -224,7 +316,7 @@ fun VehicleInfoGuideDialog(
         RotaryFocusDialog(
             onDismissRequest = dismiss,
             dialogKey = "vehicle-info-${rotarySafeKey(control.key)}-${control.areaId}",
-            initialFocus = RotaryFocusTarget(areaId, closeId),
+            initialFocus = RotaryFocusTarget(areaId, if (guideAvailable) guideActionId else closeId),
             window =
                 RotaryDialogWindow(
                     width = ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -234,6 +326,8 @@ fun VehicleInfoGuideDialog(
         )
     }
 }
+
+private const val VEHICLE_GUIDE_DURATION_MILLIS = 4_000
 
 @Composable
 private fun GuideDialogSection(
@@ -256,15 +350,3 @@ private fun GuideDialogSection(
 }
 
 private fun rotarySafeKey(value: String): String = value.replace(Regex("[^A-Za-z0-9_-]"), "_")
-
-@Composable
-private fun vehicleGuideStatus(control: VehicleControlUiModel): String =
-    when {
-        !control.supported -> stringResource(R.string.vehicle_control_unavailable)
-        control.errorMessage != null -> control.errorMessage
-        !control.available -> stringResource(R.string.vehicle_control_unavailable)
-        control.valueLabel.isNotBlank() -> control.valueLabel
-        control.booleanValue == true -> stringResource(R.string.vehicle_control_on)
-        control.booleanValue == false -> stringResource(R.string.vehicle_control_off)
-        else -> control.summary
-    }

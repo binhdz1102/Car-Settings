@@ -1,9 +1,12 @@
 package com.android.car.settings.feature.hvac.domain
 
+import com.android.car.settings.core.vehicle.VehiclePropertyAreaType
+
 /** A vehicle area discovered from the VHAL instead of assumed from a specific car layout. */
 data class ClimateZone(
     val areaId: Int,
     val title: String,
+    val areaType: VehiclePropertyAreaType = VehiclePropertyAreaType.UNKNOWN,
 )
 
 enum class ClimateControlId {
@@ -53,6 +56,8 @@ data class ClimateCapability(
     val zone: ClimateZone,
     val kind: ClimateControlKind,
     val writable: Boolean,
+    val readable: Boolean = true,
+    val areaType: VehiclePropertyAreaType = zone.areaType,
     val min: Float? = null,
     val max: Float? = null,
     val step: Float? = null,
@@ -70,6 +75,10 @@ data class ClimateControl(
     val booleanValue: Boolean? = null,
     val intValue: Int? = null,
     val floatValue: Float? = null,
+    val observedBooleanValue: Boolean? = null,
+    val observedIntValue: Int? = null,
+    val observedFloatValue: Float? = null,
+    val observedTimestampNanos: Long? = null,
 )
 
 data class ClimateState(

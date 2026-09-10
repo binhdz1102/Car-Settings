@@ -2,6 +2,8 @@ package com.android.car.settings.feature.seatcontrol.presentation
 
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
+import com.android.car.settings.core.ui.VehicleObservedSnapshot
+import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.feature.seatcontrol.domain.SeatControlKind
 import org.junit.Assert.assertEquals
@@ -79,5 +81,12 @@ class SeatControlVisualizationTest {
             pending = false,
             numericValue = numericValue,
             range = range,
+            observedSnapshot =
+                VehicleObservedSnapshot(
+                    numericValue = numericValue,
+                    status =
+                        if (numericValue == null) VehicleObservationStatus.UNKNOWN
+                        else VehicleObservationStatus.CONFIRMED,
+                ),
         )
 }

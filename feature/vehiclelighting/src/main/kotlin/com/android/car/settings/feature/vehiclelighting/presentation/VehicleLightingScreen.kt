@@ -11,6 +11,7 @@ import com.android.car.settings.core.ui.VehicleControlUiMetadata
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleFeatureScreen
 import com.android.car.settings.core.ui.VehicleVisualizationSource
+import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toUiControls
 import com.android.car.settings.core.vehicle.VehicleConnectionState
@@ -79,7 +80,8 @@ fun VehicleLightingRoute(
         showVehicleDiagram = true,
         visualizationSource = VehicleVisualizationSource.LIVE_PROPERTY,
         visualizationLabel = "Observed control setting visualisation — not a lamp diagnostic",
-        visualization = { selected -> VehicleLightingVisualization(controls, selected) },
+        visualization = { selected, policy -> VehicleLightingVisualization(controls, selected, visualPolicy = policy) },
+        visualPolicy = state.uxPolicy.toVehicleVisualPolicy(),
     )
 }
 

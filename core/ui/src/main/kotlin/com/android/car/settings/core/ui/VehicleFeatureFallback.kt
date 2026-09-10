@@ -57,7 +57,9 @@ internal fun VehicleFeatureHostlessFallback(
     showVehicleDiagram: Boolean,
     visualizationSource: VehicleVisualizationSource?,
     visualizationLabel: String?,
-    visualization: (@Composable (VehicleControlUiModel?) -> Unit)?,
+    visualization: (@Composable (VehicleControlUiModel?, VehicleVisualPolicy) -> Unit)?,
+    guideVisualization: (@Composable (VehicleControlUiModel, Float) -> Unit)?,
+    visualPolicy: VehicleVisualPolicy,
 ) {
     val retryLabel = stringResource(R.string.vehicle_control_retry)
     val showAllLabel = stringResource(R.string.vehicle_control_show_all)
@@ -174,6 +176,7 @@ internal fun VehicleFeatureHostlessFallback(
                                 visualizationSource = visualizationSource,
                                 visualizationLabel = visualizationLabel,
                                 visualization = visualization,
+                                visualPolicy = visualPolicy,
                             )
                         }
                     }
@@ -234,6 +237,7 @@ internal fun VehicleFeatureHostlessFallback(
                                         onSetBoolean = onSetBoolean,
                                         onSetInt = onSetInt,
                                         onSetFloat = onSetFloat,
+                                        showInfo = visualPolicy.allowGuide,
                                         showDivider = index != sectionControls.lastIndex,
                                     )
                                 }
@@ -248,6 +252,8 @@ internal fun VehicleFeatureHostlessFallback(
     infoControl?.let { control ->
         VehicleInfoGuideDialog(
             control = control,
+            visualPolicy = visualPolicy,
+            guideVisualization = guideVisualization,
             onDismissRequest = { infoControl = null },
         )
     }
@@ -259,7 +265,8 @@ private fun VehicleFallbackPreviewItem(
     onOpenInfo: (VehicleControlUiModel) -> Unit,
     visualizationSource: VehicleVisualizationSource?,
     visualizationLabel: String?,
-    visualization: (@Composable (VehicleControlUiModel?) -> Unit)?,
+    visualization: (@Composable (VehicleControlUiModel?, VehicleVisualPolicy) -> Unit)?,
+    visualPolicy: VehicleVisualPolicy,
 ) {
     VehiclePreviewPane(
         control = control,
@@ -268,6 +275,7 @@ private fun VehicleFallbackPreviewItem(
         visualizationSource = visualizationSource,
         visualizationLabel = visualizationLabel,
         visualization = visualization,
+        visualPolicy = visualPolicy,
         modifier = Modifier.fillMaxWidth(),
     )
 }

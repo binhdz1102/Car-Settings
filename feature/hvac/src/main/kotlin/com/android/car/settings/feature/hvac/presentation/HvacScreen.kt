@@ -9,9 +9,14 @@ import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleEnumOption
 import com.android.car.settings.core.ui.VehicleFeatureScreen
+import com.android.car.settings.core.ui.VehicleObservationStatus
+import com.android.car.settings.core.ui.VehicleObservedSnapshot
+import com.android.car.settings.core.ui.VehicleVisualBinding
+import com.android.car.settings.core.ui.VehicleVisualMeaning
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualizationSource
+import com.android.car.settings.core.ui.VehicleVisualPolicy
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.feature.hvac.R
 import com.android.car.settings.feature.hvac.domain.ClimateControl
@@ -101,9 +106,15 @@ internal fun HvacScreen(
         state.controls
             .filter { it.capability.id in occupantZoneControls }
             .map { it.capability.zone }
-            .distinctBy { it.areaId }
-            .filterNot { it.areaId == 0 || it.title.contains(" + ") }
-            .map { VehicleZoneOption(areaId = it.areaId, label = it.title) }
+            .distinctBy { it.areaType to it.areaId }
+            .filterNot { it.areaId == 0 }
+            .map {
+                VehicleZoneOption(
+                    areaId = it.areaId,
+                    label = it.title,
+                    areaType = it.areaType,
+                )
+            }
     val zones =
         discoveredZones.ifEmpty {
             listOf(VehicleZoneOption(0, stringResource(R.string.hvac_global_zone)))
@@ -133,7 +144,14 @@ internal fun HvacScreen(
         showVehicleDiagram = discoveredZones.size > 1,
         visualizationSource = VehicleVisualizationSource.LIVE_PROPERTY,
         visualizationLabel = stringResource(R.string.hvac_visualization_label),
-        visualization = { selected -> HvacVisualization(controls, selected) },
+        visualization = { selected, policy -> HvacVisualization(controls, selected, visualPolicy = policy) },
+        guideVisualization = { selected, progress -> HvacGuideVisualization(selected, progress) },
+        visualPolicy =
+            if (state.uxRestricted) {
+                VehicleVisualPolicy(false, false, false, stringResource(R.string.hvac_restricted))
+            } else {
+                VehicleVisualPolicy(true, true, true)
+            },
     )
 }
 
@@ -403,7 +421,8 @@ private fun ClimateControl.toVehicleControl(
         dependencies = dependencies,
         illustrationRes = presentation.illustrationRes,
         editor = kind.toVehicleEditor(),
-        readable = true,
+        readable = capability.readable,
+        areaType = capability.areaType,
         writable = capability.writable,
         supported = true,
         available = statusAllowsValue && hasValue && rangeValid && optionsValid,
@@ -434,8 +453,57 @@ private fun ClimateControl.toVehicleControl(
                 ClimateValueStatus.ERROR -> unavailableReason ?: unavailableLabel
                 else -> null
             },
+        observedSnapshot =
+            when {
+                !capability.readable ->
+                    VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+                status == ClimateValueStatus.ERROR ->
+                    VehicleObservedSnapshot(status = VehicleObservationStatus.ERROR)
+                status == ClimateValueStatus.UNAVAILABLE ->
+                    VehicleObservedSnapshot(status = VehicleObservationStatus.UNAVAILABLE)
+                capability.kind == ClimateControlKind.TOGGLE &&
+                    observedBooleanValue != null ->
+                    VehicleObservedSnapshot(
+                        booleanValue = observedBooleanValue,
+                        status = VehicleObservationStatus.CONFIRMED,
+                        timestampNanos = observedTimestampNanos,
+                    )
+                capability.kind != ClimateControlKind.TOGGLE &&
+                    observedFloatValue != null && observedFloatValue.isFinite() ->
+                    VehicleObservedSnapshot(
+                        numericValue = observedFloatValue,
+                        enumValue = observedIntValue.takeIf { capability.kind == ClimateControlKind.INT_OPTIONS },
+                        status = VehicleObservationStatus.CONFIRMED,
+                        timestampNanos = observedTimestampNanos,
+                    )
+                else -> VehicleObservedSnapshot(status = VehicleObservationStatus.UNKNOWN)
+            },
+        visualBinding = climateVisualBinding(presentation.id),
     )
 }
+
+private fun climateVisualBinding(id: ClimateControlId): VehicleVisualBinding =
+    VehicleVisualBinding(
+        previewSceneId = "climate_cabin_top_view",
+        guideSceneId =
+            when (id) {
+                ClimateControlId.FAN_DIRECTION,
+                ClimateControlId.FAN_SPEED,
+                ClimateControlId.RECIRCULATION,
+                ClimateControlId.AUTO_RECIRCULATION,
+                ClimateControlId.FRONT_DEFROSTER,
+                ClimateControlId.REAR_DEFROSTER,
+                ClimateControlId.MAX_DEFROST,
+                -> "climate_${id.name.lowercase()}"
+                else -> null
+            },
+        meaning =
+            if (id == ClimateControlId.TEMPERATURE_CURRENT) {
+                VehicleVisualMeaning.OBSERVED_STATE
+            } else {
+                VehicleVisualMeaning.CONFIRMED_SETTING
+            },
+    )
 
 internal fun climateSliderUiSpec(id: ClimateControlId): VehicleSliderUiSpec =
     when (id) {

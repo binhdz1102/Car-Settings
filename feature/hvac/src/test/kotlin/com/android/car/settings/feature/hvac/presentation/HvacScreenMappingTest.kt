@@ -1,6 +1,8 @@
 package com.android.car.settings.feature.hvac.presentation
 
 import com.android.car.settings.core.ui.VehicleEditorUiKind
+import com.android.car.settings.core.ui.VehicleObservationStatus
+import com.android.car.settings.core.vehicle.VehiclePropertyAreaType
 import com.android.car.settings.feature.hvac.domain.ClimateCapability
 import com.android.car.settings.feature.hvac.domain.ClimateControl
 import com.android.car.settings.feature.hvac.domain.ClimateControlId
@@ -12,6 +14,59 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class HvacScreenMappingTest {
+    @Test
+    fun pendingTemperatureUsesConfirmedSnapshotAndPreservesAreaMetadata() {
+        val presentation =
+            ClimatePresentation(
+                id = ClimateControlId.TEMPERATURE_SET,
+                title = "Set temperature",
+                categoryKey = "TEMPERATURE",
+                categoryTitle = "Temperature",
+                expectedKind = ClimateControlKind.FLOAT_RANGE,
+                info = "Temperature guide",
+            )
+        val runtimeControl =
+            ClimateControl(
+                key = "TEMPERATURE_SET:1",
+                capability =
+                    ClimateCapability(
+                        id = ClimateControlId.TEMPERATURE_SET,
+                        propertyId = 100,
+                        zone = ClimateZone(1, "Driver"),
+                        kind = ClimateControlKind.FLOAT_RANGE,
+                        writable = true,
+                        readable = true,
+                        areaType = VehiclePropertyAreaType.SEAT,
+                        min = 16f,
+                        max = 30f,
+                    ),
+                title = "Set temperature",
+                section = "Temperature",
+                status = ClimateValueStatus.PENDING,
+                floatValue = 24f,
+                observedFloatValue = 20f,
+                observedTimestampNanos = 9L,
+            )
+
+        val mapped =
+            mapClimateControls(
+                state = ClimateState(connected = true, controls = listOf(runtimeControl)),
+                presentations = listOf(presentation),
+                limitations = "Limits",
+                dependencies = "Dependencies",
+                onLabel = "On",
+                offLabel = "Off",
+                unavailableLabel = "Unavailable",
+            ).single()
+
+        assertThat(mapped.numericValue).isEqualTo(24f)
+        assertThat(mapped.observedSnapshot.numericValue).isEqualTo(20f)
+        assertThat(mapped.observedSnapshot.status).isEqualTo(VehicleObservationStatus.CONFIRMED)
+        assertThat(mapped.observedSnapshot.timestampNanos).isEqualTo(9L)
+        assertThat(mapped.areaType).isEqualTo(VehiclePropertyAreaType.SEAT)
+        assertThat(mapped.readable).isTrue()
+    }
+
     @Test
     fun everyClimateControlHasAUniqueGuide() {
         val resources = ClimateControlId.entries.map(::hvacArtwork)

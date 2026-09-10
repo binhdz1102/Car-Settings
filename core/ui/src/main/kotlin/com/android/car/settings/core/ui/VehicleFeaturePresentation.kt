@@ -208,6 +208,7 @@ internal fun buildVehicleControlFocusLayout(
     connected: Boolean,
     restricted: Boolean,
     hasRetryAction: Boolean,
+    includeInfo: Boolean = true,
 ): VehicleControlFocusLayout {
     val entries =
         controls.map { control ->
@@ -247,9 +248,11 @@ internal fun buildVehicleControlFocusLayout(
             if (hasRetryAction) add(retryFocusId)
             entries.forEach { entry ->
                 if (entry.rotaryActionable) add(entry.focusId)
-                // Information remains available for disabled/read-only controls and is a distinct
-                // actionable stop rather than a nested action in the editor row.
-                add(entry.infoFocusId)
+                if (includeInfo) {
+                    // Information remains available for disabled/read-only controls and is a distinct
+                    // actionable stop rather than a nested action in the editor row.
+                    add(entry.infoFocusId)
+                }
             }
         }
     return VehicleControlFocusLayout(

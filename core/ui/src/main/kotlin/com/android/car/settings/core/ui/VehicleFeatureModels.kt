@@ -35,6 +35,39 @@ enum class VehicleVisualizationSource {
     ILLUSTRATION,
 }
 
+/** Describes what a visual is allowed to claim about the vehicle. */
+enum class VehicleVisualMeaning {
+    OBSERVED_STATE,
+    CONFIRMED_SETTING,
+    CONTEXT_ONLY,
+    INSTRUCTIONAL,
+}
+
+/** Quality of the property value used by the preview; optimistic editor values are excluded. */
+enum class VehicleObservationStatus {
+    CONFIRMED,
+    UNKNOWN,
+    UNAVAILABLE,
+    ERROR,
+}
+
+@Immutable
+data class VehicleObservedSnapshot(
+    val booleanValue: Boolean? = null,
+    val numericValue: Float? = null,
+    val enumValue: Int? = null,
+    val status: VehicleObservationStatus = VehicleObservationStatus.UNKNOWN,
+    val timestampNanos: Long? = null,
+)
+
+@Immutable
+data class VehicleVisualBinding(
+    val previewSceneId: String? = null,
+    val guideSceneId: String? = null,
+    val meaning: VehicleVisualMeaning = VehicleVisualMeaning.CONTEXT_ONLY,
+    val companionKeys: List<String> = emptyList(),
+)
+
 @Immutable
 data class VehicleZoneKey(
     val areaType: VehiclePropertyAreaType,
@@ -90,6 +123,8 @@ data class VehicleControlUiModel(
     val enumOptions: List<VehicleEnumOption> = emptyList(),
     val errorMessage: String? = null,
     val requiresUnrestrictedUx: Boolean = false,
+    val observedSnapshot: VehicleObservedSnapshot = VehicleObservedSnapshot(),
+    val visualBinding: VehicleVisualBinding = VehicleVisualBinding(),
 ) {
     val zoneKey: VehicleZoneKey
         get() = VehicleZoneKey(areaType, categoryKey, areaId)

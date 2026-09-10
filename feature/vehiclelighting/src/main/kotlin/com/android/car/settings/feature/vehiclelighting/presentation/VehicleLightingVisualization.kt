@@ -22,7 +22,9 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
+import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehiclePreviewAnchor
+import com.android.car.settings.core.ui.VehicleVisualPolicy
 import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.vehiclelighting.R
 
@@ -35,6 +37,7 @@ import com.android.car.settings.feature.vehiclelighting.R
 internal fun VehicleLightingVisualization(
     controls: List<VehicleControlUiModel>,
     selectedControl: VehicleControlUiModel?,
+    visualPolicy: VehicleVisualPolicy = VehicleVisualPolicy(true, true, true),
     modifier: Modifier = Modifier,
 ) {
     val selectedKey = selectedControl?.key
@@ -43,7 +46,13 @@ internal fun VehicleLightingVisualization(
         remember(controls, selectedKey, selectedAreaId) {
             controls
                 .firstOrNull { it.key == selectedKey && it.areaId == selectedAreaId }
-                ?.let { it.numericValue to it.booleanValue }
+        ?.let {
+            if (it.observedSnapshot.status == VehicleObservationStatus.CONFIRMED) {
+                it.observedSnapshot.numericValue to it.observedSnapshot.booleanValue
+            } else {
+                null to null
+            }
+        }
         }
     val glow by
         animateFloatAsState(
@@ -52,7 +61,7 @@ internal fun VehicleLightingVisualization(
                     numericValue = selectedControlState?.first,
                     booleanValue = selectedControlState?.second,
                 ),
-            animationSpec = tween(durationMillis = 240),
+            animationSpec = tween(durationMillis = if (visualPolicy.allowPreviewTransition) 240 else 0),
             label = "lighting-observed-glow",
         )
     val activeColor = MaterialTheme.colorScheme.tertiary

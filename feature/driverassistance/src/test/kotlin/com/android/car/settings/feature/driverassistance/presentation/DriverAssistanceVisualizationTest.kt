@@ -15,6 +15,10 @@ class DriverAssistanceVisualizationTest {
             driverAssistanceIllustrationFamily("BLIND_SPOT_WARNING"),
         )
         assertEquals(
+            DriverAssistanceIllustrationFamily.CROSS_TRAFFIC,
+            driverAssistanceIllustrationFamily("CROSS_TRAFFIC_MONITORING"),
+        )
+        assertEquals(
             DriverAssistanceIllustrationFamily.COLLISION,
             driverAssistanceIllustrationFamily("FORWARD_COLLISION_WARNING"),
         )

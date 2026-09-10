@@ -16,6 +16,63 @@ import org.junit.Test
 
 class VehicleFeatureUiMapperTest {
     @Test
+    fun pendingEditorValueDoesNotReplaceConfirmedPreviewValue() {
+        val spec = VehiclePropertySpec.float(0x21406101)
+        val state =
+            VehicleFeatureState(
+                loading = false,
+                controls =
+                    listOf(
+                        VehicleFeatureControlState(
+                            definition = VehicleFeatureDefinition("temperature", spec),
+                            supported = true,
+                            access = VehiclePropertyAccess.READ_WRITE,
+                            changeMode = VehiclePropertyChangeMode.ON_CHANGE,
+                            areaType = VehiclePropertyAreaType.SEAT,
+                            areas =
+                                listOf(
+                                    VehicleFeatureAreaState(
+                                        area = VehiclePropertyArea(1),
+                                        access = VehiclePropertyAccess.READ_WRITE,
+                                        minValue = 16f,
+                                        maxValue = 30f,
+                                        value = 24f,
+                                        confirmedValue = 20f,
+                                        confirmedTimestampNanos = 42L,
+                                        status = VehiclePropertyStatus.AVAILABLE,
+                                        pending = true,
+                                    ),
+                                ),
+                        ),
+                    ),
+            )
+
+        val control =
+            state.toUiControls(
+                metadata =
+                    listOf(
+                        VehicleControlUiMetadata(
+                            key = "temperature",
+                            section = "Climate",
+                            title = "Temperature",
+                            summary = "Set temperature",
+                            info = "Info",
+                            limitations = "",
+                            dependencies = "",
+                            editor = VehicleEditorUiKind.SLIDER,
+                            valueLabel = Any::toString,
+                        ),
+                    ),
+                errorMessage = { it.description },
+            ).single()
+
+        assertEquals(24f, control.numericValue)
+        assertEquals(20f, control.observedSnapshot.numericValue)
+        assertEquals(VehicleObservationStatus.CONFIRMED, control.observedSnapshot.status)
+        assertEquals(42L, control.observedSnapshot.timestampNanos)
+    }
+
+    @Test
     fun writeOnlySlotActionBuildsOptionsWithoutFakeCurrentValue() {
         val spec = VehiclePropertySpec.int(0x15400B80)
         val state =

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -53,7 +54,20 @@ internal class DefaultVehicleUxPolicy
                         ),
                     )
                 } else {
-                    observeGateway(gateway).map(PlatformUxRestrictions::toPolicyState)
+                    observeGateway(gateway)
+                        .map(PlatformUxRestrictions::toPolicyState)
+                        .catch { error ->
+                            emit(
+                                VehicleUxPolicyState.Unavailable(
+                                    VehiclePropertyError.ServiceUnavailable(
+                                        operation = VehiclePropertyOperation.UX_RESTRICTIONS,
+                                        description =
+                                            error.message
+                                                ?: "Car UX restrictions service is unavailable",
+                                    ),
+                                ),
+                            )
+                        }
                 }
             }
 

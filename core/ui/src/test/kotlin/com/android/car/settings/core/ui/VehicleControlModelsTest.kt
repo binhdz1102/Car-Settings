@@ -4,6 +4,7 @@ import androidx.compose.ui.geometry.Size
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemId
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Test
 
@@ -354,6 +355,24 @@ class VehicleControlModelsTest {
         assertEquals(false, layout.entries.single().rotaryActionable)
         assertEquals(listOf(layout.entries.single().infoFocusId), layout.focusOrder)
         assertEquals(layout.entries.single().infoFocusId, layout.firstMeaningfulFocusId)
+    }
+
+    @Test
+    fun focusLayout_canRemoveInfoStopsWhenVisualPolicyDisablesGuide() {
+        val control = minimalControl(key = "AUTO", categoryKey = "Climate", supported = true)
+        val layout =
+            buildVehicleControlFocusLayout(
+                controls = listOf(control),
+                selectedAreaId = 1,
+                controlsAreaId = "controls-climate",
+                connected = true,
+                restricted = false,
+                hasRetryAction = false,
+                includeInfo = false,
+            )
+
+        assertEquals(emptyList<FocusItemId>(), layout.focusOrder)
+        assertNull(layout.firstMeaningfulFocusId)
     }
 
     @Test

@@ -3,11 +3,6 @@ package com.android.car.settings.core.ui
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -428,7 +422,9 @@ internal fun VehicleCategoryScreen(
     showVehicleDiagram: Boolean,
     visualizationSource: VehicleVisualizationSource?,
     visualizationLabel: String?,
-    visualization: (@Composable (VehicleControlUiModel?) -> Unit)?,
+    visualization: (@Composable (VehicleControlUiModel?, VehicleVisualPolicy) -> Unit)?,
+    guideVisualization: (@Composable (VehicleControlUiModel, Float) -> Unit)?,
+    visualPolicy: VehicleVisualPolicy,
 ) {
     val rotaryController = LocalRotaryFocusController.current
     // Register the category Back callback inside the nested rotary destination. This callback is
@@ -506,18 +502,9 @@ internal fun VehicleCategoryScreen(
         onBack = onBack,
         destinationKey = destinationKey,
         modifier = modifier,
-        // The first selected target must be a useful writable control whenever one exists.
-        // The illustrated-guide button is only the fallback for an all-read-only category.
-        // Every visible row exposes an information action, including read-only/unsupported
-        // capabilities. Prefer the controls area whenever it has a meaningful action; only use
-        // the preview guide as a fallback for a genuinely empty category.
-        // The controls pane always owns the first actionable fallback.  A preview with no
-        // selected control intentionally contains only decorative content and therefore must not
-        // become the destination's initial focus area; doing so leaves CCP with a missing target
-        // on empty/unsupported categories.
+        // The preview is decorative. Only zone and control panes register rotary focus areas.
         contentFocusAreaIds =
             buildList {
-                add(previewAreaId)
                 if (selectableZones.size > 1) add(zoneAreaId)
                 add(controlsAreaId)
             },
@@ -554,6 +541,7 @@ internal fun VehicleCategoryScreen(
                         visualizationSource = visualizationSource,
                         visualizationLabel = visualizationLabel,
                         visualization = visualization,
+                        visualPolicy = visualPolicy,
                         modifier = Modifier.weight(0.38f).fillMaxHeight(),
                     )
                     VehicleControlsPane(
@@ -577,19 +565,12 @@ internal fun VehicleCategoryScreen(
                         controlsAreaId = controlsAreaId,
                         zoneSelectorLabel = zoneSelectorLabel,
                         showVehicleDiagram = showVehicleDiagram,
+                        allowInfo = visualPolicy.allowGuide,
                         scrollInternally = true,
-                        // The native app-bar FocusArea reports a 184px bottom edge on API 37,
-                        // while the scrollable content can be translated upward when CCP brings
-                        // the first control into view. Offset the entire controls pane (not just
-                        // its children) by a full 48dp so the zone FocusArea keeps a visible
-                        // clearance from the header in both the settled and bring-into-view
-                        // layouts. This prevents the native validator from registering a
-                        // transient header/zone overlap after typography or row-height changes.
                         modifier =
                             Modifier
                                 .weight(0.62f)
-                                .fillMaxHeight()
-                                .offset(y = 48.dp),
+                                .fillMaxHeight(),
                     )
                 }
             } else {
@@ -610,6 +591,7 @@ internal fun VehicleCategoryScreen(
                         visualizationSource = visualizationSource,
                         visualizationLabel = visualizationLabel,
                         visualization = visualization,
+                        visualPolicy = visualPolicy,
                         modifier = Modifier.fillMaxWidth(),
                     )
                     VehicleControlsPane(
@@ -633,6 +615,7 @@ internal fun VehicleCategoryScreen(
                         controlsAreaId = controlsAreaId,
                         zoneSelectorLabel = zoneSelectorLabel,
                         showVehicleDiagram = showVehicleDiagram,
+                        allowInfo = visualPolicy.allowGuide,
                         scrollInternally = false,
                         modifier = Modifier.fillMaxWidth(),
                     )
@@ -649,122 +632,97 @@ internal fun VehiclePreviewPane(
     onOpenInfo: (VehicleControlUiModel) -> Unit,
     visualizationSource: VehicleVisualizationSource?,
     visualizationLabel: String?,
-    visualization: (@Composable (VehicleControlUiModel?) -> Unit)?,
+    visualization: (@Composable (VehicleControlUiModel?, VehicleVisualPolicy) -> Unit)?,
+    visualPolicy: VehicleVisualPolicy,
     modifier: Modifier = Modifier,
 ) {
-    val focusAreaId = FocusAreaId(areaId)
-    val focusPolicy = vehicleDetailFocusAreaPolicy(focusAreaId)
-    FocusArea(
-        id = focusAreaId,
-        firstFocusAt = if (control != null) FocusItemId("$areaId-guide") else null,
-        wrapAround = focusPolicy.wrapAround,
-        previousFocusArea = focusPolicy.previousFocusArea,
-        nextFocusArea = focusPolicy.nextFocusArea,
-        modifier = modifier,
-    ) {
-        if (control == null) {
-            BCard(
-                modifier = Modifier.fillMaxWidth(),
-                style = BCardStyle.Filled,
-                size = BCardSize.Lg,
-                content = {
-                    Text(stringResource(R.string.vehicle_control_category_empty))
-                },
-            )
-        } else {
-            // The illustration and its explanatory text are deliberately static. The separate
-            // labelled button below is the only focusable information action in this pane.
-            BCard(
-                modifier = Modifier.fillMaxWidth(),
-                style = BCardStyle.Elevated,
-                size = BCardSize.Lg,
-                content = {
-                    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                        if (visualization != null) {
-                            visualization(control)
+    if (control == null) {
+        BCard(
+            modifier = modifier.fillMaxWidth(),
+            style = BCardStyle.Filled,
+            size = BCardSize.Lg,
+            content = { Text(stringResource(R.string.vehicle_control_category_empty)) },
+        )
+        return
+    }
+    BCard(
+        modifier = modifier.fillMaxWidth(),
+        style = BCardStyle.Elevated,
+        size = BCardSize.Lg,
+        content = {
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                if (visualization != null) {
+                    visualization(control, visualPolicy)
+                } else {
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.large,
+                        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    ) {
+                        if (control.illustrationRes != null) {
+                            VehicleIllustrationImage(
+                                illustrationRes = control.illustrationRes,
+                                contentDescription = control.title,
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
                         } else {
-                            AnimatedContent(
-                                targetState = control.key to control.illustrationRes,
-                                transitionSpec = {
-                                    fadeIn(tween(VehicleMotionTokens.CONTENT_ENTER_DURATION_MILLIS)) togetherWith
-                                        fadeOut(tween(VehicleMotionTokens.CONTENT_EXIT_DURATION_MILLIS))
-                                },
-                                label = "vehicle-control-preview",
-                            ) { (_, illustrationRes) ->
-                                Surface(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = MaterialTheme.shapes.large,
-                                    color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                ) {
-                                    if (illustrationRes != null) {
-                                        VehicleIllustrationImage(
-                                            illustrationRes = illustrationRes,
-                                            contentDescription = control.info,
-                                            contentScale = ContentScale.Fit,
-                                            modifier = Modifier.fillMaxWidth(),
-                                        )
-                                    } else {
-                                        Box(
-                                            modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp),
-                                            contentAlignment = Alignment.Center,
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.DirectionsCar,
-                                                contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.size(104.dp),
-                                            )
-                                        }
-                                    }
-                                }
+                            Box(
+                                modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.DirectionsCar,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(104.dp),
+                                )
                             }
                         }
-                        if (visualizationSource != null && visualizationLabel != null) {
-                            Text(
-                                text = visualizationLabel,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier =
-                                    Modifier.semantics {
-                                        stateDescription = visualizationSource.name
-                                    },
-                            )
-                        }
-                        Text(
-                            text = control.title,
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                        Text(
-                            text = control.summary,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                        Text(
-                            text = vehicleControlStatusLabel(control),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
                     }
-                },
-            )
-            FocusItem(
-                id = FocusItemId("$areaId-guide"),
-                onClick = { onOpenInfo(control) },
-                touchBehavior = FocusItemTouchBehavior.ComposeContent,
-                semantics =
-                    FocusItemSemantics(
-                        label = control.title,
-                        stateDescription = stringResource(R.string.vehicle_control_illustrated_guide),
-                        role = FocusItemRole.Button,
-                    ),
-            ) { _ ->
-                AutomotiveTextButton(
-                    label = stringResource(R.string.vehicle_control_illustrated_guide),
-                    onClick = { onOpenInfo(control) },
-                    modifier = Modifier.padding(top = 4.dp),
+                }
+                if (visualizationSource != null && visualizationLabel != null) {
+                    Text(
+                        text = visualizationLabel,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.semantics { stateDescription = visualizationSource.name },
+                    )
+                }
+                Text(
+                    text = control.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = control.summary,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    text = vehicleObservedStatusLabel(control),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
-        }
-    }
+        },
+    )
 }
+
+@Composable
+internal fun vehicleObservedStatusLabel(control: VehicleControlUiModel): String =
+    when {
+        !control.supported -> stringResource(R.string.vehicle_control_unavailable)
+        control.observedSnapshot.status != VehicleObservationStatus.CONFIRMED ->
+            stringResource(R.string.vehicle_control_unavailable)
+        control.observedSnapshot.booleanValue == true -> stringResource(R.string.vehicle_control_on)
+        control.observedSnapshot.booleanValue == false -> stringResource(R.string.vehicle_control_off)
+        control.observedSnapshot.enumValue != null ->
+            control.enumOptions
+                .firstOrNull { it.key == control.observedSnapshot.enumValue.toString() }
+                ?.label
+                ?: control.observedSnapshot.enumValue.toString()
+        control.observedSnapshot.numericValue != null ->
+            "%.1f".format(control.observedSnapshot.numericValue)
+        else -> stringResource(R.string.vehicle_control_unavailable)
+    }

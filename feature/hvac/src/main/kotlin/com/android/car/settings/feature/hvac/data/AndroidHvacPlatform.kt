@@ -132,9 +132,16 @@ private fun toClimateState(state: VehicleFeatureState): ClimateState {
                         ClimateCapability(
                             id = spec.id,
                             propertyId = spec.propertyId,
-                            zone = ClimateZone(area.area.areaId, zoneTitle(spec, area.area.areaId)),
+                            zone =
+                                ClimateZone(
+                                    area.area.areaId,
+                                    zoneTitle(spec, area.area.areaId),
+                                    property.areaType,
+                                ),
                             kind = spec.kind,
                             writable = area.access.canWrite,
+                            readable = area.access.canRead,
+                            areaType = property.areaType,
                             min = (area.minValue as? Number)?.toFloat(),
                             max = (area.maxValue as? Number)?.toFloat(),
                             step =
@@ -176,6 +183,11 @@ private fun toClimateState(state: VehicleFeatureState): ClimateState {
                         booleanValue = area.value as? Boolean,
                         intValue = (area.value as? Number)?.toInt(),
                         floatValue = (area.value as? Number)?.toFloat(),
+                        observedBooleanValue = area.confirmedValue as? Boolean,
+                        observedIntValue = (area.confirmedValue as? Number)?.toInt(),
+                        observedFloatValue = (area.confirmedValue as? Number)?.toFloat(),
+                        observedTimestampNanos =
+                            area.confirmedTimestampNanos.takeIf { it != Long.MIN_VALUE },
                     )
                 }
             }

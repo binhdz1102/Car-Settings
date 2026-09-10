@@ -25,7 +25,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
+import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehiclePreviewAnchor
+import com.android.car.settings.core.ui.VehicleVisualPolicy
 import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.seatcontrol.R
 
@@ -37,6 +39,7 @@ import com.android.car.settings.feature.seatcontrol.R
 internal fun SeatControlVisualization(
     controls: List<VehicleControlUiModel>,
     selectedControl: VehicleControlUiModel?,
+    visualPolicy: VehicleVisualPolicy = VehicleVisualPolicy(true, true, true),
     modifier: Modifier = Modifier,
 ) {
     val areaId = selectedControl?.areaId ?: controls.firstOrNull()?.areaId ?: 0
@@ -44,14 +47,14 @@ internal fun SeatControlVisualization(
         remember(controls, areaId) {
             seatVisualMotion(controls.filter { it.areaId == areaId || it.areaId == 0 })
         }
-    val foreAft by animateFloatAsState(motion.foreAft, seatMotionSpec(), label = "seat-fore-aft")
-    val height by animateFloatAsState(motion.height, seatMotionSpec(), label = "seat-height")
-    val depth by animateFloatAsState(motion.depth, seatMotionSpec(), label = "seat-depth")
-    val tilt by animateFloatAsState(motion.tilt, seatMotionSpec(), label = "seat-tilt")
-    val backrest by animateFloatAsState(motion.backrest, seatMotionSpec(), label = "seat-backrest")
-    val headrestHeight by animateFloatAsState(motion.headrestHeight, seatMotionSpec(), label = "seat-headrest-height")
-    val headrestAngle by animateFloatAsState(motion.headrestAngle, seatMotionSpec(), label = "seat-headrest-angle")
-    val lumbar by animateFloatAsState(motion.lumbar, seatMotionSpec(), label = "seat-lumbar")
+    val foreAft by animateFloatAsState(motion.foreAft, seatMotionSpec(visualPolicy), label = "seat-fore-aft")
+    val height by animateFloatAsState(motion.height, seatMotionSpec(visualPolicy), label = "seat-height")
+    val depth by animateFloatAsState(motion.depth, seatMotionSpec(visualPolicy), label = "seat-depth")
+    val tilt by animateFloatAsState(motion.tilt, seatMotionSpec(visualPolicy), label = "seat-tilt")
+    val backrest by animateFloatAsState(motion.backrest, seatMotionSpec(visualPolicy), label = "seat-backrest")
+    val headrestHeight by animateFloatAsState(motion.headrestHeight, seatMotionSpec(visualPolicy), label = "seat-headrest-height")
+    val headrestAngle by animateFloatAsState(motion.headrestAngle, seatMotionSpec(visualPolicy), label = "seat-headrest-angle")
+    val lumbar by animateFloatAsState(motion.lumbar, seatMotionSpec(visualPolicy), label = "seat-lumbar")
     val selectedKey = selectedControl?.key.orEmpty()
     val accent = MaterialTheme.colorScheme.primary
     val visualizationDescription = stringResource(R.string.seat_visualization_content_description)
@@ -122,7 +125,8 @@ internal fun SeatControlVisualization(
     }
 }
 
-private fun seatMotionSpec() = tween<Float>(durationMillis = 420, easing = FastOutSlowInEasing)
+private fun seatMotionSpec(policy: VehicleVisualPolicy) =
+    tween<Float>(durationMillis = if (policy.allowPreviewTransition) 420 else 0, easing = FastOutSlowInEasing)
 
 internal data class SeatVisualMotion(
     val foreAft: Float = .5f,
@@ -146,7 +150,12 @@ internal fun seatVisualMotion(controls: List<VehicleControlUiModel>): SeatVisual
 
     fun level(key: String): Float {
         val control = byKey[key] ?: return .5f
-        return normalizedSeatPosition(control.numericValue, control.range)
+        return normalizedSeatPosition(
+            control.observedSnapshot.numericValue.takeIf {
+                control.observedSnapshot.status == VehicleObservationStatus.CONFIRMED
+            },
+            control.range,
+        )
     }
     return SeatVisualMotion(
         foreAft = level("FORE_AFT"),

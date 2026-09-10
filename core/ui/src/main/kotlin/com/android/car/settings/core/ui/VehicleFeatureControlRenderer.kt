@@ -73,6 +73,7 @@ internal fun VehicleControlsPane(
     controlsAreaId: String,
     zoneSelectorLabel: String,
     showVehicleDiagram: Boolean,
+    allowInfo: Boolean = true,
     scrollInternally: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -112,7 +113,7 @@ internal fun VehicleControlsPane(
             )
         } else {
             val focusLayout =
-                remember(controls, selectedAreaId, controlsAreaId, connected, restricted, errorMessage) {
+                remember(controls, selectedAreaId, controlsAreaId, connected, restricted, errorMessage, allowInfo) {
                     buildVehicleControlFocusLayout(
                         controls = controls,
                         selectedAreaId = selectedAreaId,
@@ -120,6 +121,7 @@ internal fun VehicleControlsPane(
                         connected = connected,
                         restricted = restricted,
                         hasRetryAction = errorMessage != null,
+                        includeInfo = allowInfo,
                     )
                 }
             val controlsFocusAreaId = FocusAreaId(controlsAreaId)
@@ -159,6 +161,7 @@ internal fun VehicleControlsPane(
                                 onSetBoolean = onSetBoolean,
                                 onSetInt = onSetInt,
                                 onSetFloat = onSetFloat,
+                                showInfo = allowInfo,
                                 showDivider = index != controls.lastIndex,
                             )
                         } else {
@@ -187,15 +190,17 @@ internal fun VehicleControlsPane(
                                         onSetBoolean = onSetBoolean,
                                         onSetInt = onSetInt,
                                         onSetFloat = onSetFloat,
-                                        showInfo = false,
+                                        showInfo = allowInfo,
                                         showDivider = false,
                                     )
                                 }
-                                VehicleInfoFocusItem(
-                                    focusId = entry.infoFocusId,
-                                    title = control.title,
-                                    onClick = { onOpenInfo(control) },
-                                )
+                                if (allowInfo) {
+                                    VehicleInfoFocusItem(
+                                        focusId = entry.infoFocusId,
+                                        title = control.title,
+                                        onClick = { onOpenInfo(control) },
+                                    )
+                                }
                             }
                             if (index != controls.lastIndex) {
                                 HorizontalDivider(
@@ -308,6 +313,7 @@ internal fun VehicleRotaryControlRow(
     onSetBoolean: (String, Int, Boolean) -> Unit,
     onSetInt: (String, Int, Int) -> Unit,
     onSetFloat: ((String, Int, Float) -> Unit)?,
+    showInfo: Boolean = true,
     showDivider: Boolean,
 ) {
     val disconnectedReason = stringResource(R.string.vehicle_control_service_unavailable)
@@ -461,11 +467,13 @@ internal fun VehicleRotaryControlRow(
                 )
             }
         }
-        VehicleInfoFocusItem(
-            focusId = infoFocusId,
-            title = control.title,
-            onClick = onOpenInfo,
-        )
+        if (showInfo) {
+            VehicleInfoFocusItem(
+                focusId = infoFocusId,
+                title = control.title,
+                onClick = onOpenInfo,
+            )
+        }
     }
     if (showDivider) {
         HorizontalDivider(

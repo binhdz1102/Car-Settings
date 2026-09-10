@@ -2,6 +2,8 @@ package com.android.car.settings.feature.doorcontrol.presentation
 
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
+import com.android.car.settings.core.ui.VehicleObservedSnapshot
+import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.feature.doorcontrol.domain.DoorControlKind
 import org.junit.Assert.assertEquals
@@ -69,5 +71,16 @@ class DoorControlVisualizationTest {
             numericValue = numeric,
             booleanValue = boolean,
             range = range,
+            observedSnapshot =
+                VehicleObservedSnapshot(
+                    booleanValue = boolean,
+                    numericValue = numeric,
+                    status =
+                        if (boolean != null || numeric != null) {
+                            VehicleObservationStatus.CONFIRMED
+                        } else {
+                            VehicleObservationStatus.UNKNOWN
+                        },
+                ),
         )
 }
