@@ -171,6 +171,23 @@ fun VehicleFeatureScreen(
     }
     val rotaryController = LocalRotaryFocusController.current
     val isInTouchMode = LocalIsInTouchMode.current
+    // Park before removing the category tree.  Waiting for RotaryDestination's onDispose is too
+    // late: FocusItemView unregisters first, so the controller no longer knows which destination
+    // owns the current target and the host parking view restores the shell Search item.
+    val leaveCategoryToOverview: () -> Unit = {
+        prepareVehicleDetailNavigation(
+            isInTouchMode = isInTouchMode,
+            parkFocus = { rotaryController?.parkFocus() == true },
+            navigate = {
+                Log.i(
+                    "MySystemVehicle",
+                    "vehicle-category-back title=$title category=$selectedCategoryKey",
+                )
+                Log.d("MySystemVehicle", "vehicle-back category-to-overview")
+                selectedCategoryKey = null
+            },
+        )
+    }
     // Keep this handler enabled for the short hand-off window after a rotary dialog closes or
     // while a control is in direct-manipulation mode.
     // Some AAOS builds dispatch the same hardware Back event again after removing the dialog
@@ -194,8 +211,7 @@ fun VehicleFeatureScreen(
             Log.d("MySystemVehicle", "vehicle-back consumed after info popup dismiss")
             suppressParentBackAfterInfoDismiss = false
         } else {
-            Log.d("MySystemVehicle", "vehicle-back category-to-overview")
-            selectedCategoryKey = null
+            leaveCategoryToOverview()
         }
     }
 
@@ -255,13 +271,7 @@ fun VehicleFeatureScreen(
                         zones = activeZones,
                         selectedAreaId = effectiveSelectedAreaId,
                         onAreaSelected = { selectedAreaId = it },
-                        onBack = {
-                            Log.i(
-                                "MySystemVehicle",
-                                "vehicle-category-back title=$title category=$selectedCategoryKey",
-                            )
-                            selectedCategoryKey = null
-                        },
+                        onBack = leaveCategoryToOverview,
                         onRefresh = onRefresh,
                         onOpenInfo = { control ->
                             selectedInfoKey = control.key
