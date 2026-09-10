@@ -1,5 +1,7 @@
 package com.android.car.settings.core.ui
 
+import android.util.Log
+
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable
@@ -227,8 +229,20 @@ fun SettingsScaffold(
             focusEntryState?.cancelPendingFocus()
             return@LaunchedEffect
         }
+        Log.d(
+            "MySystemFocus",
+            "detail-state route=$routeKey request=${pendingFocusEntry?.requestId} " +
+                "target=$contentFallback first=$firstFocusableContentItemId " +
+                "materialized=$requestedTargetMaterialized allowed=$contentFocusAllowed",
+        )
         val request = pendingFocusEntry ?: return@LaunchedEffect
         val target = contentFallback ?: return@LaunchedEffect
+        Log.d(
+            "MySystemFocus",
+            "detail-enter route=$routeKey request=${request.requestId} " +
+                "target=$target first=$firstFocusableContentItemId " +
+                "materialized=$requestedTargetMaterialized allowed=$contentFocusAllowed",
+        )
         if (focusController == null || request.destinationKey != routeKey) {
             return@LaunchedEffect
         }
@@ -241,7 +255,12 @@ fun SettingsScaffold(
         val targetWasClaimed = focusEntryState.dispatchFocusIfCurrent(request.requestId, target)
         val targetWasAlreadyClaimed = focusEntryState.dispatchedTarget == target
         if (targetWasClaimed || (requestedTargetMaterialized && targetWasAlreadyClaimed)) {
-            focusController.requestFocus(target)
+            val accepted = focusController.requestFocus(target)
+            Log.d(
+                "MySystemFocus",
+                "detail-request route=$routeKey request=${request.requestId} " +
+                    "target=$target claimed=$targetWasClaimed accepted=$accepted",
+            )
         }
     }
     RotaryDestination(
@@ -301,6 +320,10 @@ fun SettingsScaffold(
                             }
                         },
                         LocalSettingsContentFocusObserver provides { itemId ->
+                            Log.d(
+                                "MySystemFocus",
+                                "detail-item-focused route=$routeKey item=$itemId",
+                            )
                             focusEntryState?.onContentItemFocused(routeKey, itemId)
                         },
                         LocalSettingsFocusItemAvailabilityObserver provides onFocusItemAvailability,

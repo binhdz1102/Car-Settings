@@ -47,6 +47,7 @@ import com.android.car.settings.core.ui.MySystemTheme
 import com.android.car.settings.core.ui.SettingsAppShell
 import com.android.car.settings.core.ui.SettingsCardDialog
 import com.android.car.settings.core.ui.SettingsCategoryUiModel
+import com.android.car.settings.core.ui.SettingsFocusEntryState
 import com.android.car.settings.core.ui.VehicleDialogBackGuard
 import com.android.car.settings.core.ui.rememberSettingsFocusEntryState
 import com.android.car.settings.core.ui.setSafeRotaryContent
@@ -189,7 +190,18 @@ class MainActivity : ComponentActivity() {
                     // change. Re-navigating the same root with popUpTo briefly unregisters its
                     // FocusAreas; the one-shot request can then be consumed before the new tree
                     // is attached and B-Material falls back to the parked Search item.
-                    if (shouldNavigateToDestination(navController.currentDestination?.route, route)) {
+                    val navigationWillChange =
+                        shouldNavigateToDestination(navController.currentDestination?.route, route)
+                    val preparedVehicleFocus =
+                        navigationWillChange &&
+                            prepareVehicleDestinationFocus(
+                                destinationId = destinationId,
+                                route = route,
+                                isInTouchMode = isInTouchMode,
+                                focusEntryState = focusEntryState,
+                                parkFocus = rotaryFocusController::parkFocus,
+                            )
+                    if (navigationWillChange) {
                         navController.navigate(route) {
                             if (replaceSearch) popUpTo(searchRoute) { inclusive = true }
                             if (replaceStack) {
@@ -202,6 +214,7 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     if (
+                        !preparedVehicleFocus &&
                         shouldRequestDefaultFocus(
                             isInTouchMode = isInTouchMode,
                             navigationAccepted = true,
@@ -487,6 +500,38 @@ internal fun shouldNavigateToDestination(
     currentRoute: String?,
     destinationRoute: String,
 ): Boolean = currentRoute != destinationRoute
+
+internal fun isVehicleDestination(destinationId: SettingsDestinationId): Boolean =
+    when (destinationId) {
+        SettingsDestinationId.HVAC,
+        SettingsDestinationId.DRIVER_ASSISTANCE,
+        SettingsDestinationId.SEAT_CONTROL,
+        SettingsDestinationId.VEHICLE_LIGHTING,
+        SettingsDestinationId.DOOR_CONTROL,
+        -> true
+        else -> false
+    }
+
+/** Arms and parks only Vehicle route handoffs before the loading destination replaces its source. */
+internal fun prepareVehicleDestinationFocus(
+    destinationId: SettingsDestinationId,
+    route: String,
+    isInTouchMode: Boolean,
+    focusEntryState: SettingsFocusEntryState,
+    parkFocus: () -> Boolean,
+): Boolean {
+    if (!isVehicleDestination(destinationId) || isInTouchMode) return false
+    val request = focusEntryState.requestDefaultFocus(route)
+    val parked = parkFocus()
+    Timber.d(
+        "VehicleFocus prepare destination=%s route=%s request=%d parked=%s",
+        destinationId,
+        route,
+        request.requestId,
+        parked,
+    )
+    return true
+}
 
 @Composable
 private fun categoryLabel(id: SettingsCategoryId): String =
