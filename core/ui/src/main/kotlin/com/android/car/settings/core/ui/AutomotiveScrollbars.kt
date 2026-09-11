@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.b231001.bmaterial.uicomponents.scrollbar.BScrollbarStyle
 import com.b231001.bmaterial.uicomponents.scrollbar.bLazyScrollbar
@@ -24,19 +25,30 @@ val AutomotiveScrollbarStyle =
         cornerRadius = 6.dp,
     )
 
+val AutomotiveDialogScrollbarStyle =
+    BScrollbarStyle(
+        thickness = 12.dp,
+        padding = 4.dp,
+        minThumbLength = 64.dp,
+        cornerRadius = 6.dp,
+    )
+
 /** Reserved AAOS touch target; rendering and pointer behavior stay owned by B-Material. */
 val AutomotiveScrollbarGutterWidth = 48.dp
+val AutomotiveDialogScrollbarGutterWidth = 20.dp
 
 fun Modifier.automotiveScrollbar(
     scrollState: ScrollState,
     orientation: Orientation = Orientation.Vertical,
+    style: BScrollbarStyle = AutomotiveScrollbarStyle,
+    gutterWidth: Dp = AutomotiveScrollbarGutterWidth,
 ): Modifier =
     bScrollbar(
         scrollState = scrollState,
         orientation = orientation,
-        style = AutomotiveScrollbarStyle,
+        style = style,
         autoHideEnabled = false,
-        gutterWidth = AutomotiveScrollbarGutterWidth,
+        gutterWidth = gutterWidth,
     )
 
 fun Modifier.automotiveLazyScrollbar(

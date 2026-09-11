@@ -1,13 +1,13 @@
 package com.android.car.settings.feature.driverassistance.presentation
 
+import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.core.vehicle.VehicleFeatureControlState
 import com.android.car.settings.core.vehicle.VehicleFeatureDefinition
 import com.android.car.settings.core.vehicle.VehicleFeatureState
 import com.android.car.settings.core.vehicle.VehiclePropertySpec
 import com.android.car.settings.core.vehicle.VehiclePropertyValueType
-import com.android.car.settings.core.ui.VehicleSliderUiKind
-import com.android.car.settings.feature.driverassistance.domain.DriverAssistanceId
 import com.android.car.settings.feature.driverassistance.domain.DRIVER_ASSISTANCE_DEFINITIONS
+import com.android.car.settings.feature.driverassistance.domain.DriverAssistanceId
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 

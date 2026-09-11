@@ -22,9 +22,10 @@ class VehicleVisualPolicyTest {
         val restricted =
             VehicleUxPolicyState.Restricted(activeRestrictions = 1).toVehicleVisualPolicy()
         val unavailable =
-            VehicleUxPolicyState.Unavailable(
-                VehiclePropertyError.ServiceUnavailable(VehiclePropertyOperation.UX_RESTRICTIONS),
-            ).toVehicleVisualPolicy()
+            VehicleUxPolicyState
+                .Unavailable(
+                    VehiclePropertyError.ServiceUnavailable(VehiclePropertyOperation.UX_RESTRICTIONS),
+                ).toVehicleVisualPolicy()
 
         assertFalse(restricted.allowGuide)
         assertFalse(restricted.allowGuidePlayback)

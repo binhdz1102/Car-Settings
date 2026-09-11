@@ -122,20 +122,19 @@ internal fun securityRootFocusSpec(
     canManageScreenLock: Boolean,
     isGuestUser: Boolean,
     isWorking: Boolean,
-) =
-    settingsLazyFocusListSpec(
-        listOf(
-            SettingsLazyFocusListSlot(
-                focusId = "security-screen-lock",
-                isEnabled = canManageScreenLock && !isGuestUser,
-            ),
-            SettingsLazyFocusListSlot(
-                focusId = "security-clear-credentials",
-                isEnabled = canManageScreenLock && !isGuestUser && !isWorking,
-            ),
-            SettingsLazyFocusListSlot(focusId = "security-device-admin"),
+) = settingsLazyFocusListSpec(
+    listOf(
+        SettingsLazyFocusListSlot(
+            focusId = "security-screen-lock",
+            isEnabled = canManageScreenLock && !isGuestUser,
         ),
-    )
+        SettingsLazyFocusListSlot(
+            focusId = "security-clear-credentials",
+            isEnabled = canManageScreenLock && !isGuestUser && !isWorking,
+        ),
+        SettingsLazyFocusListSlot(focusId = "security-device-admin"),
+    ),
+)
 
 @Composable
 fun LockTypesRoute(

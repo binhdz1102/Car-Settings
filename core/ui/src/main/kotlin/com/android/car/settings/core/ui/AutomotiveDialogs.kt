@@ -1,5 +1,6 @@
 ﻿package com.android.car.settings.core.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.DialogProperties
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaLayout

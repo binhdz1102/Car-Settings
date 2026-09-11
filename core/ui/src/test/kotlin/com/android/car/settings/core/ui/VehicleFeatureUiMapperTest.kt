@@ -48,23 +48,24 @@ class VehicleFeatureUiMapperTest {
             )
 
         val control =
-            state.toUiControls(
-                metadata =
-                    listOf(
-                        VehicleControlUiMetadata(
-                            key = "temperature",
-                            section = "Climate",
-                            title = "Temperature",
-                            summary = "Set temperature",
-                            info = "Info",
-                            limitations = "",
-                            dependencies = "",
-                            editor = VehicleEditorUiKind.SLIDER,
-                            valueLabel = Any::toString,
+            state
+                .toUiControls(
+                    metadata =
+                        listOf(
+                            VehicleControlUiMetadata(
+                                key = "temperature",
+                                section = "Climate",
+                                title = "Temperature",
+                                summary = "Set temperature",
+                                info = "Info",
+                                limitations = "",
+                                dependencies = "",
+                                editor = VehicleEditorUiKind.SLIDER,
+                                valueLabel = Any::toString,
+                            ),
                         ),
-                    ),
-                errorMessage = { it.description },
-            ).single()
+                    errorMessage = { it.description },
+                ).single()
 
         assertEquals(24f, control.numericValue)
         assertEquals(20f, control.observedSnapshot.numericValue)

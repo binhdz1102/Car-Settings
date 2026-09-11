@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -30,6 +29,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -48,8 +48,8 @@ import com.android.car.settings.feature.wifi.domain.WifiNetwork
 import com.android.car.settings.feature.wifi.domain.WifiRadioState
 import com.android.car.settings.feature.wifi.domain.WifiSecurity
 import com.android.car.settings.core.ui.AutomotiveButton as Button
-import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 import com.android.car.settings.core.ui.AutomotiveLazyColumn as LazyColumn
+import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 
 @Composable
 fun WifiRoute(

@@ -341,11 +341,12 @@ internal class AndroidDisplayPlatform
         private fun readThemeMode(): ThemeMode {
             // 1. Automotive Global forced mode if supported by the image
             if (hasGlobalThemeModeSetting()) {
-                val forcedValue = Settings.Global.getInt(
-                    resolver,
-                    FORCED_DAY_NIGHT_MODE,
-                    themePreferences.getInt(KEY_THEME_MODE, THEME_AUTO),
-                )
+                val forcedValue =
+                    Settings.Global.getInt(
+                        resolver,
+                        FORCED_DAY_NIGHT_MODE,
+                        themePreferences.getInt(KEY_THEME_MODE, THEME_AUTO),
+                    )
                 return when (forcedValue) {
                     THEME_DAY -> ThemeMode.DAY
                     THEME_NIGHT -> ThemeMode.NIGHT

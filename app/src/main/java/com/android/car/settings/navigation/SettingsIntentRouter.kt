@@ -2,13 +2,12 @@ package com.android.car.settings.navigation
 
 import android.content.Intent
 import android.media.RingtoneManager
-import android.net.Uri
 import android.provider.Settings
+import com.android.car.settings.feature.accessibility.presentation.ACCESSIBILITY_ROUTE
 import com.android.car.settings.feature.applications.presentation.ALL_APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.APPLICATIONS_ROUTE
 import com.android.car.settings.feature.applications.presentation.applicationDetailsRoute
 import com.android.car.settings.feature.assistantvoice.presentation.ASSISTANT_VOICE_ROUTE
-import com.android.car.settings.feature.accessibility.presentation.ACCESSIBILITY_ROUTE
 import com.android.car.settings.feature.bluetooth.presentation.BLUETOOTH_ROUTE
 import com.android.car.settings.feature.display.presentation.DATE_TIME_ROUTE
 import com.android.car.settings.feature.display.presentation.DISPLAY_ROUTE
@@ -16,14 +15,12 @@ import com.android.car.settings.feature.display.presentation.TIME_ZONE_ROUTE
 import com.android.car.settings.feature.hvac.presentation.HVAC_ROUTE
 import com.android.car.settings.feature.location.presentation.LOCATION_ROUTE
 import com.android.car.settings.feature.notifications.presentation.NOTIFICATIONS_ROUTE
-import com.android.car.settings.feature.privacy.presentation.PRIVACY_LOCATION_ROUTE
 import com.android.car.settings.feature.privacy.presentation.PRIVACY_ROUTE
-import com.android.car.settings.feature.profileaccounts.presentation.PROFILE_ACCOUNTS_ROUTE
 import com.android.car.settings.feature.profileaccounts.presentation.PROFILES_ROUTE
+import com.android.car.settings.feature.profileaccounts.presentation.PROFILE_ACCOUNTS_ROUTE
 import com.android.car.settings.feature.search.presentation.SEARCH_ROUTE
 import com.android.car.settings.feature.security.presentation.SECURITY_DEVICE_ADMINS_ROUTE
 import com.android.car.settings.feature.security.presentation.SECURITY_ROUTE
-import com.android.car.settings.feature.security.presentation.SECURITY_LOCK_TYPES_ROUTE
 import com.android.car.settings.feature.sound.domain.RingtoneKind
 import com.android.car.settings.feature.sound.presentation.SOUND_ROUTE
 import com.android.car.settings.feature.sound.presentation.ringtoneRoute
@@ -50,12 +47,14 @@ object SettingsIntentRouter {
             action = intent?.action,
             componentClassName = intent?.component?.className,
             dataPackage = packageFromData,
-            packageExtra = intent?.getStringExtra(Intent.EXTRA_PACKAGE_NAME)
-                ?: intent?.getStringExtra(EXTRA_APP_PACKAGE),
-            ringtoneType = intent?.getIntExtra(
-                RingtoneManager.EXTRA_RINGTONE_TYPE,
-                RingtoneManager.TYPE_RINGTONE,
-            ) ?: RingtoneManager.TYPE_RINGTONE,
+            packageExtra =
+                intent?.getStringExtra(Intent.EXTRA_PACKAGE_NAME)
+                    ?: intent?.getStringExtra(EXTRA_APP_PACKAGE),
+            ringtoneType =
+                intent?.getIntExtra(
+                    RingtoneManager.EXTRA_RINGTONE_TYPE,
+                    RingtoneManager.TYPE_RINGTONE,
+                ) ?: RingtoneManager.TYPE_RINGTONE,
         )
     }
 
@@ -155,8 +154,10 @@ object SettingsIntentRouter {
             else -> RingtoneKind.PHONE
         }
 
-    private fun packageName(dataPackage: String?, packageExtra: String?): String? =
-        dataPackage ?: packageExtra
+    private fun packageName(
+        dataPackage: String?,
+        packageExtra: String?,
+    ): String? = dataPackage ?: packageExtra
 
     private fun componentDestination(
         componentClassName: String?,
@@ -171,7 +172,8 @@ object SettingsIntentRouter {
             "SoundSettingsActivity" -> SOUND_ROUTE
             "RingtonePickerActivity" -> ringtoneRoute(ringtoneKind(ringtoneType))
             "NetworkAndInternetActivity", "WifiSettingsActivity", "WifiControlActivity",
-            "AddWifiActivity" -> WIFI_ROUTE
+            "AddWifiActivity",
+            -> WIFI_ROUTE
             "WifiTetherActivity" -> WIFI_HOTSPOT_ROUTE
             "WifiPreferencesActivity" -> WIFI_PREFERENCES_ROUTE
             "BluetoothSettingsActivity" -> BLUETOOTH_ROUTE
@@ -191,14 +193,16 @@ object SettingsIntentRouter {
             "AssistantAndVoiceSettingsActivity" -> ASSISTANT_VOICE_ROUTE
             "LanguagesAndInputActivity",
             "LanguagePickerActivity", "DefaultAutofillPickerActivity", "KeyboardActivity",
-            "TextToSpeechOutputActivity" -> LANGUAGE_INPUT_ROUTE
+            "TextToSpeechOutputActivity",
+            -> LANGUAGE_INPUT_ROUTE
             "AboutSettingsActivity" -> SYSTEM_ABOUT_ROUTE
             "LegalInformationActivity" -> LEGAL_ROUTE
             "ResetOptionsActivity" -> RESET_OPTIONS_ROUTE
             "SystemSettingsActivity" -> SYSTEM_ROUTE
             "MobileNetworkActivity", "MobileNetworkListActivity" -> MOBILE_NETWORK_ROUTE
             "SpecialAccessSettingsActivity", "ModifySystemSettingsActivity",
-            "PremiumSmsAccessActivity", "UsageAccessActivity", "AlarmsAndRemindersActivity" ->
+            "PremiumSmsAccessActivity", "UsageAccessActivity", "AlarmsAndRemindersActivity",
+            ->
                 com.android.car.settings.feature.applications.presentation.SPECIAL_APP_ACCESS_ROUTE
             "ChooseAccountActivity" -> PROFILE_ACCOUNTS_ROUTE
             else -> null
@@ -248,18 +252,20 @@ private const val URI_SCHEME_PACKAGE = "package"
 private const val ACTION_MANAGE_USER_ASPECT_RATIO_SETTINGS =
     "android.settings.MANAGE_USER_ASPECT_RATIO_SETTINGS"
 
-private val APPLICATION_DETAIL_ACTIONS = setOf(
-    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-    Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS,
-    Settings.ACTION_APP_NOTIFICATION_SETTINGS,
-    Intent.ACTION_AUTO_REVOKE_PERMISSIONS,
-    ACTION_MANAGE_USER_ASPECT_RATIO_SETTINGS,
-)
+private val APPLICATION_DETAIL_ACTIONS =
+    setOf(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS,
+        Settings.ACTION_APP_NOTIFICATION_SETTINGS,
+        Intent.ACTION_AUTO_REVOKE_PERMISSIONS,
+        ACTION_MANAGE_USER_ASPECT_RATIO_SETTINGS,
+    )
 
-    // Some automotive images redefine these two constants with an ".action." infix
-    // (android.settings.action.MANAGE_*); accept both spellings so standard AOSP
-    // callers and this image's framework agree.
-    private val SPECIAL_APP_ACCESS_ACTIONS = setOf(
+// Some automotive images redefine these two constants with an ".action." infix
+// (android.settings.action.MANAGE_*); accept both spellings so standard AOSP
+// callers and this image's framework agree.
+private val SPECIAL_APP_ACCESS_ACTIONS =
+    setOf(
         Settings.ACTION_USAGE_ACCESS_SETTINGS,
         "android.settings.MANAGE_OVERLAY_PERMISSION",
         "android.settings.action.MANAGE_OVERLAY_PERMISSION",

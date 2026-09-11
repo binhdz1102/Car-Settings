@@ -1,8 +1,8 @@
 package com.android.car.settings.core.vehicle
 
 import com.android.car.settings.core.vehicle.internal.PlatformUxRestrictions
-import com.android.car.settings.core.vehicle.internal.PlatformVehicleUxGateway
 import com.android.car.settings.core.vehicle.internal.PlatformUxSubscription
+import com.android.car.settings.core.vehicle.internal.PlatformVehicleUxGateway
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -89,9 +89,7 @@ class VehicleUxPolicyTest {
 }
 
 private class ThrowingUxGateway : PlatformVehicleUxGateway {
-    override fun current(): PlatformUxRestrictions =
-        error("UX restriction service failed")
+    override fun current(): PlatformUxRestrictions = error("UX restriction service failed")
 
-    override fun subscribe(callback: (PlatformUxRestrictions) -> Unit): PlatformUxSubscription =
-        error("UX restriction service failed")
+    override fun subscribe(callback: (PlatformUxRestrictions) -> Unit): PlatformUxSubscription = error("UX restriction service failed")
 }

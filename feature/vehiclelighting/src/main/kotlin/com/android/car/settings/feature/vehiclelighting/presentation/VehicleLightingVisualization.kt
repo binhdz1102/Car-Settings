@@ -46,13 +46,13 @@ internal fun VehicleLightingVisualization(
         remember(controls, selectedKey, selectedAreaId) {
             controls
                 .firstOrNull { it.key == selectedKey && it.areaId == selectedAreaId }
-        ?.let {
-            if (it.observedSnapshot.status == VehicleObservationStatus.CONFIRMED) {
-                it.observedSnapshot.numericValue to it.observedSnapshot.booleanValue
-            } else {
-                null to null
-            }
-        }
+                ?.let {
+                    if (it.observedSnapshot.status == VehicleObservationStatus.CONFIRMED) {
+                        it.observedSnapshot.numericValue to it.observedSnapshot.booleanValue
+                    } else {
+                        null to null
+                    }
+                }
         }
     val glow by
         animateFloatAsState(

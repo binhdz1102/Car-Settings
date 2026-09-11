@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Size
@@ -45,6 +46,7 @@ internal fun RotaryFocusContent(
 ) {
     val presentation = rotaryFocusPresentation(state.isFocused)
     Box(
+        contentAlignment = Alignment.Center,
         modifier =
             Modifier.rotaryFocusBorder(
                 isFocused = presentation == RotaryFocusPresentation.BorderOnly,

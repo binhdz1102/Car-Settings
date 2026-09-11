@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
+import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaLayout
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemLayout
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemRole
@@ -118,6 +120,7 @@ fun VehicleInfoGuideDialog(
         // onDismiss callback can leak the same hardware event to the parent activity on AAOS API
         // 37, which would close the vehicle destination after dismissing the popup.
         BackHandler(enabled = true, onBack = dismiss)
+
         @Composable
         fun StaticArtwork() {
             if (control.illustrationRes != null) {
@@ -155,16 +158,21 @@ fun VehicleInfoGuideDialog(
                     Modifier
                         .fillMaxWidth()
                         .heightIn(max = 720.dp)
-                        .padding(24.dp),
+                        .padding(vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 Column(
                     modifier =
                         Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 620.dp)
-                            .automotiveScrollbar(infoScrollState)
-                            .verticalScroll(infoScrollState),
+                            .weight(1f, fill = false)
+                            .automotiveScrollbar(
+                                scrollState = infoScrollState,
+                                style = AutomotiveDialogScrollbarStyle,
+                                gutterWidth = AutomotiveDialogScrollbarGutterWidth,
+                            )
+                            .verticalScroll(infoScrollState)
+                            .padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     Text(
@@ -181,8 +189,10 @@ fun VehicleInfoGuideDialog(
                         content = {
                             if (
                                 guideAvailable &&
-                                    (playback.phase == VehicleGuidePhase.PLAYING ||
-                                        playback.phase == VehicleGuidePhase.COMPLETE)
+                                (
+                                    playback.phase == VehicleGuidePhase.PLAYING ||
+                                        playback.phase == VehicleGuidePhase.COMPLETE
+                                )
                             ) {
                                 requireNotNull(guideVisualization)(control, playbackProgress.value)
                             } else {
@@ -217,13 +227,19 @@ fun VehicleInfoGuideDialog(
 
                 FocusArea(
                     id = areaId,
+                    layout =
+                        FocusAreaLayout(
+                            itemSpacing = SettingsTokens.DialogActionGap,
+                            fillMainAxis = false,
+                        ),
                     firstFocusAt = if (guideAvailable) guideActionId else closeId,
-                    focusOrder = buildList {
-                        if (guideAvailable) add(guideActionId)
-                        add(closeId)
-                    },
+                    focusOrder =
+                        buildList {
+                            if (guideAvailable) add(guideActionId)
+                            add(closeId)
+                        },
                     contentPadding = PaddingValues(vertical = SettingsTokens.FocusRingClearance),
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
                 ) {
                     if (guideAvailable) {
                         FocusItem(
@@ -240,7 +256,7 @@ fun VehicleInfoGuideDialog(
                                 playback = reduceVehicleGuidePlayback(playback, intent, visualPolicy)
                             },
                             touchBehavior = FocusItemTouchBehavior.ComposeContent,
-                            layout = FocusItemLayout(minHeight = 60.dp),
+                            layout = FocusItemLayout(minHeight = SettingsTokens.DialogActionMinHeight),
                             semantics =
                                 FocusItemSemantics(
                                     label =
@@ -275,7 +291,7 @@ fun VehicleInfoGuideDialog(
                                     playback = reduceVehicleGuidePlayback(playback, intent, visualPolicy)
                                 },
                                 size = BButtonSize.Lg,
-                                modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp),
+                                modifier = Modifier.fillMaxWidth().height(SettingsTokens.DialogActionMinHeight),
                             )
                         }
                     }
@@ -285,7 +301,7 @@ fun VehicleInfoGuideDialog(
                         touchBehavior = FocusItemTouchBehavior.ComposeContent,
                         layout =
                             FocusItemLayout(
-                                minHeight = 60.dp,
+                                minHeight = SettingsTokens.DialogActionMinHeight,
                             ),
                         semantics =
                             FocusItemSemantics(
@@ -297,7 +313,7 @@ fun VehicleInfoGuideDialog(
                             label = stringResource(R.string.vehicle_control_info_close),
                             onClick = dismiss,
                             size = BButtonSize.Lg,
-                            modifier = Modifier.fillMaxWidth().heightIn(min = 60.dp),
+                            modifier = Modifier.fillMaxWidth().height(SettingsTokens.DialogActionMinHeight),
                         )
                     }
                 }

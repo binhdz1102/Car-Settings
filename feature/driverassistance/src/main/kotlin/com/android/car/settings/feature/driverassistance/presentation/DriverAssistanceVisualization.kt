@@ -20,8 +20,8 @@ import androidx.compose.ui.semantics.semantics
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.core.ui.VehicleVisualPolicy
-import com.android.car.settings.feature.driverassistance.domain.DriverAssistanceId
 import com.android.car.settings.feature.driverassistance.R
+import com.android.car.settings.feature.driverassistance.domain.DriverAssistanceId
 
 /**
  * Instructional motion for ADAS guidance only. This VHAL catalog exposes configuration/enabled

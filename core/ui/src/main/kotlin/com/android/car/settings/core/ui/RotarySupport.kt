@@ -1,11 +1,16 @@
 package com.android.car.settings.core.ui
 
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.view.ViewParent
+import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
@@ -26,6 +31,7 @@ import androidx.compose.ui.text.AnnotatedString
 import com.b231001.bmaterial.ccp.rotaryfocus.DirectManipulationConfig
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaLayout
+import com.b231001.bmaterial.ccp.rotaryfocus.FocusAreaOrientation
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemBringIntoViewBehavior
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemId
 import com.b231001.bmaterial.ccp.rotaryfocus.FocusItemLayout
@@ -144,10 +150,20 @@ fun FocusArea(
     content: @Composable () -> Unit,
 ) {
     if (LocalRotaryFallback.current || LocalRotaryFocusController.current == null) {
-        androidx.compose.foundation.layout.Box(
-            modifier = modifier,
-        ) {
-            content()
+        if (layout.orientation == FocusAreaOrientation.Horizontal) {
+            Row(
+                modifier = modifier,
+                horizontalArrangement = Arrangement.spacedBy(layout.itemSpacing),
+            ) {
+                content()
+            }
+        } else {
+            Column(
+                modifier = modifier,
+                verticalArrangement = Arrangement.spacedBy(layout.itemSpacing),
+            ) {
+                content()
+            }
         }
     } else {
         BMaterialFocusArea(
@@ -239,6 +255,12 @@ fun FocusItem(
                 val composeView = LocalView.current
                 val focusItemView = composeView.findRotaryFocusItemView()
                 focusItemView?.defaultFocusHighlightEnabled = false
+                (composeView.layoutParams as? FrameLayout.LayoutParams)?.let { lp ->
+                    if (lp.gravity != Gravity.CENTER) {
+                        lp.gravity = Gravity.CENTER
+                        composeView.layoutParams = lp
+                    }
+                }
                 // This renderer composition is installed by FocusItemView after the native view
                 // has attached. Report materialization separately from isFocusable: the enclosing
                 // root FocusArea may be temporarily disabled while waiting for this exact target.

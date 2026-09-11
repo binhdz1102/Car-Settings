@@ -9,8 +9,10 @@ import timber.log.Timber
  * Direct-boot aware broadcast receiver for storage unmount events.
  */
 class StorageUnmountReceiver : BroadcastReceiver() {
-
-    override fun onReceive(context: Context, intent: Intent?) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent?,
+    ) {
         Timber.d("StorageUnmountReceiver.onReceive intent=%s", intent)
     }
 }

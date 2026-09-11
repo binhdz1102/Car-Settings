@@ -5,8 +5,8 @@ import com.android.car.settings.feature.applications.presentation.SPECIAL_APP_AC
 import com.android.car.settings.feature.applications.presentation.applicationDetailsRoute
 import com.android.car.settings.feature.display.presentation.DISPLAY_ROUTE
 import com.android.car.settings.feature.notifications.presentation.NOTIFICATIONS_ROUTE
-import com.android.car.settings.feature.sound.presentation.ringtoneRoute
 import com.android.car.settings.feature.sound.domain.RingtoneKind
+import com.android.car.settings.feature.sound.presentation.ringtoneRoute
 import com.android.car.settings.feature.wifi.presentation.WIFI_ROUTE
 import org.junit.Assert.assertEquals
 import org.junit.Test

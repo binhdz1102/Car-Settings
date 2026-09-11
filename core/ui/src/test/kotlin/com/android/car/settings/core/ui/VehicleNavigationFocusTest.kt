@@ -26,7 +26,10 @@ class VehicleNavigationFocusTest {
 
         prepareVehicleDetailNavigation(
             isInTouchMode = true,
-            parkFocus = { events += "park"; true },
+            parkFocus = {
+                events += "park"
+                true
+            },
             navigate = { events += "navigate" },
         )
 

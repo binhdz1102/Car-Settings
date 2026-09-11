@@ -35,8 +35,8 @@ import com.android.car.settings.core.ui.SettingsActionRow
 import com.android.car.settings.core.ui.SettingsAppBarAction
 import com.android.car.settings.core.ui.SettingsFormButton
 import com.android.car.settings.core.ui.SettingsFormSlider
-import com.android.car.settings.core.ui.SettingsLeadingIcon
 import com.android.car.settings.core.ui.SettingsLazyFocusListSlot
+import com.android.car.settings.core.ui.SettingsLeadingIcon
 import com.android.car.settings.core.ui.SettingsScaffold
 import com.android.car.settings.core.ui.SettingsSection
 import com.android.car.settings.core.ui.SettingsSwitchRow
@@ -198,25 +198,24 @@ internal fun soundRootFocusSpec(
     isRingerModeSupported: Boolean,
     isWorking: Boolean,
     ringtoneFocusIds: List<String>,
-) =
-    settingsLazyFocusListSpec(
-        buildList {
+) = settingsLazyFocusListSpec(
+    buildList {
+        add(SettingsLazyFocusListSlot())
+        volumeFocusIds.forEach { add(SettingsLazyFocusListSlot(it)) }
+        if (isRingerModeSupported) {
             add(SettingsLazyFocusListSlot())
-            volumeFocusIds.forEach { add(SettingsLazyFocusListSlot(it)) }
-            if (isRingerModeSupported) {
-                add(SettingsLazyFocusListSlot())
-                add(SettingsLazyFocusListSlot())
-                RingerMode.entries.forEach { mode ->
-                    add(SettingsLazyFocusListSlot("ringer-mode-${mode.name}"))
-                }
-                add(SettingsLazyFocusListSlot("sound-vibrate-calls", isEnabled = !isWorking))
+            add(SettingsLazyFocusListSlot())
+            RingerMode.entries.forEach { mode ->
+                add(SettingsLazyFocusListSlot("ringer-mode-${mode.name}"))
             }
-            add(SettingsLazyFocusListSlot())
-            add(SettingsLazyFocusListSlot("sound-do-not-disturb"))
-            add(SettingsLazyFocusListSlot())
-            ringtoneFocusIds.forEach { add(SettingsLazyFocusListSlot(it)) }
-        },
-    )
+            add(SettingsLazyFocusListSlot("sound-vibrate-calls", isEnabled = !isWorking))
+        }
+        add(SettingsLazyFocusListSlot())
+        add(SettingsLazyFocusListSlot("sound-do-not-disturb"))
+        add(SettingsLazyFocusListSlot())
+        ringtoneFocusIds.forEach { add(SettingsLazyFocusListSlot(it)) }
+    },
+)
 
 private fun soundVolumeFocusId(volumeId: Int): String = "sound-volume-$volumeId"
 

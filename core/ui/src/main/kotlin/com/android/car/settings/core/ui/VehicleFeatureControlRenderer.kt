@@ -166,7 +166,7 @@ internal fun VehicleControlsPane(
                             )
                         } else {
                             Row(
-                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 Box(
@@ -190,7 +190,7 @@ internal fun VehicleControlsPane(
                                         onSetBoolean = onSetBoolean,
                                         onSetInt = onSetInt,
                                         onSetFloat = onSetFloat,
-                                        showInfo = allowInfo,
+                                        showInfo = false,
                                         showDivider = false,
                                     )
                                 }
@@ -199,6 +199,7 @@ internal fun VehicleControlsPane(
                                         focusId = entry.infoFocusId,
                                         title = control.title,
                                         onClick = { onOpenInfo(control) },
+                                        modifier = Modifier.align(Alignment.CenterVertically),
                                     )
                                 }
                             }
@@ -472,6 +473,7 @@ internal fun VehicleRotaryControlRow(
                 focusId = infoFocusId,
                 title = control.title,
                 onClick = onOpenInfo,
+                modifier = Modifier.align(Alignment.CenterVertically),
             )
         }
     }
@@ -495,7 +497,7 @@ internal fun VehicleFeatureControlRow(
     onSetBoolean: (String, Int, Boolean) -> Unit,
     onSetInt: (String, Int, Int) -> Unit,
     onSetFloat: ((String, Int, Float) -> Unit)?,
-    showInfo: Boolean = true,
+    showInfo: Boolean = false,
     showDivider: Boolean,
 ) {
     var sliderValue by

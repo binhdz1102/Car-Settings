@@ -11,12 +11,12 @@ import com.android.car.settings.core.ui.VehicleEnumOption
 import com.android.car.settings.core.ui.VehicleFeatureScreen
 import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehicleObservedSnapshot
-import com.android.car.settings.core.ui.VehicleVisualBinding
-import com.android.car.settings.core.ui.VehicleVisualMeaning
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.core.ui.VehicleSliderUiSpec
-import com.android.car.settings.core.ui.VehicleVisualizationSource
+import com.android.car.settings.core.ui.VehicleVisualBinding
+import com.android.car.settings.core.ui.VehicleVisualMeaning
 import com.android.car.settings.core.ui.VehicleVisualPolicy
+import com.android.car.settings.core.ui.VehicleVisualizationSource
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.feature.hvac.R
 import com.android.car.settings.feature.hvac.domain.ClimateControl
@@ -469,7 +469,8 @@ private fun ClimateControl.toVehicleControl(
                         timestampNanos = observedTimestampNanos,
                     )
                 capability.kind != ClimateControlKind.TOGGLE &&
-                    observedFloatValue != null && observedFloatValue.isFinite() ->
+                    observedFloatValue != null &&
+                    observedFloatValue.isFinite() ->
                     VehicleObservedSnapshot(
                         numericValue = observedFloatValue,
                         enumValue = observedIntValue.takeIf { capability.kind == ClimateControlKind.INT_OPTIONS },

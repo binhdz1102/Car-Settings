@@ -107,8 +107,13 @@ internal fun HvacVisualization(
                             startAngle = 205f,
                             sweepAngle = 130f,
                             useCenter = false,
-                            topLeft = center - androidx.compose.ui.geometry.Offset(size.width * .15f, size.height * .12f),
-                            size = androidx.compose.ui.geometry.Size(size.width * .30f, size.height * .24f),
+                            topLeft =
+                                center -
+                                    androidx.compose.ui.geometry
+                                        .Offset(size.width * .15f, size.height * .12f),
+                            size =
+                                androidx.compose.ui.geometry
+                                    .Size(size.width * .30f, size.height * .24f),
                             style = stroke,
                         )
                     }
@@ -125,17 +130,20 @@ internal fun HvacVisualization(
                         drawCircle(accent.copy(alpha = intensity * .20f), size.minDimension * .22f, cabin)
                         drawCircle(accent.copy(alpha = intensity), size.minDimension * .028f, cabin)
                     }
-                    else -> vents.forEach { anchor ->
-                        val center = anchor.offsetIn(size)
-                        drawCircle(accent.copy(alpha = intensity), size.minDimension * .035f, center, style = stroke)
-                        drawLine(
-                            accent.copy(alpha = intensity * .85f),
-                            center,
-                            center + androidx.compose.ui.geometry.Offset(size.width * (.05f + intensity * .035f), 0f),
-                            stroke.width,
-                            cap = StrokeCap.Round,
-                        )
-                    }
+                    else ->
+                        vents.forEach { anchor ->
+                            val center = anchor.offsetIn(size)
+                            drawCircle(accent.copy(alpha = intensity), size.minDimension * .035f, center, style = stroke)
+                            drawLine(
+                                accent.copy(alpha = intensity * .85f),
+                                center,
+                                center +
+                                    androidx.compose.ui.geometry
+                                        .Offset(size.width * (.05f + intensity * .035f), 0f),
+                                stroke.width,
+                                cap = StrokeCap.Round,
+                            )
+                        }
                 }
             }
         }
@@ -176,7 +184,9 @@ internal fun HvacGuideVisualization(
                             sweepAngle = 300f * t,
                             useCenter = false,
                             topLeft = VehiclePreviewAnchor(.38f, .28f).offsetIn(size),
-                            size = androidx.compose.ui.geometry.Size(size.width * .25f, size.height * .30f),
+                            size =
+                                androidx.compose.ui.geometry
+                                    .Size(size.width * .25f, size.height * .30f),
                             style = stroke,
                         )
                     }
@@ -184,7 +194,15 @@ internal fun HvacGuideVisualization(
                         val start = VehiclePreviewAnchor(.40f, .50f).offsetIn(size)
                         val end = VehiclePreviewAnchor(.40f, .18f).offsetIn(size)
                         drawLine(accent.copy(alpha = t), start, start + (end - start) * t, stroke.width)
-                        drawLine(accent.copy(alpha = t), start + androidx.compose.ui.geometry.Offset(size.width * .08f, 0f), end + androidx.compose.ui.geometry.Offset(size.width * .08f, 0f) * t, stroke.width)
+                        drawLine(
+                            accent.copy(alpha = t),
+                            start +
+                                androidx.compose.ui.geometry
+                                    .Offset(size.width * .08f, 0f),
+                            end + androidx.compose.ui.geometry
+                                .Offset(size.width * .08f, 0f) * t,
+                            stroke.width,
+                        )
                     }
                     else -> {
                         val start = VehiclePreviewAnchor(.28f, .55f).offsetIn(size)

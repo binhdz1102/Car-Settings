@@ -22,7 +22,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.unit.dp
 import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.core.ui.VehicleObservationStatus

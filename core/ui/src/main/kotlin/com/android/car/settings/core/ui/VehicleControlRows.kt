@@ -257,7 +257,7 @@ fun VehicleSliderRow(
                     icon = endpointIcons.first,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                Box(modifier = Modifier.weight(1f).height(56.dp)) {
+                Box(modifier = Modifier.weight(1f)) {
                     val markerFraction = vehicleSliderCenterFraction(uiSpec.centerMarker, valueRange)
                     if (markerFraction != null) {
                         Canvas(modifier = Modifier.fillMaxSize()) {
@@ -276,7 +276,7 @@ fun VehicleSliderRow(
                         steps = steps.coerceAtLeast(0),
                         limitMin = valueRange.start,
                         limitMax = valueRange.endInclusive,
-                        showTickMarks = vehicleSliderShowsTicks(uiSpec, steps),
+                        showTickMarks = false,
                         showValueLabel = uiSpec.showValueLabel,
                         style = sliderStyle,
                         size = BSliderSize.Lg,

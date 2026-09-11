@@ -2,9 +2,9 @@ package com.android.car.settings
 
 import com.android.car.settings.core.settings.SettingsDestinationId
 import com.android.car.settings.core.ui.SettingsFocusEntryState
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class NavigationFocusPolicyTest {
@@ -60,6 +60,7 @@ class NavigationFocusPolicyTest {
         )
         assertEquals(null, focusState.pendingRequest)
     }
+
     @Test
     fun categoryRootDestinations_areTheOnlyDestinationsThatNeedExplicitShellHandoff() {
         assertTrue(isCategoryRootDestination(SettingsDestinationId.VEHICLE))

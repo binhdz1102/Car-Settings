@@ -14,7 +14,6 @@ import timber.log.Timber
  * `com.android.car.settings.qc` during startup to resolve fast settings tiles.
  */
 class SettingsQCProvider : ContentProvider() {
-
     override fun onCreate(): Boolean {
         Timber.i("SettingsQCProvider initialized (directBootAware=true)")
         return true
@@ -33,7 +32,10 @@ class SettingsQCProvider : ContentProvider() {
 
     override fun getType(uri: Uri): String = "vnd.android.cursor.item/vnd.com.android.car.settings.qc"
 
-    override fun insert(uri: Uri, values: ContentValues?): Uri? = null
+    override fun insert(
+        uri: Uri,
+        values: ContentValues?,
+    ): Uri? = null
 
     override fun delete(
         uri: Uri,

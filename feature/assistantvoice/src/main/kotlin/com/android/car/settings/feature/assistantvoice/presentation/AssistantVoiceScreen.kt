@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.RecordVoiceOver
 import androidx.compose.material3.Icon
@@ -33,8 +32,8 @@ import com.android.car.settings.core.ui.SettingsScaffold
 import com.android.car.settings.core.ui.SettingsSection
 import com.android.car.settings.core.ui.SettingsSwitchRow
 import com.android.car.settings.feature.assistantvoice.domain.VoiceInputOption
-import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 import com.android.car.settings.core.ui.AutomotiveLazyColumn as LazyColumn
+import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 
 @Composable
 fun AssistantVoiceRoute(

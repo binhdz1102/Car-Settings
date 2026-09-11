@@ -104,14 +104,15 @@ private fun VehicleFeatureAreaState.observedSnapshot(): VehicleObservedSnapshot 
     if (error != null || status == VehiclePropertyStatus.ERROR) {
         return VehicleObservedSnapshot(status = VehicleObservationStatus.ERROR)
     }
-    val observed = confirmedValue ?: return VehicleObservedSnapshot(
-        status =
-            if (status == VehiclePropertyStatus.UNAVAILABLE) {
-                VehicleObservationStatus.UNAVAILABLE
-            } else {
-                VehicleObservationStatus.UNKNOWN
-            },
-    )
+    val observed =
+        confirmedValue ?: return VehicleObservedSnapshot(
+            status =
+                if (status == VehiclePropertyStatus.UNAVAILABLE) {
+                    VehicleObservationStatus.UNAVAILABLE
+                } else {
+                    VehicleObservationStatus.UNKNOWN
+                },
+        )
     return when (observed) {
         is Boolean ->
             VehicleObservedSnapshot(

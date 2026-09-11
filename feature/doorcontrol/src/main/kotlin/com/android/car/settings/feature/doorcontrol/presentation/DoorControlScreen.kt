@@ -13,9 +13,9 @@ import com.android.car.settings.core.ui.VehicleFeatureScreen
 import com.android.car.settings.core.ui.VehicleSliderUiKind
 import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualizationSource
-import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toUiControls
+import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.vehicle.VehicleConnectionState
 import com.android.car.settings.core.vehicle.VehiclePropertyAreaType
 import com.android.car.settings.core.vehicle.VehicleUxPolicyState

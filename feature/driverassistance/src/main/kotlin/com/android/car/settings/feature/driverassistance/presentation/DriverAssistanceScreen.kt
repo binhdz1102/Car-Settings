@@ -11,13 +11,13 @@ import com.android.car.settings.core.ui.VehicleControlUiModel
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleEnumOption
 import com.android.car.settings.core.ui.VehicleFeatureScreen
-import com.android.car.settings.core.ui.VehicleSliderUiKind
-import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehicleObservedSnapshot
-import com.android.car.settings.core.ui.VehicleVisualizationSource
+import com.android.car.settings.core.ui.VehicleSliderUiKind
+import com.android.car.settings.core.ui.VehicleSliderUiSpec
 import com.android.car.settings.core.ui.VehicleVisualBinding
 import com.android.car.settings.core.ui.VehicleVisualMeaning
+import com.android.car.settings.core.ui.VehicleVisualizationSource
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.vehicle.VehicleConnectionState

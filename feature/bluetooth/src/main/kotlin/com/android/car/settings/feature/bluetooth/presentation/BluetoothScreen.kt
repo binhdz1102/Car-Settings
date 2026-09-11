@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bluetooth
 import androidx.compose.material.icons.filled.BluetoothSearching
@@ -20,6 +19,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -36,9 +36,8 @@ import com.android.car.settings.feature.bluetooth.domain.BluetoothConnectionStat
 import com.android.car.settings.feature.bluetooth.domain.BluetoothDeviceModel
 import com.android.car.settings.feature.bluetooth.domain.BluetoothRadioState
 import com.android.car.settings.core.ui.AutomotiveButton as Button
-import com.android.car.settings.core.ui.AutomotiveOutlinedButton as OutlinedButton
-import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 import com.android.car.settings.core.ui.AutomotiveLazyColumn as LazyColumn
+import com.android.car.settings.core.ui.AutomotiveOutlinedButton as OutlinedButton
 
 @Composable
 fun BluetoothRoute(

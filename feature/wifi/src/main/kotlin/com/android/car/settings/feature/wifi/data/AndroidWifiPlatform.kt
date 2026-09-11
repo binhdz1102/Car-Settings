@@ -55,11 +55,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import timber.log.Timber
 import java.net.Inet4Address
 import java.util.concurrent.Executor
 import javax.inject.Inject
 import javax.inject.Singleton
-import timber.log.Timber
 
 @Singleton
 internal class AndroidWifiPlatform

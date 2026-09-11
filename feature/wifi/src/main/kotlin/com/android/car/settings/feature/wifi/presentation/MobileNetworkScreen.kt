@@ -20,8 +20,8 @@ import com.android.car.settings.core.ui.SettingsScaffold
 import com.android.car.settings.core.ui.SettingsSection
 import com.android.car.settings.core.ui.SettingsSwitchRow
 import com.android.car.settings.core.ui.AutomotiveButton as Button
-import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 import com.android.car.settings.core.ui.AutomotiveLazyColumn as LazyColumn
+import com.android.car.settings.core.ui.AutomotiveTextButton as TextButton
 
 private sealed interface MobileConfirmation {
     data object DisableData : MobileConfirmation

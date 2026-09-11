@@ -1,7 +1,6 @@
 package com.android.car.settings.core.ui
 
 import android.util.Log
-
 import androidx.activity.compose.BackHandler
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.clickable

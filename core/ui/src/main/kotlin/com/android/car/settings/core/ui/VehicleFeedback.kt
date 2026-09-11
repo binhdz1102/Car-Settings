@@ -7,8 +7,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -270,15 +272,20 @@ fun VehicleInfoFocusItem(
                 role = FocusItemRole.Button,
             ),
     ) { _ ->
-        IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp),
+        Box(
+            modifier = Modifier.defaultMinSize(minWidth = 64.dp, minHeight = 72.dp),
+            contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Info,
-                contentDescription = infoLabel,
-            )
+            IconButton(
+                onClick = onClick,
+                enabled = enabled,
+                modifier = Modifier.sizeIn(minWidth = 48.dp, minHeight = 48.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    contentDescription = infoLabel,
+                )
+            }
         }
     }
 }

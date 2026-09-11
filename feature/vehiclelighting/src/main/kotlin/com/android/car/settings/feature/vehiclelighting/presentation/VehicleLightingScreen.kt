@@ -11,9 +11,9 @@ import com.android.car.settings.core.ui.VehicleControlUiMetadata
 import com.android.car.settings.core.ui.VehicleEditorUiKind
 import com.android.car.settings.core.ui.VehicleFeatureScreen
 import com.android.car.settings.core.ui.VehicleVisualizationSource
-import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.ui.VehicleZoneOption
 import com.android.car.settings.core.ui.toUiControls
+import com.android.car.settings.core.ui.toVehicleVisualPolicy
 import com.android.car.settings.core.vehicle.VehicleConnectionState
 import com.android.car.settings.core.vehicle.VehicleUxPolicyState
 import com.android.car.settings.feature.vehiclelighting.R

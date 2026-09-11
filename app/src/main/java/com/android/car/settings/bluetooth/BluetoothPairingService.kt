@@ -10,7 +10,6 @@ import timber.log.Timber
  * Direct-boot aware service stub for background Bluetooth pairing orchestration.
  */
 class BluetoothPairingService : Service() {
-
     private val binder = Binder()
 
     override fun onBind(intent: Intent?): IBinder {

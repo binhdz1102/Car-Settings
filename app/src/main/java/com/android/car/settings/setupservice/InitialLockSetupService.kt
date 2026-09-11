@@ -10,7 +10,6 @@ import timber.log.Timber
  * Direct-boot aware service stub for lockscreen setup during initial setup wizard / CarService.
  */
 class InitialLockSetupService : Service() {
-
     private val binder = Binder()
 
     override fun onBind(intent: Intent?): IBinder {

@@ -2,7 +2,6 @@ package com.android.car.settings.feature.wifi.presentation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NetworkCell
 import androidx.compose.material.icons.filled.Wifi
@@ -10,6 +9,7 @@ import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.car.settings.core.ui.KeyValueRow
@@ -94,9 +94,10 @@ fun NetworkInternetRoute(
                     checked = wifiEnabled,
                     enabled = !state.isWorking,
                     busy = state.wifi.radioState == WifiRadioState.ENABLING || state.wifi.radioState == WifiRadioState.DISABLING,
-                    retainFocusWhenDisabled = state.isWorking ||
-                        state.wifi.radioState == WifiRadioState.ENABLING ||
-                        state.wifi.radioState == WifiRadioState.DISABLING,
+                    retainFocusWhenDisabled =
+                        state.isWorking ||
+                            state.wifi.radioState == WifiRadioState.ENABLING ||
+                            state.wifi.radioState == WifiRadioState.DISABLING,
                     leading = { Icon(Icons.Default.Wifi, contentDescription = null) },
                     onCheckedChange = viewModel::setWifiEnabled,
                     onRowClick = onWifi,
@@ -147,19 +148,18 @@ internal fun networkInternetRootFocusSpec(
     mobileNetworkEnabled: Boolean,
     wifiEnabled: Boolean,
     connectedNetworkFocusId: String?,
-) =
-    settingsLazyFocusListSpec(
-        buildList {
-            add(SettingsLazyFocusListSlot())
-            add(SettingsLazyFocusListSlot("network-hotspot", isEnabled = hotspotEnabled))
-            add(SettingsLazyFocusListSlot("network-mobile", isEnabled = mobileNetworkEnabled))
-            add(SettingsLazyFocusListSlot("network-wifi", isEnabled = wifiEnabled))
-            connectedNetworkFocusId?.let { add(SettingsLazyFocusListSlot(it)) }
-            add(SettingsLazyFocusListSlot())
-            add(SettingsLazyFocusListSlot("network-join-other"))
-            add(SettingsLazyFocusListSlot("network-wifi-preferences"))
-        },
-    )
+) = settingsLazyFocusListSpec(
+    buildList {
+        add(SettingsLazyFocusListSlot())
+        add(SettingsLazyFocusListSlot("network-hotspot", isEnabled = hotspotEnabled))
+        add(SettingsLazyFocusListSlot("network-mobile", isEnabled = mobileNetworkEnabled))
+        add(SettingsLazyFocusListSlot("network-wifi", isEnabled = wifiEnabled))
+        connectedNetworkFocusId?.let { add(SettingsLazyFocusListSlot(it)) }
+        add(SettingsLazyFocusListSlot())
+        add(SettingsLazyFocusListSlot("network-join-other"))
+        add(SettingsLazyFocusListSlot("network-wifi-preferences"))
+    },
+)
 
 internal fun Long.toDataUsageString(): String =
     when {

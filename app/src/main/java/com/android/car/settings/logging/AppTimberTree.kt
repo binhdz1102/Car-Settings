@@ -11,8 +11,10 @@ class AppTimberTree(
     private val gitCommitHash: String,
     private val isDebugBuild: Boolean = true,
 ) : Timber.Tree() {
-    override fun isLoggable(tag: String?, priority: Int): Boolean =
-        isDebugBuild || priority >= Log.INFO
+    override fun isLoggable(
+        tag: String?,
+        priority: Int,
+    ): Boolean = isDebugBuild || priority >= Log.INFO
 
     override fun log(
         priority: Int,
