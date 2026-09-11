@@ -35,8 +35,8 @@ keystore/
 *.keystore
 *.p12
 
-# Private design-system source and binaries must only be resolved from GitHub Packages
-/libs/bmaterial/
+# Private design-system and compile-stub binaries must only be resolved from GitHub Packages
+/libs/
 /third_party/bmaterial-ccp-rotary-focus/
 *.aar
 

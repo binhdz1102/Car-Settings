@@ -1,6 +1,29 @@
 pluginManagement {
     includeBuild("build-logic")
+    val bMaterialGitHubUser = providers.gradleProperty("gpr.user")
+        .orElse(providers.environmentVariable("GITHUB_ACTOR"))
+    val bMaterialGitHubKey = providers.gradleProperty("gpr.key")
+        .orElse(providers.environmentVariable("GITHUB_TOKEN"))
+
     repositories {
+        maven {
+            name = "BMaterialGitHubPackages"
+            url = uri("https://maven.pkg.github.com/binhdz1102/B-Material")
+            credentials {
+                username = bMaterialGitHubUser.orNull
+                password = bMaterialGitHubKey.orNull
+            }
+            content {
+                includeGroup("com.b231001.bmaterial")
+                includeGroup("com.b231001.bmaterial.aosp-platform-stubs")
+            }
+        }
+        mavenLocal {
+            content {
+                includeGroup("com.b231001.bmaterial")
+                includeGroup("com.b231001.bmaterial.aosp-platform-stubs")
+            }
+        }
         google {
             content {
                 includeGroupByRegex("com\\.android.*")
@@ -31,6 +54,11 @@ dependencyResolutionManagement {
                 username = bMaterialGitHubUser.orNull
                 password = bMaterialGitHubKey.orNull
             }
+            content {
+                includeGroup("com.b231001.bmaterial")
+            }
+        }
+        mavenLocal {
             content {
                 includeGroup("com.b231001.bmaterial")
             }

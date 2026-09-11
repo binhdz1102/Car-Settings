@@ -1,9 +1,8 @@
-import org.gradle.api.tasks.compile.JavaCompile
-
 plugins {
     id("settings.android.library")
     id("settings.android.navigation.compose")
     id("settings.android.hilt")
+    alias(libs.plugins.bmaterial.aosp.platform.stubs)
 }
 
 android {
@@ -18,18 +17,8 @@ dependencies {
     implementation(libs.coroutines.core)
     implementation(libs.coroutines.android)
 
-    compileOnly(fileTree(rootProject.file("libs/platform")) { include("*.jar") })
-
     testImplementation(libs.junit)
     testImplementation(libs.truth)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
-}
-
-afterEvaluate {
-    tasks.withType<JavaCompile>().configureEach {
-        val platformJars = fileTree(rootProject.file("libs/platform")) { include("*.jar") }
-        options.bootstrapClasspath = platformJars
-        classpath = platformJars + classpath
-    }
 }

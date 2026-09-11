@@ -1,9 +1,12 @@
-import org.gradle.api.tasks.compile.JavaCompile
-
 plugins {
     id("settings.android.library")
     id("settings.android.navigation.compose")
     id("settings.android.hilt")
+    alias(libs.plugins.bmaterial.aosp.platform.stubs)
+}
+
+aospPlatformStubs {
+    includeSystemServer.set(true)
 }
 
 android {
@@ -21,20 +24,9 @@ dependencies {
     implementation(libs.coroutines.android)
     implementation("com.google.zxing:core:3.5.3")
 
-    compileOnly(fileTree(rootProject.file("libs/platform")) { include("*.jar") })
-    compileOnly(fileTree(rootProject.file("libs/system-server")) { include("*.jar") })
-
     testImplementation(libs.junit)
     testImplementation(libs.truth)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.turbine)
     androidTestImplementation(libs.androidx.junit)
-}
-
-afterEvaluate {
-    tasks.withType<JavaCompile>().configureEach {
-        val platformJars = fileTree(rootProject.file("libs/platform")) { include("*.jar") }
-        options.bootstrapClasspath = platformJars
-        classpath = platformJars + classpath
-    }
 }

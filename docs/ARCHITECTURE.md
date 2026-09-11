@@ -8,8 +8,9 @@ and rotary-focus implementations are external private artifacts; `core/ui` adds 
 focus identifiers, destination policy, and small composition façades.
 
 The APK retains `com.android.car.settings`, public Android Settings actions, and compatibility
-aliases required by AAOS callers. Platform and system-server JARs under `libs/` are compile-only
-stubs. Their classes resolve from the device boot classpath and are not packaged into the APK.
+aliases required by AAOS callers. Platform and system-server APIs are provided at compile time
+via the external `com.b231001.bmaterial.aosp-platform-stubs` plugin. Their classes resolve from
+the device boot classpath at runtime and are not packaged into the APK.
 
 ## Module graph
 

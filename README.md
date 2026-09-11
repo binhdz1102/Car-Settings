@@ -18,7 +18,7 @@ and platform-signing material before it can produce an installable system APK.
 - Real vehicle-property adapters with explicit unavailable/read-only/failure states.
 - Touch, rotary, dialog-focus, Direct Manipulation, and lazy-list focus integration.
 - Automotive scrollbars with a reserved 48 dp interaction gutter.
-- Compile-only AOSP framework and system-server APIs; no platform implementation is packaged.
+- Compile-only AOSP framework and system-server APIs supplied via B-Material's platform-stubs plugin; no platform implementation is packaged.
 
 ## Demo
 
@@ -40,8 +40,6 @@ core/ui/             App composition, visual policy, and thin design-system adap
 core/vehicle/        Vehicle-property abstractions and AAOS integration
 feature/*/           Domain, data, presentation, and feature tests
 build-logic/         Android, Compose, Hilt, quality, and coverage conventions
-libs/platform/       Compile-only AOSP framework stubs
-libs/system-server/  Compile-only AOSP system-server stubs
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for dependency boundaries and runtime data flow.
@@ -56,7 +54,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for dependency boundaries and r
 
 ## Private package access
 
-The committed Gradle configuration resolves the design system only from GitHub Packages. Put
+The committed Gradle configuration resolves design-system and compile-stub dependencies from GitHub Packages. Put
 credentials in your user-level `~/.gradle/gradle.properties` file:
 
 ```properties

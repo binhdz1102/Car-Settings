@@ -11,4 +11,5 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.detekt) apply false
     alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.bmaterial.aosp.platform.stubs) apply false
 }

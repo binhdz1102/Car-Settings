@@ -4,6 +4,11 @@ plugins {
     id("settings.android.application")
     id("settings.android.navigation.compose")
     id("settings.android.hilt")
+    alias(libs.plugins.bmaterial.aosp.platform.stubs)
+}
+
+aospPlatformStubs {
+    includeSystemServer.set(true)
 }
 
 val gitCommitHash =
@@ -99,11 +104,6 @@ dependencies {
     implementation(libs.timber)
     // Hilt's generated view-model key maps reference Guava collections at runtime.
     implementation(libs.guava.android)
-
-    // The search index provider and system app integration compile against hidden
-    // framework APIs; at runtime these resolve against the platform boot classpath.
-    compileOnly(fileTree(rootProject.file("libs/platform")) { include("*.jar") })
-    compileOnly(fileTree(rootProject.file("libs/system-server")) { include("*.jar") })
 
     testImplementation(libs.junit)
     testImplementation(libs.truth)

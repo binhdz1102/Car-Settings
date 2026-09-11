@@ -170,8 +170,7 @@ fun VehicleInfoGuideDialog(
                                 scrollState = infoScrollState,
                                 style = AutomotiveDialogScrollbarStyle,
                                 gutterWidth = AutomotiveDialogScrollbarGutterWidth,
-                            )
-                            .verticalScroll(infoScrollState)
+                            ).verticalScroll(infoScrollState)
                             .padding(horizontal = 24.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {

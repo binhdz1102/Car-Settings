@@ -173,3 +173,7 @@ room = { id = "androidx.room", version.ref = "room" }
 
 # Code quality
 detekt = { id = "dev.detekt", version.ref = "detekt" }
+
+# AOSP compile stubs
+bmaterial-aosp-platform-stubs = { id = "com.b231001.bmaterial.aosp-platform-stubs", version.ref = "bmaterial" }
+
