@@ -108,6 +108,7 @@ internal fun HvacScreen(
             .map { it.capability.zone }
             .distinctBy { it.areaType to it.areaId }
             .filterNot { it.areaId == 0 }
+            .sortedBy { it.areaId }
             .map {
                 VehicleZoneOption(
                     areaId = it.areaId,

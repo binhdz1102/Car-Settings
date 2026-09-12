@@ -12,6 +12,7 @@
     <string name="vehicle_zone_global">Toàn bộ xe</string><string name="lighting_zone_selector">Vùng chiếu sáng</string>
     <string name="zone_front_left">Trước trái</string><string name="zone_front_right">Trước phải</string>
     <string name="zone_rear_left">Sau trái</string><string name="zone_rear_center">Sau giữa</string><string name="zone_rear_right">Sau phải</string>
+    <string name="zone_rear_row">Hàng ghế sau</string>
     <string name="vehicle_zone_id_format">Vùng 0x%1$X</string>
     <string-array name="vehicle_lighting_sections"><item>Đèn ngoài</item><item>Đèn an toàn</item><item>Đèn trong xe</item></string-array>
     <string-array name="vehicle_lighting_titles">

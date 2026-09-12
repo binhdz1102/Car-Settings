@@ -12,6 +12,7 @@
     <string name="vehicle_zone_global">Whole vehicle</string><string name="lighting_zone_selector">Lighting zone</string>
     <string name="zone_front_left">Front left</string><string name="zone_front_right">Front right</string>
     <string name="zone_rear_left">Rear left</string><string name="zone_rear_center">Rear center</string><string name="zone_rear_right">Rear right</string>
+    <string name="zone_rear_row">Rear row</string>
     <string name="vehicle_zone_id_format">Zone 0x%1$X</string>
     <string-array name="vehicle_lighting_sections"><item>Exterior lighting</item><item>Safety lighting</item><item>Interior lighting</item></string-array>
     <string-array name="vehicle_lighting_titles">

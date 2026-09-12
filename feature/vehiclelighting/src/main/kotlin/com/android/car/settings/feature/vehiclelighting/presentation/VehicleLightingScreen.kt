@@ -126,6 +126,11 @@ private fun lightingArtwork(id: VehicleLightingId): Int =
         VehicleLightingId.FOOTWELL_LIGHTS -> R.drawable.guide_lighting_footwell_lights
     }
 
+private const val SEAT_ROW_2_ALL =
+    VehicleAreaSeat.SEAT_ROW_2_LEFT or
+        VehicleAreaSeat.SEAT_ROW_2_CENTER or
+        VehicleAreaSeat.SEAT_ROW_2_RIGHT
+
 @Composable
 private fun lightingAreaLabel(areaId: Int): String =
     when (areaId) {
@@ -135,5 +140,6 @@ private fun lightingAreaLabel(areaId: Int): String =
         VehicleAreaSeat.SEAT_ROW_2_LEFT -> stringResource(R.string.zone_rear_left)
         VehicleAreaSeat.SEAT_ROW_2_CENTER -> stringResource(R.string.zone_rear_center)
         VehicleAreaSeat.SEAT_ROW_2_RIGHT -> stringResource(R.string.zone_rear_right)
+        SEAT_ROW_2_ALL -> stringResource(R.string.zone_rear_row)
         else -> stringResource(R.string.vehicle_zone_id_format, areaId)
     }

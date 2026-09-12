@@ -542,6 +542,62 @@ class VehicleControlModelsTest {
         }
     }
 
+    @Test
+    fun toTopViewZones_mapsHorizontalCarSeatCoordinatesCorrectly() {
+        val options =
+            listOf(
+                VehicleZoneOption(areaId = 0, label = "Global"),
+                VehicleZoneOption(areaId = 1, label = "Driver"),
+                VehicleZoneOption(areaId = 4, label = "Front passenger"),
+                VehicleZoneOption(areaId = 16, label = "Rear left"),
+                VehicleZoneOption(areaId = 32, label = "Rear center"),
+                VehicleZoneOption(areaId = 64, label = "Rear right"),
+            )
+        val zones = options.toTopViewZones()
+        assertEquals(5, zones.size)
+
+        val driver = zones.first { it.areaId == 1 }
+        assertEquals(0.47f, driver.horizontalFraction)
+        assertEquals(0.62f, driver.verticalFraction)
+        assertEquals("Dr", driver.shortLabel)
+
+        val passenger = zones.first { it.areaId == 4 }
+        assertEquals(0.47f, passenger.horizontalFraction)
+        assertEquals(0.38f, passenger.verticalFraction)
+        assertEquals("Ps", passenger.shortLabel)
+
+        val rearLeft = zones.first { it.areaId == 16 }
+        assertEquals(0.64f, rearLeft.horizontalFraction)
+        assertEquals(0.63f, rearLeft.verticalFraction)
+        assertEquals("RL", rearLeft.shortLabel)
+
+        val rearCenter = zones.first { it.areaId == 32 }
+        assertEquals(0.64f, rearCenter.horizontalFraction)
+        assertEquals(0.50f, rearCenter.verticalFraction)
+        assertEquals("RC", rearCenter.shortLabel)
+
+        val rearRight = zones.first { it.areaId == 64 }
+        assertEquals(0.64f, rearRight.horizontalFraction)
+        assertEquals(0.37f, rearRight.verticalFraction)
+        assertEquals("RR", rearRight.shortLabel)
+    }
+
+    @Test
+    fun toTopViewZones_usesSeatAbbreviationsForSeatControlAndLightingLabels() {
+        val options =
+            listOf(
+                VehicleZoneOption(areaId = 1, label = "Front left"),
+                VehicleZoneOption(areaId = 4, label = "Front right"),
+                VehicleZoneOption(areaId = 16, label = "Rear left"),
+                VehicleZoneOption(areaId = 32, label = "Rear center"),
+                VehicleZoneOption(areaId = 64, label = "Rear right"),
+                VehicleZoneOption(areaId = 0x70, label = "Rear row"),
+            )
+        val zones = options.toTopViewZones()
+        val labels = zones.map { it.shortLabel }
+        assertEquals(listOf("FL", "FR", "RL", "RC", "RR", "R2"), labels)
+    }
+
     private fun minimalControl(
         key: String,
         categoryKey: String,

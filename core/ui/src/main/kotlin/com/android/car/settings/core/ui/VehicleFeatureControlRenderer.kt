@@ -669,18 +669,117 @@ internal fun vehicleControlStateDescription(
         }
     }
 
+// Android Automotive VehicleAreaSeat bitmask constants
+private const val SEAT_ROW_1_LEFT = 0x0001
+private const val SEAT_ROW_1_CENTER = 0x0002
+private const val SEAT_ROW_1_RIGHT = 0x0004
+private const val SEAT_ROW_2_LEFT = 0x0010
+private const val SEAT_ROW_2_CENTER = 0x0020
+private const val SEAT_ROW_2_RIGHT = 0x0040
+private const val SEAT_ROW_3_LEFT = 0x0100
+private const val SEAT_ROW_3_CENTER = 0x0200
+private const val SEAT_ROW_3_RIGHT = 0x0400
+
+private const val SEAT_ROW_1_ALL = SEAT_ROW_1_LEFT or SEAT_ROW_1_RIGHT
+private const val SEAT_ROW_1_ALL_THREE = SEAT_ROW_1_LEFT or SEAT_ROW_1_CENTER or SEAT_ROW_1_RIGHT
+private const val SEAT_ROW_2_ALL = SEAT_ROW_2_LEFT or SEAT_ROW_2_CENTER or SEAT_ROW_2_RIGHT
+private const val SEAT_ROW_2_DUAL = SEAT_ROW_2_LEFT or SEAT_ROW_2_RIGHT
+
+internal fun vehicleZoneCoordinates(
+    areaId: Int,
+    label: String,
+    fallbackIndex: Int = 0,
+): Pair<Float, Float> =
+    when (areaId) {
+        SEAT_ROW_1_LEFT -> 0.47f to 0.62f
+        SEAT_ROW_1_RIGHT -> 0.47f to 0.38f
+        SEAT_ROW_1_CENTER -> 0.47f to 0.50f
+        SEAT_ROW_2_LEFT -> 0.64f to 0.63f
+        SEAT_ROW_2_CENTER -> 0.64f to 0.50f
+        SEAT_ROW_2_RIGHT -> 0.64f to 0.37f
+        SEAT_ROW_3_LEFT -> 0.76f to 0.63f
+        SEAT_ROW_3_CENTER -> 0.76f to 0.50f
+        SEAT_ROW_3_RIGHT -> 0.76f to 0.37f
+        SEAT_ROW_2_ALL, SEAT_ROW_2_DUAL -> 0.55f to 0.50f
+        SEAT_ROW_1_ALL, SEAT_ROW_1_ALL_THREE -> 0.47f to 0.50f
+        else -> {
+            val lower = label.lowercase()
+            when {
+                lower.contains("driver") ||
+                    lower.contains("tài xế") ||
+                    lower.contains("front left") ||
+                    lower.contains("trước trái") -> 0.47f to 0.62f
+                lower.contains("passenger") ||
+                    lower.contains("hành khách") ||
+                    lower.contains("front right") ||
+                    lower.contains("trước phải") -> 0.47f to 0.38f
+                lower.contains("front center") || lower.contains("trước giữa") -> 0.47f to 0.50f
+                lower.contains("rear left") || lower.contains("sau trái") -> 0.64f to 0.63f
+                lower.contains("rear center") || lower.contains("sau giữa") -> 0.64f to 0.50f
+                lower.contains("rear right") || lower.contains("sau phải") -> 0.64f to 0.37f
+                lower.contains("rear row") || lower.contains("hàng ghế sau") -> 0.55f to 0.50f
+                lower.contains("third row left") || lower.contains("hàng ba trái") -> 0.76f to 0.63f
+                lower.contains("third row right") || lower.contains("hàng ba phải") -> 0.76f to 0.37f
+                lower.contains("third row center") || lower.contains("hàng ba giữa") -> 0.76f to 0.50f
+                else -> (0.47f + (fallbackIndex * 0.12f)).coerceAtMost(0.80f) to 0.50f
+            }
+        }
+    }
+
+internal fun vehicleZoneShortLabel(
+    areaId: Int,
+    label: String,
+): String =
+    when (areaId) {
+        SEAT_ROW_1_LEFT ->
+            if (label.startsWith("Driver", ignoreCase = true) || label.contains("tài xế", ignoreCase = true)) {
+                "Dr"
+            } else {
+                "FL"
+            }
+        SEAT_ROW_1_RIGHT ->
+            if (label.contains("passenger", ignoreCase = true) || label.contains("hành khách", ignoreCase = true)) {
+                "Ps"
+            } else {
+                "FR"
+            }
+        SEAT_ROW_1_CENTER -> "FC"
+        SEAT_ROW_2_LEFT -> "RL"
+        SEAT_ROW_2_CENTER -> "RC"
+        SEAT_ROW_2_RIGHT -> "RR"
+        SEAT_ROW_3_LEFT -> "3L"
+        SEAT_ROW_3_CENTER -> "3C"
+        SEAT_ROW_3_RIGHT -> "3R"
+        SEAT_ROW_2_ALL, SEAT_ROW_2_DUAL -> "R2"
+        SEAT_ROW_1_ALL, SEAT_ROW_1_ALL_THREE -> "R1"
+        else -> {
+            val lower = label.lowercase()
+            when {
+                lower.contains("driver") || lower.contains("tài xế") -> "Dr"
+                lower.contains("passenger") || lower.contains("hành khách") -> "Ps"
+                lower.contains("front left") || lower.contains("trước trái") -> "FL"
+                lower.contains("front right") || lower.contains("trước phải") -> "FR"
+                lower.contains("front center") || lower.contains("trước giữa") -> "FC"
+                lower.contains("rear left") || lower.contains("sau trái") -> "RL"
+                lower.contains("rear center") || lower.contains("sau giữa") -> "RC"
+                lower.contains("rear right") || lower.contains("sau phải") -> "RR"
+                lower.contains("rear row") || lower.contains("hàng ghế sau") -> "R2"
+                else -> label.filter { it.isLetterOrDigit() }.take(2).uppercase()
+            }
+        }
+    }
+
 internal fun List<VehicleZoneOption>.toTopViewZones(): List<VehicleTopViewZone> {
     val nonGlobal = filter { it.areaId != 0 }
     return nonGlobal.mapIndexed { index, zone ->
-        val row = index / 2
-        val left = index % 2 == 0
+        val (hFraction, vFraction) = vehicleZoneCoordinates(zone.areaId, zone.label, index)
         VehicleTopViewZone(
             areaId = zone.areaId,
             label = zone.label,
-            shortLabel = zone.label.take(2),
+            shortLabel = vehicleZoneShortLabel(zone.areaId, zone.label),
             contentDescription = zone.contentDescription,
-            horizontalFraction = if (left) 0.42f else 0.58f,
-            verticalFraction = (0.37f + row * 0.15f).coerceAtMost(0.76f),
+            horizontalFraction = hFraction,
+            verticalFraction = vFraction,
             enabled = zone.enabled,
         )
     }
