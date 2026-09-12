@@ -22,6 +22,8 @@ import androidx.compose.material.icons.outlined.DisplaySettings
 import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PrivacyTip
 import androidx.compose.material.icons.outlined.RecordVoiceOver
 import androidx.compose.material.icons.outlined.VolumeUp
 import androidx.compose.material.icons.outlined.Wifi
@@ -561,9 +563,9 @@ private fun categoryIcon(id: SettingsCategoryId) =
         SettingsCategoryId.NOTIFICATIONS -> Icons.Outlined.Notifications
         SettingsCategoryId.SOUND -> Icons.Outlined.VolumeUp
         SettingsCategoryId.DISPLAY -> Icons.Outlined.DisplaySettings
-        SettingsCategoryId.PROFILE -> Icons.Outlined.Lock
+        SettingsCategoryId.PROFILE -> Icons.Outlined.Person
         SettingsCategoryId.LOCATION -> Icons.Outlined.LocationOn
-        SettingsCategoryId.PRIVACY -> Icons.Outlined.Lock
+        SettingsCategoryId.PRIVACY -> Icons.Outlined.PrivacyTip
         SettingsCategoryId.ACCESSIBILITY -> Icons.Outlined.AccessibilityNew
         SettingsCategoryId.SECURITY -> Icons.Outlined.Lock
         SettingsCategoryId.APPS -> Icons.Outlined.Apps

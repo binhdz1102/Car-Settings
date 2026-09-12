@@ -35,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -299,16 +300,27 @@ fun SettingsCardSurface(
     enabled: Boolean = true,
     content: @Composable () -> Unit,
 ) {
+    val borderColor =
+        if (enabled) {
+            settingsOutlineColor()
+        } else {
+            settingsOutlineColor().copy(alpha = 0.35f)
+        }
+    val cardColor =
+        when {
+            !enabled -> settingsBackgroundColor().copy(alpha = 0.7f)
+            selected -> settingsSelectedColor()
+            else -> settingsSurfaceColor()
+        }
     Surface(
         modifier = modifier,
         shape = SettingsTokens.CardShape,
-        color =
-            when {
-                !enabled -> settingsSurfaceColor().copy(alpha = 0.55f)
-                selected -> settingsSelectedColor()
-                else -> settingsSurfaceColor()
-            },
+        color = cardColor,
         contentColor = MaterialTheme.colorScheme.onSurface,
-        border = BorderStroke(1.dp, settingsOutlineColor()),
-    ) { content() }
+        border = BorderStroke(1.dp, borderColor),
+    ) {
+        Box(modifier = if (!enabled) Modifier.alpha(0.38f) else Modifier) {
+            content()
+        }
+    }
 }

@@ -2,10 +2,12 @@ package com.android.car.settings.feature.sound.presentation
 
 import android.content.Intent
 import android.provider.Settings
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -17,9 +19,13 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.VolumeUp
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -31,9 +37,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.car.settings.core.ui.AutomotiveOutlinedButton
 import com.android.car.settings.core.ui.SettingsActionRow
 import com.android.car.settings.core.ui.SettingsAppBarAction
-import com.android.car.settings.core.ui.SettingsFormButton
 import com.android.car.settings.core.ui.SettingsFormSlider
 import com.android.car.settings.core.ui.SettingsLazyFocusListSlot
 import com.android.car.settings.core.ui.SettingsLeadingIcon
@@ -292,6 +298,11 @@ fun RingtonePickerRoute(
             viewModel.clearMessage()
         }
     }
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.previewRingtone(null)
+        }
+    }
 
     val selected =
         state.sound.ringtones
@@ -330,22 +341,41 @@ private fun RingtoneOptionRow(
     onPreview: (String?) -> Unit,
     onSelect: (String?) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        SettingsActionRow(
-            title = option.title,
-            summary = if (selected) "Current" else null,
-            focusId = "ringtone-select-${option.uri ?: "silent"}",
-            onClick = { onSelect(option.uri) },
-        )
-        option.uri?.let { uri ->
-            SettingsFormButton(
-                focusId = "ringtone-preview-$uri",
-                label = "Preview",
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
-                onClick = { onPreview(uri) },
+    SettingsActionRow(
+        title = option.title,
+        focusId = "ringtone-select-${option.uri ?: "silent"}",
+        leading = {
+            RadioButton(
+                selected = selected,
+                onClick = {
+                    onSelect(option.uri)
+                    onPreview(option.uri)
+                },
             )
-        }
-    }
+        },
+        trailing = {
+            if (option.uri != null) {
+                AutomotiveOutlinedButton(
+                    onClick = { onPreview(option.uri) },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VolumeUp,
+                        contentDescription = "Preview ${option.title}",
+                        modifier = Modifier.size(24.dp),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "Preview",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+            }
+        },
+        onClick = {
+            onSelect(option.uri)
+            onPreview(option.uri)
+        },
+    )
 }
 
 private fun RingtoneKind.title(): String =

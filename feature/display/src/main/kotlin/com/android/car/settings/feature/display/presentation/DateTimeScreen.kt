@@ -148,25 +148,43 @@ private fun DateTimeScreen(
             }
             item { SettingsSection("Manual settings") {} }
             item {
+                val dateFormatted = DateFormat.getLongDateFormat(context).format(dateTime.currentEpochMillis)
                 SettingsActionRow(
                     title = "Set date",
-                    summary = DateFormat.getLongDateFormat(context).format(dateTime.currentEpochMillis),
+                    summary =
+                        if (dateTime.autoTimeEnabled) {
+                            "Set automatically ($dateFormatted)"
+                        } else {
+                            dateFormatted
+                        },
                     enabled = dateTime.canSetManualTime && !state.isWorking,
                     onClick = { showDatePicker = true },
                 )
             }
             item {
+                val timeFormatted = DateFormat.getTimeFormat(context).format(dateTime.currentEpochMillis)
                 SettingsActionRow(
                     title = "Set time",
-                    summary = DateFormat.getTimeFormat(context).format(dateTime.currentEpochMillis),
+                    summary =
+                        if (dateTime.autoTimeEnabled) {
+                            "Set automatically ($timeFormatted)"
+                        } else {
+                            timeFormatted
+                        },
                     enabled = dateTime.canSetManualTime && !state.isWorking,
                     onClick = { showTimePicker = true },
                 )
             }
             item {
+                val zoneFormatted = timeZoneSummary(dateTime.timeZoneId)
                 SettingsActionRow(
                     title = "Time zone",
-                    summary = timeZoneSummary(dateTime.timeZoneId),
+                    summary =
+                        if (dateTime.autoTimeZoneEnabled) {
+                            "Set automatically ($zoneFormatted)"
+                        } else {
+                            zoneFormatted
+                        },
                     enabled = dateTime.canSetManualTimeZone && !state.isWorking,
                     onClick = onTimeZone,
                 )

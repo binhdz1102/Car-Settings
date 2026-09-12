@@ -140,7 +140,6 @@ private fun WifiScreen(
     SettingsScaffold(
         title = "Wi‑Fi",
         destinationKey = "wifi",
-        isRoot = true,
         onBack = onBack,
         actions = {
             SettingsAppBarAction(
