@@ -25,6 +25,7 @@ import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehiclePreviewAnchor
 import com.android.car.settings.core.ui.VehicleVisualPolicy
+import com.android.car.settings.core.ui.drawAmbientBeacon
 import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.vehiclelighting.R
 
@@ -94,20 +95,15 @@ internal fun VehicleLightingVisualization(
                 val interior =
                     listOf("CABIN", "READING", "FOOTWELL", "DOME", "AMBIENT").any(selectedFamilyKey::contains)
                 if (exterior) {
-                    drawLight(VehiclePreviewAnchor(.18f, .50f).offsetIn(size), glow, activeColor)
-                    drawLight(VehiclePreviewAnchor(.47f, .49f).offsetIn(size), glow, activeColor)
+                    drawLight(VehiclePreviewAnchor(.09f, .49f).offsetIn(size), glow, activeColor)
+                    drawLight(VehiclePreviewAnchor(.42f, .52f).offsetIn(size), glow, activeColor)
                 }
                 if (interior || !exterior) {
-                    val cabin = VehiclePreviewAnchor(.59f, .31f).offsetIn(size)
-                    drawCircle(
-                        color = activeColor.copy(alpha = glow * .2f),
-                        radius = size.minDimension * .18f,
-                        center = cabin,
-                    )
-                    drawCircle(
-                        color = activeColor.copy(alpha = glow),
-                        radius = size.minDimension * .025f,
-                        center = cabin,
+                    drawAmbientBeacon(
+                        center = VehiclePreviewAnchor(.58f, .34f).offsetIn(size),
+                        radius = size.minDimension * .035f,
+                        color = activeColor,
+                        pulse = glow,
                     )
                 }
             }
@@ -137,7 +133,10 @@ private fun DrawScope.drawLight(
     glow: Float,
     color: Color,
 ) {
-    drawCircle(color = color.copy(alpha = glow * .18f), radius = size.minDimension * .20f, center = center)
-    drawCircle(color = color.copy(alpha = glow * .42f), radius = size.minDimension * .10f, center = center)
-    drawCircle(color = color.copy(alpha = glow), radius = size.minDimension * .035f, center = center)
+    drawAmbientBeacon(
+        center = center,
+        radius = size.minDimension * .030f,
+        color = color,
+        pulse = glow,
+    )
 }

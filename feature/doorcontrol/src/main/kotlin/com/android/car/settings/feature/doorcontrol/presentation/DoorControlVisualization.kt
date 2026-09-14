@@ -15,11 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.rotate
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -29,6 +26,9 @@ import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehiclePreviewAnchor
 import com.android.car.settings.core.ui.VehicleVisualPolicy
+import com.android.car.settings.core.ui.drawAmbientBeacon
+import com.android.car.settings.core.ui.drawAngleArcGauge
+import com.android.car.settings.core.ui.drawDoorSeamGlow
 import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.doorcontrol.R
 
@@ -83,41 +83,76 @@ internal fun DoorControlVisualization(
                 modifier = Modifier.fillMaxSize(),
             )
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val stroke = Stroke(width = size.minDimension * .017f)
-                val hinge = VehiclePreviewAnchor(.62f, .36f).offsetIn(size)
-                val doorTopLeft = VehiclePreviewAnchor(.42f, .29f).offsetIn(size)
-                val doorSize = Size(size.width * .205f, size.height * .37f)
-                rotate(degrees = doorOpen * 18f, pivot = hinge) {
-                    drawRoundRect(
-                        color = accent.copy(alpha = .88f),
-                        topLeft = doorTopLeft,
-                        size = doorSize,
-                        cornerRadius = CornerRadius(size.minDimension * .025f),
-                        style = stroke,
+                val isRearArea = (areaId and 0x00000050) != 0
+                val isTailgate = (areaId and 0x00100000) != 0
+
+                // 1. Door Ajar / Seam Glow: Traces the authentic trailing latch shut-line
+                if (doorOpen > 0.01f) {
+                    val seamPath =
+                        Path().apply {
+                            if (isTailgate) {
+                                moveTo(size.width * .065f, size.height * .320f)
+                                lineTo(size.width * .075f, size.height * .520f)
+                            } else if (isRearArea) {
+                                moveTo(size.width * .170f, size.height * .230f)
+                                lineTo(size.width * .165f, size.height * .680f)
+                            } else {
+                                // Front door B-pillar latch shut-line
+                                moveTo(size.width * .354f, size.height * .205f)
+                                lineTo(size.width * .358f, size.height * .690f)
+                            }
+                        }
+                    drawDoorSeamGlow(
+                        seamPath = seamPath,
+                        color = accent,
+                        openRatio = doorOpen,
                     )
-                }
 
-                val windowY = size.height * (.28f + windowOpen * .11f)
-                drawLine(
-                    color = accent.copy(alpha = .9f),
-                    start = Offset(size.width * .44f, windowY),
-                    end = Offset(size.width * .59f, windowY),
-                    strokeWidth = stroke.width,
-                )
-
-                val mirror = VehiclePreviewAnchor(.72f, .36f).offsetIn(size)
-                rotate(degrees = mirrorAngle * .22f, pivot = mirror) {
+                    // Ambient ground puddle / entry wash illumination under the open door
+                    val puddleCenter =
+                        if (isRearArea) {
+                            Offset(size.width * .260f, size.height * .715f)
+                        } else {
+                            Offset(size.width * .470f, size.height * .720f)
+                        }
                     drawCircle(
-                        color = accent.copy(alpha = .9f),
-                        radius = size.minDimension * .045f,
-                        center = mirror,
-                        style = stroke,
+                        color = accent.copy(alpha = 0.20f * doorOpen),
+                        radius = size.minDimension * 0.065f,
+                        center = puddleCenter,
                     )
                 }
-                drawCircle(
+
+                // 2. Side Mirror Fold Indicator at actual mirror position
+                val mirror = VehiclePreviewAnchor(.495f, .379f).offsetIn(size)
+                if (motion.mirrorFolded) {
+                    drawAngleArcGauge(
+                        center = mirror,
+                        radius = size.minDimension * .035f,
+                        startAngle = 180f,
+                        sweepAngle = mirrorAngle,
+                        currentProgress = 1f,
+                        color = accent,
+                    )
+                } else {
+                    drawAmbientBeacon(
+                        center = mirror,
+                        radius = size.minDimension * .012f,
+                        color = accent.copy(alpha = .7f),
+                    )
+                }
+
+                // 3. Door Handle Lock Beacon placed precisely on the selected door's handle
+                val handleAnchor =
+                    when {
+                        isTailgate -> VehiclePreviewAnchor(.085f, .480f)
+                        isRearArea -> VehiclePreviewAnchor(.197f, .413f)
+                        else -> VehiclePreviewAnchor(.394f, .445f)
+                    }
+                drawAmbientBeacon(
+                    center = handleAnchor.offsetIn(size),
+                    radius = size.minDimension * .015f,
                     color = lockColor,
-                    radius = size.minDimension * .027f,
-                    center = VehiclePreviewAnchor(.48f, .43f).offsetIn(size),
+                    pulse = if (motion.locked) .75f else 1f,
                 )
             }
         }

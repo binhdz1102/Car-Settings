@@ -12,6 +12,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -24,6 +26,8 @@ import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehiclePreviewAnchor
 import com.android.car.settings.core.ui.VehicleVisualPolicy
+import com.android.car.settings.core.ui.drawAirflowStreamline
+import com.android.car.settings.core.ui.drawAmbientBeacon
 import com.android.car.settings.core.ui.normalizedVehiclePreviewValue
 import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.hvac.R
@@ -47,10 +51,10 @@ internal fun HvacVisualization(
             observed?.range ?: (0f..1f),
         )
     val enabledTarget =
-        if (snapshot?.status == VehicleObservationStatus.CONFIRMED && snapshot.booleanValue != false) {
-            1f
+        if (snapshot?.status == VehicleObservationStatus.CONFIRMED) {
+            if (snapshot.booleanValue != false) 1f else .25f
         } else {
-            .18f
+            .65f
         }
     val intensity by
         animateFloatAsState(
@@ -92,58 +96,131 @@ internal fun HvacVisualization(
                 modifier = Modifier.fillMaxSize(),
             )
             Canvas(Modifier.fillMaxSize()) {
-                val stroke = Stroke(size.minDimension * .016f, cap = StrokeCap.Round)
-                val vents =
-                    listOf(
-                        VehiclePreviewAnchor(.19f, .42f),
-                        VehiclePreviewAnchor(.38f, .37f),
-                        VehiclePreviewAnchor(.82f, .35f),
-                    )
                 when {
                     "DEFROST" in key -> {
-                        val center = VehiclePreviewAnchor(.39f, .24f).offsetIn(size)
+                        val stroke = Stroke(size.minDimension * .010f, cap = StrokeCap.Round)
+                        val center = VehiclePreviewAnchor(.37f, .22f).offsetIn(size)
                         drawArc(
-                            color = accent.copy(alpha = intensity),
-                            startAngle = 205f,
-                            sweepAngle = 130f,
+                            color = accent.copy(alpha = intensity * .75f),
+                            startAngle = 195f,
+                            sweepAngle = 145f,
                             useCenter = false,
                             topLeft =
-                                center -
-                                    androidx.compose.ui.geometry
-                                        .Offset(size.width * .15f, size.height * .12f),
-                            size =
-                                androidx.compose.ui.geometry
-                                    .Size(size.width * .30f, size.height * .24f),
+                                Offset(
+                                    center.x - size.width * .16f,
+                                    center.y - size.height * .10f,
+                                ),
+                            size = Size(size.width * .32f, size.height * .20f),
                             style = stroke,
+                        )
+                        drawAmbientBeacon(
+                            center = center,
+                            radius = size.minDimension * .014f,
+                            color = accent,
+                            pulse = intensity,
                         )
                     }
                     "RECIRCULATION" in key -> {
-                        drawCircle(
-                            color = accent.copy(alpha = intensity),
-                            radius = size.minDimension * .15f,
-                            center = VehiclePreviewAnchor(.60f, .51f).offsetIn(size),
-                            style = stroke,
+                        val cabin = VehiclePreviewAnchor(.58f, .48f).offsetIn(size)
+                        drawArc(
+                            color = accent.copy(alpha = intensity * .65f),
+                            startAngle = 30f,
+                            sweepAngle = 280f,
+                            useCenter = false,
+                            topLeft = Offset(cabin.x - size.minDimension * .12f, cabin.y - size.minDimension * .12f),
+                            size = Size(size.minDimension * .24f, size.minDimension * .24f),
+                            style = Stroke(size.minDimension * .010f, cap = StrokeCap.Round),
+                        )
+                        drawAmbientBeacon(
+                            center = cabin,
+                            radius = size.minDimension * .014f,
+                            color = accent,
+                            pulse = intensity,
                         )
                     }
                     "TEMPERATURE" in key || "HEAT" in key -> {
-                        val cabin = VehiclePreviewAnchor(.62f, .53f).offsetIn(size)
-                        drawCircle(accent.copy(alpha = intensity * .20f), size.minDimension * .22f, cabin)
-                        drawCircle(accent.copy(alpha = intensity), size.minDimension * .028f, cabin)
+                        val cabin = VehiclePreviewAnchor(.58f, .48f).offsetIn(size)
+                        drawCircle(accent.copy(alpha = intensity * .15f), size.minDimension * .22f, cabin)
+                        drawAmbientBeacon(
+                            center = cabin,
+                            radius = size.minDimension * .018f,
+                            color = accent,
+                            pulse = intensity,
+                        )
                     }
-                    else ->
-                        vents.forEach { anchor ->
-                            val center = anchor.offsetIn(size)
-                            drawCircle(accent.copy(alpha = intensity), size.minDimension * .035f, center, style = stroke)
-                            drawLine(
-                                accent.copy(alpha = intensity * .85f),
-                                center,
-                                center +
-                                    androidx.compose.ui.geometry
-                                        .Offset(size.width * (.05f + intensity * .035f), 0f),
-                                stroke.width,
-                                cap = StrokeCap.Round,
-                            )
-                        }
+                    else -> {
+                        // 1. Driver Dashboard Vent Streamline
+                        val driverVent = VehiclePreviewAnchor(.228f, .362f).offsetIn(size)
+                        drawAmbientBeacon(
+                            center = driverVent,
+                            radius = size.minDimension * .011f,
+                            color = accent,
+                            pulse = intensity,
+                        )
+                        drawAirflowStreamline(
+                            start = driverVent,
+                            control1 = Offset(driverVent.x + size.width * .06f, driverVent.y + size.height * .08f),
+                            control2 = Offset(driverVent.x + size.width * .12f, driverVent.y + size.height * .16f),
+                            end = Offset(driverVent.x + size.width * .16f, driverVent.y + size.height * .22f),
+                            color = accent,
+                            intensity = intensity,
+                            strokeWidth = size.minDimension * .008f,
+                        )
+
+                        // 2. Center Console Vent Streamlines
+                        val centerVent = VehiclePreviewAnchor(.369f, .280f).offsetIn(size)
+                        drawAmbientBeacon(
+                            center = centerVent,
+                            radius = size.minDimension * .011f,
+                            color = accent,
+                            pulse = intensity,
+                        )
+                        drawAirflowStreamline(
+                            start = centerVent,
+                            control1 = Offset(centerVent.x + size.width * .05f, centerVent.y + size.height * .06f),
+                            control2 = Offset(centerVent.x + size.width * .09f, centerVent.y + size.height * .12f),
+                            end = Offset(centerVent.x + size.width * .12f, centerVent.y + size.height * .16f),
+                            color = accent,
+                            intensity = intensity,
+                            strokeWidth = size.minDimension * .008f,
+                        )
+
+                        // 3. Passenger Vent Streamline
+                        val passVent = VehiclePreviewAnchor(.439f, .162f).offsetIn(size)
+                        drawAmbientBeacon(
+                            center = passVent,
+                            radius = size.minDimension * .011f,
+                            color = accent,
+                            pulse = intensity,
+                        )
+                        drawAirflowStreamline(
+                            start = passVent,
+                            control1 = Offset(passVent.x + size.width * .04f, passVent.y + size.height * .06f),
+                            control2 = Offset(passVent.x + size.width * .07f, passVent.y + size.height * .12f),
+                            end = Offset(passVent.x + size.width * .10f, passVent.y + size.height * .18f),
+                            color = accent,
+                            intensity = intensity,
+                            strokeWidth = size.minDimension * .008f,
+                        )
+
+                        // 4. Rear Console Vent Streamline
+                        val rearVent = VehiclePreviewAnchor(.516f, .492f).offsetIn(size)
+                        drawAmbientBeacon(
+                            center = rearVent,
+                            radius = size.minDimension * .011f,
+                            color = accent,
+                            pulse = intensity,
+                        )
+                        drawAirflowStreamline(
+                            start = rearVent,
+                            control1 = Offset(rearVent.x + size.width * .05f, rearVent.y + size.height * .04f),
+                            control2 = Offset(rearVent.x + size.width * .10f, rearVent.y + size.height * .08f),
+                            end = Offset(rearVent.x + size.width * .14f, rearVent.y + size.height * .12f),
+                            color = accent,
+                            intensity = intensity,
+                            strokeWidth = size.minDimension * .008f,
+                        )
+                    }
                 }
             }
         }

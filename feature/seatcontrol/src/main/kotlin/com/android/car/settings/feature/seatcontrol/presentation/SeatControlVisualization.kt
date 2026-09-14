@@ -14,9 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -27,6 +25,9 @@ import com.android.car.settings.core.ui.VehicleIllustrationImage
 import com.android.car.settings.core.ui.VehicleObservationStatus
 import com.android.car.settings.core.ui.VehiclePreviewAnchor
 import com.android.car.settings.core.ui.VehicleVisualPolicy
+import com.android.car.settings.core.ui.drawAmbientBeacon
+import com.android.car.settings.core.ui.drawAngleArcGauge
+import com.android.car.settings.core.ui.drawTechnicalTrackRuler
 import com.android.car.settings.core.ui.offsetIn
 import com.android.car.settings.feature.seatcontrol.R
 
@@ -77,45 +78,81 @@ internal fun SeatControlVisualization(
                 modifier = Modifier.fillMaxSize(),
             )
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val stroke = Stroke(width = size.minDimension * .018f)
-                val seatShift = (foreAft - .5f) * size.width * .08f
-                val seatLift = (.5f - height) * size.height * .08f
-                val seat = VehiclePreviewAnchor(.70f, .57f).offsetIn(size) + Offset(seatShift, seatLift)
+                val stroke = Stroke(width = size.minDimension * .012f)
+                val seatShift = (foreAft - .5f) * size.width * .06f
+                val seatLift = (.5f - height) * size.height * .06f
+                val seatHinge = VehiclePreviewAnchor(.675f, .730f).offsetIn(size) + Offset(seatShift, seatLift)
                 val head =
-                    VehiclePreviewAnchor(.71f, .17f).offsetIn(size) +
-                        Offset(seatShift, (.5f - headrestHeight) * size.height * .10f)
-                val steering = VehiclePreviewAnchor(.34f, .38f).offsetIn(size)
-                val railStart = VehiclePreviewAnchor(.48f, .88f).offsetIn(size)
-                val railEnd = VehiclePreviewAnchor(.78f, .88f).offsetIn(size)
+                    VehiclePreviewAnchor(.690f, .130f).offsetIn(size) +
+                        Offset(seatShift, (.5f - headrestHeight) * size.height * .08f)
+                val steering = VehiclePreviewAnchor(.310f, .370f).offsetIn(size)
+                val railStart = VehiclePreviewAnchor(.440f, .870f).offsetIn(size)
+                val railEnd = VehiclePreviewAnchor(.680f, .845f).offsetIn(size)
 
-                drawLine(accent.copy(alpha = .38f), railStart, railEnd, stroke.width)
-                drawCircle(accent.copy(alpha = .9f), size.minDimension * .022f, seat)
+                // 1. Mechanical Seat Track Ruler along slider rail
+                drawTechnicalTrackRuler(
+                    start = railStart,
+                    end = railEnd,
+                    normalizedPosition = foreAft,
+                    color = accent,
+                    intensity = if ("FORE_AFT" in selectedKey || selectedKey.isBlank()) 1f else .45f,
+                )
 
+                // 2. Feature-specific telemetry overlay
                 when {
-                    "HEADREST" in selectedKey ->
-                        drawCircle(accent.copy(alpha = .9f), size.minDimension * (.07f + headrestAngle * .025f), head, style = stroke)
-                    "STEERING" in selectedKey ->
-                        drawCircle(accent.copy(alpha = .9f), size.minDimension * .095f, steering, style = stroke)
-                    "BACKREST" in selectedKey || "LUMBAR" in selectedKey -> {
-                        val width = size.width * (.13f + lumbar * .025f)
-                        val topLeft = Offset(seat.x - width * .42f, seat.y - size.height * (.29f + backrest * .03f))
-                        drawRoundRect(
-                            accent.copy(alpha = .88f),
-                            topLeft,
-                            Size(width, size.height * .28f),
-                            CornerRadius(size.minDimension * .035f),
+                    "HEADREST" in selectedKey -> {
+                        drawAmbientBeacon(
+                            center = head,
+                            radius = size.minDimension * (.014f + headrestAngle * .006f),
+                            color = accent,
+                        )
+                        drawAngleArcGauge(
+                            center = head,
+                            radius = size.minDimension * .045f,
+                            startAngle = 260f,
+                            sweepAngle = 40f,
+                            currentProgress = headrestAngle,
+                            color = accent,
+                        )
+                    }
+                    "STEERING" in selectedKey -> {
+                        drawCircle(
+                            color = accent.copy(alpha = .30f),
+                            radius = size.minDimension * .095f,
+                            center = steering,
                             style = stroke,
+                        )
+                        drawAmbientBeacon(
+                            center = steering,
+                            radius = size.minDimension * .012f,
+                            color = accent,
+                        )
+                    }
+                    "BACKREST" in selectedKey -> {
+                        drawAngleArcGauge(
+                            center = seatHinge,
+                            radius = size.minDimension * .075f,
+                            startAngle = 235f,
+                            sweepAngle = 45f,
+                            currentProgress = backrest,
+                            color = accent,
+                        )
+                    }
+                    "LUMBAR" in selectedKey -> {
+                        val lumbarCenter = VehiclePreviewAnchor(.615f, .540f).offsetIn(size) + Offset(seatShift, seatLift)
+                        drawAmbientBeacon(
+                            center = lumbarCenter,
+                            radius = size.minDimension * (.012f + lumbar * .010f),
+                            color = accent,
                         )
                     }
                     else -> {
-                        val width = size.width * (.18f + depth * .04f)
-                        val topLeft = Offset(seat.x - width * .5f, seat.y - size.height * .02f)
-                        drawRoundRect(
-                            accent.copy(alpha = .88f),
-                            topLeft,
-                            Size(width, size.height * (.12f + tilt * .018f)),
-                            CornerRadius(size.minDimension * .035f),
-                            style = stroke,
+                        // Cushion adjustment / Height / Tilt
+                        drawAmbientBeacon(
+                            center = seatHinge,
+                            radius = size.minDimension * .014f,
+                            color = accent,
+                            pulse = .75f,
                         )
                     }
                 }
